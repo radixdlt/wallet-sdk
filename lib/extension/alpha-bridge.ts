@@ -1,0 +1,72 @@
+import { createSdkError } from '../errors'
+import { EventType, IncomingMessage, OutgoingMessage } from '../messages'
+
+export const alphaBridge = {
+  transformIncomingMessage: (message: any): IncomingMessage => {
+    if (!message?.action?.type) return message
+
+    switch (message.action.type) {
+      case 'getAccountAddressSuccess':
+        return {
+          method: 'request',
+          requestId: message.action.id,
+          payload: [
+            {
+              requestType: 'accountAddress',
+              addresses: [message.action.payload],
+            },
+          ],
+        }
+      case 'getAccountAddressFailure':
+        return createSdkError('missingAddress', message.action.id)
+
+      case 'signTransactionSuccess':
+        return {
+          method: 'sendTransaction',
+          requestId: message.action.id,
+          payload: message.action.payload.transactionHash,
+        }
+
+      case 'signTransactionFailure':
+        return createSdkError('submitTransaction', message.action.id)
+
+      default:
+        throw new Error('unhandled incoming message')
+    }
+  },
+  transformOutgoingMessage: (value: {
+    event: EventType
+    message: OutgoingMessage
+  }) => {
+    switch (value.message.method) {
+      case 'request':
+        return {
+          event: value.event,
+          payload: {
+            action: {
+              type: 'getAccountAddress',
+              payload: '',
+              id: value.message.requestId,
+            },
+            target: 0,
+          },
+        }
+
+      case 'sendTransaction':
+        return {
+          event: value.event,
+          payload: {
+            action: {
+              type: 'signTransaction',
+              payload: value.message.payload,
+              id: value.message.requestId,
+            },
+            target: 0,
+          },
+        }
+
+      default:
+        return value.message
+    }
+  },
+}

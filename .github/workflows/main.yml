@@ -1,0 +1,37 @@
+name: Build
+
+on:
+  push:
+    branches: ['**']
+  workflow_dispatch:
+
+jobs:
+  test_and_lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Running lint
+        run: yarn lint
+
+      - name: Running tests
+        run: yarn test
+
+      - name: Build
+        run: yarn build
+
+      - name: Prepare artifact
+        run: rm -rf node_modules e2e lib sandbox
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: js-sdk.${{ github.sha }}
+          path: .
