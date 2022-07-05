@@ -1,7 +1,8 @@
 {
     "compilerOptions": {
       "lib": [
-        "ESNext"
+        "ESNext",
+        "DOM"
       ],
       "outDir": "dist",
       "removeComments": true,
@@ -17,6 +18,8 @@
       "alwaysStrict": true,
       "noImplicitAny": true,
       "strictNullChecks": true,
+      "declaration": true,
+      "strictBindCallApply": true
     },
     "include": ["./**/*.ts"],
     "exclude": [

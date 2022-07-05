@@ -2,9 +2,13 @@
   "name": "radix-js",
   "version": "1.0.0",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "license": "MIT",
   "dependencies": {
-    "neverthrow": "^4.3.1"
+    "@types/uuid": "^8.3.4",
+    "neverthrow": "^4.3.1",
+    "rxjs": "^7.5.5",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "tsc": "^2.0.4",
