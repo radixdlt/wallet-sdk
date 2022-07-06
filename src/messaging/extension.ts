@@ -1,3 +1,4 @@
+import { ResultAsync } from "neverthrow"
 import { filter, firstValueFrom, map, ReplaySubject } from "rxjs"
 import { v4 as uuid } from "uuid"
 import { send, ActionType, Response } from "."
@@ -20,10 +21,13 @@ export const sendExtensionMessage = send((type, payload) => {
 
     window.dispatchEvent(new CustomEvent(`radix#chromeExtension#send`, { detail: { type, payload, id } }))
 
-    return firstValueFrom(
-        messages$.pipe(
-            filter(event => event.detail.id === id),
-            map(event => event.detail.response as Response<typeof type>),
-        )
+    return ResultAsync.fromPromise(
+        firstValueFrom(
+            messages$.pipe(
+                filter(event => event.detail.id === id),
+                map(event => event.detail.response as Response<typeof type>),
+            )
+        ),
+        (e: Error) => e
     )
 })

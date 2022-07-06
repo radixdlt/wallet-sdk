@@ -1,3 +1,5 @@
+import { ResultAsync } from 'neverthrow'
+
 export * from './extension'
 
 export enum ActionType {
@@ -16,7 +18,7 @@ export type Payload<T extends ActionType> =
     T extends ActionType.RequestProof ? string[] :
     never
 
-export type Response<T extends ActionType> = 
+export type Response<T extends ActionType> =
     T extends ActionType.Connect ? UserInfo :
     T extends ActionType.RequestInfo ? {
         accounts?: string[]
@@ -35,10 +37,6 @@ type UserInfo = {
     identity?: string
 }
 
-export type SendMessage = <T extends ActionType>(type: T, payload: Payload<T>) => Promise<Response<T>>
+export type SendMessage = <T extends ActionType>(type: T, payload: Payload<T>) => ResultAsync<Response<T>, Error>
 
-export const send = (
-    fn: SendMessage
-) => <T extends ActionType>(
-    ...[type, payload]: [type: T, payload: Payload<T>]
-) => fn(type, payload)
+export const send = (fn: SendMessage) => <T extends ActionType>(type: T) => (payload: Payload<T>) => fn(type, payload)

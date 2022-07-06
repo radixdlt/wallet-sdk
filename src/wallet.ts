@@ -4,23 +4,11 @@ import { ActionType, Payload, sendExtensionMessage } from "./messaging"
 // @ts-ignore
 const isAvailable = () => window.radixBrowserExtensionEnabled ? ok(undefined) : err(Error('Browser extension not available'))
 
-const connect = () => ResultAsync.fromPromise(
-    sendExtensionMessage(ActionType.Connect, undefined), (e: Error) => e
-).andThen(
-    response => response ? okAsync(response) : errAsync(Error('Wallet connection rejected'))
-)
+const connect = sendExtensionMessage(ActionType.Connect)
 
-const requestInfo = (info: Payload<ActionType.RequestInfo>) => ResultAsync.fromPromise(
-    sendExtensionMessage(ActionType.RequestInfo, info), (e: Error) => e
-).andThen(
-    response => response ? okAsync(response) : errAsync(Error('Info request rejected'))
-)
+const requestInfo = sendExtensionMessage(ActionType.RequestInfo)
 
-const requestProof = (addresses: Payload<ActionType.RequestProof>) => ResultAsync.fromPromise(
-    sendExtensionMessage(ActionType.RequestProof, addresses), (e: Error) => e
-).andThen(
-    response => response ? okAsync(response) : errAsync(Error('Proof request rejected'))
-)
+const requestProof = sendExtensionMessage(ActionType.RequestProof)
 
 export const Wallet = {
     isAvailable,
