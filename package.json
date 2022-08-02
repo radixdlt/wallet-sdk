@@ -5,8 +5,11 @@
   "types": "dist/index.d.ts",
   "license": "MIT",
   "dependencies": {
+    "@ramda/pipe": "^0.26.1",
+    "@types/ramda": "^0.28.14",
     "@types/uuid": "^8.3.4",
     "neverthrow": "^4.3.1",
+    "ramda": "^0.28.0",
     "rxjs": "^7.5.5",
     "uuid": "^8.3.2"
   },

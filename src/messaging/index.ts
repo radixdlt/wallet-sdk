@@ -15,7 +15,10 @@ export type Payload<T extends ActionType> =
         accounts?: 'any' | { reason: string, ongoing: boolean }[],
         credentials?: { type: string, ongoing: boolean }[]
     } :
-    T extends ActionType.RequestProof ? string[] :
+    T extends ActionType.RequestProof ? {
+        addresses?: string[],
+        nonce: string
+    } :
     never
 
 export type Response<T extends ActionType> =
@@ -24,7 +27,6 @@ export type Response<T extends ActionType> =
         accounts?: string[]
     } :
     never
-
 
 type Account = {
     label: string,
