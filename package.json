@@ -19,7 +19,7 @@
     "prettier": "prettier --write lib",
     "lint": "yarn eslint & yarn prettier & yarn tsc",
     "prepare": "husky install",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch"
   },
   "devDependencies": {
