@@ -15,6 +15,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:types": "tsc --project tsconfig.types.json --emitDeclarationOnly",
     "preview": "vite preview",
     "prettier": "prettier --write lib",
     "lint": "yarn eslint & yarn prettier & yarn tsc",
