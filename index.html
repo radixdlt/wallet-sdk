@@ -2,13 +2,31 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/src/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
+    <title>Radix SDK Sandbox</title>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/lib/main.ts"></script>
-    <script type="module" src="/lib/demo.ts"></script>
+    <script type="module" src="/sandbox/sandbox.ts"></script>
+    <h1>Gumball Machine</h1>
+
+    <h2>1. Fetch User Account Address</h2>
+    <p><button id="fetchAccountAddress">Click me</button> to get the account address of the PTE Browser Extension user.</p>
+    <p>Account Address: <pre id="accountAddress"></pre></p>
+
+    <h2>2. Publish Package</h2>
+    <p><button id="publishPackage">Publish</button></p>
+    <p>Package Address:<br><pre id="packageAddress"></pre></p>
+
+    <h2>3. Instantiate Gumball Machine</h2>
+    <p><button id="instantiateComponent">Instantiate</button></p>
+    <p>Component Address:<br><pre id="componentAddress"></pre></p>
+
+    <h2>3. Buy Gumball</h2>
+    <p><button id="buyGumball">Buy 1 GUM</button></p>
+    <p>Receipt:<br><pre id="receipt"></pre></p>
+
+    <h2>4. Check balance</h2>
+    <p><button id="checkBalance">Check</button></p>
+    <p>I have <span id="userBalance">?</span> GUM, and the machine has <span id="machineBalance">?</span> GUM.</p>
   </body>
 </html>
