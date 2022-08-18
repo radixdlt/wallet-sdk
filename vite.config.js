@@ -5,7 +5,7 @@ const { defineConfig } = require('vite')
 module.exports = defineConfig({
   build: {
     lib: {
-      entry: path.resolve(__dirname, 'lib/main.ts'),
+      entry: path.resolve(__dirname, 'lib/sdk.ts'),
       name: 'js-sdk',
       fileName: (format) => `js-sdk.${format}.js`,
     },
