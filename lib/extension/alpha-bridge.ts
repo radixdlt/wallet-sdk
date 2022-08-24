@@ -2,6 +2,8 @@ import { EventType, IncomingMessage, OutgoingMessage } from '../messages'
 
 export const alphaBridge = {
   transformIncomingMessage: (message: any): IncomingMessage => {
+    if (!message?.action?.type) return message
+
     switch (message.action.type) {
       case 'getAccountAddressSuccess':
         return {
@@ -22,7 +24,7 @@ export const alphaBridge = {
         }
 
       default:
-        return message
+        throw new Error('unhandled incoming message')
     }
   },
   transformOutgoingMessage: (value: {

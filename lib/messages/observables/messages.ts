@@ -16,9 +16,11 @@ export const outgoingMessage = (subjects: SubjectsType) =>
 
 export const incomingMessage = (subjects: SubjectsType) =>
   subjects.incomingMessageSubject.pipe(
-    map(alphaBridge.transformIncomingMessage),
     tap((message) => {
       log.debug(`⬇️ received message\n${JSON.stringify(message, null, 2)}`)
+    }),
+    map(alphaBridge.transformIncomingMessage),
+    tap((message) => {
       if (message.method) {
         subjects.responseSubject.next(message)
       }
