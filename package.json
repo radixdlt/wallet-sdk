@@ -1,6 +1,6 @@
 {
   "name": "@radixdlt/js-sdk",
-  "version": "0.1.0",
+  "version": "0.1.0alpha",
   "files": [
     "dist"
   ],
@@ -33,6 +33,7 @@
     "@typescript-eslint/eslint-plugin": "^5.33.1",
     "@typescript-eslint/parser": "^5.33.1",
     "babel-preset-vite": "^1.0.4",
+    "buffer": "^6.0.3",
     "eslint": "^8.22.0",
     "eslint-config-alloy": "^4.6.2",
     "eslint-plugin-unused-imports": "^2.0.0",

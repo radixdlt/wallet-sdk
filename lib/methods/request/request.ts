@@ -1,50 +1,34 @@
 import { SubjectsType } from '../../messages/subjects'
-import { filter, firstValueFrom, first, map } from 'rxjs'
-import { createMessage } from '../../messages/create-message'
-import { ok, ResultAsync } from 'neverthrow'
-import {
-  AccountAddressRequest,
-  PersonaDataRequest,
-  RequestItem,
-  RequestTypes,
-  requestType,
-} from './_types'
-
-export type RequestDataInput = Partial<{
-  accountAddress: Omit<AccountAddressRequest, 'requestType'>
-  personaData: Omit<PersonaDataRequest, 'requestType'>
-}>
+import { RequestDataInput, RequestWalletResponse } from './_types'
+import { send } from '../../messages/send'
+import { createRequestMessage } from './create-request-message'
+import { MethodResponse, SdkError } from '../_types'
+import { response } from '../../utils'
+import { Message } from '../../messages'
+import { of } from 'rxjs'
+import { err, Err } from 'neverthrow'
+import loglevel from 'loglevel'
 
 export const request =
-  (subjects: SubjectsType) => (input: RequestDataInput) => {
-    const transformedData = Object.entries(input)
-      .map(([key, value]) => ({ requestType: key, ...value }))
-      .filter((item): item is RequestItem =>
-        Object.values(requestType).includes(item.requestType as RequestTypes)
-      )
+  (subjects: SubjectsType) =>
+  (input: RequestDataInput): MethodResponse<RequestWalletResponse> => {
+    const result = createRequestMessage(input)
 
-    // TODO: validate transformedData
+    if (result.isErr()) {
+      loglevel.error(result.error)
 
-    const message = createMessage({
-      method: 'request',
-      payload: transformedData,
-    })
+      const error: Err<never, SdkError> = err({
+        error: 'internal',
+        message: 'could not construct outgoing message',
+      })
 
-    subjects.outgoingMessageSubject.next(message)
+      return response(of(error))
+    }
 
-    const response$ = subjects.responseSubject.pipe(
-      filter((response) => response.requestId === message.requestId)
+    const request$ = send<Message<'request', RequestWalletResponse>>(
+      subjects,
+      result.value
     )
 
-    return {
-      promise: () =>
-        ResultAsync.fromPromise(
-          firstValueFrom(response$),
-          (error) => error as Error
-        ),
-      observable$: response$.pipe(
-        first(),
-        map((response) => ok(response))
-      ),
-    }
+    return response(request$)
   }

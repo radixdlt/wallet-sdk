@@ -1,6 +1,7 @@
 import { SubjectsType } from '../subjects'
 import log from 'loglevel'
-import { tap, share } from 'rxjs'
+import { tap, share, map } from 'rxjs'
+import { alphaBridge } from '../../extension/alpha-bridge'
 
 export const outgoingMessage = (subjects: SubjectsType) =>
   subjects.outgoingMessageSubject.pipe(
@@ -15,8 +16,9 @@ export const outgoingMessage = (subjects: SubjectsType) =>
 
 export const incomingMessage = (subjects: SubjectsType) =>
   subjects.incomingMessageSubject.pipe(
+    map(alphaBridge.transformIncomingMessage),
     tap((message) => {
-      log.debug(`⬇️ received message\n${JSON.stringify(message)}`)
+      log.debug(`⬇️ received message\n${JSON.stringify(message, null, 2)}`)
       if (message.method) {
         subjects.responseSubject.next(message)
       }

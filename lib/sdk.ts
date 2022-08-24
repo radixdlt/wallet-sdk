@@ -1,5 +1,5 @@
 import { MessageClient } from './messages/message-client'
-import { request } from './methods'
+import { request, sendTransaction } from './methods'
 import log from 'loglevel'
 
 export type RadixSdkType = ReturnType<typeof RadixSdk>
@@ -13,9 +13,14 @@ export const RadixSdk = () => {
     messageClient.destroy()
   }
 
-  return {
-    destroy,
+  const methods = {
     request: request(messageClient.subjects),
+    sendTransaction: sendTransaction(messageClient.subjects),
+  }
+
+  return {
+    ...methods,
+    destroy,
     __subjects: messageClient.subjects,
   }
 }

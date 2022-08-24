@@ -30,7 +30,7 @@ describe('sdk flow', () => {
         )
 
         const addressRequest = {
-          accountAddress: { ongoing: false, numberOfAddresses: 1 },
+          accountAddress: {},
         }
 
         const requestSpy = subscribeSpyTo(
@@ -47,7 +47,7 @@ describe('sdk flow', () => {
 
         sdk.__subjects.incomingMessageSubject.next(incomingMessage)
 
-        expect(requestSpy.getValues()).toEqual([ok(incomingMessage)])
+        expect(requestSpy.getValues()).toEqual([ok(incomingMessage.payload)])
       })
 
       it('should send request and receive response from promise', (done) => {
@@ -65,7 +65,7 @@ describe('sdk flow', () => {
           .request(addressRequest)
           .promise()
           .map((message) => {
-            expect(message).toEqual(incomingMessage)
+            expect(message).toEqual(incomingMessage.payload)
             done()
           })
 

@@ -2,7 +2,7 @@ import {
   MethodType,
   Request,
   RequestWalletResponse,
-  Transaction,
+  SendTransaction,
   TransactionWalletResponse,
 } from '../methods'
 
@@ -14,8 +14,8 @@ export type Message<M extends MethodType, P> = {
 
 export type OutgoingMessage =
   | Message<'request', Request>
-  | Message<'transaction', Transaction>
+  | Message<'sendTransaction', SendTransaction>
 
 export type IncomingMessage =
   | Message<'request', RequestWalletResponse>
-  | Message<'transaction', TransactionWalletResponse>
+  | Message<'sendTransaction', TransactionWalletResponse>
