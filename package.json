@@ -23,7 +23,8 @@
     "prepare": "husky install",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:ci": "xvfb-run playwright test"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.18.10",
