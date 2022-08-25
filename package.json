@@ -22,7 +22,8 @@
     "lint": "yarn eslint & yarn prettier & yarn tsc",
     "prepare": "husky install",
     "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.18.10",

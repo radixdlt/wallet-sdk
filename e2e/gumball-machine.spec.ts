@@ -9,7 +9,7 @@ import fs from 'fs'
 
 const pathToGumballWasm = path.join(
   __dirname,
-  '../../sandbox/gumball_machine.wasm'
+  '../sandbox/gumball_machine.wasm'
 )
 const gumballWasm = fs.readFileSync(pathToGumballWasm)
 
@@ -24,7 +24,7 @@ export const test = base.extend<{
 }>({
   // eslint-disable-next-line no-empty-pattern
   context: async ({}, use) => {
-    const pathToExtension = path.join(__dirname, '../../sandbox/extension')
+    const pathToExtension = path.join(__dirname, '../sandbox/extension')
     const context = await chromium.launchPersistentContext('', {
       headless: false,
       args: [

@@ -29,7 +29,7 @@ jobs:
         run: yarn build
 
       - name: Prepare artifact
-        run: rm -rf ./node_modules
+        run: rm -rf node_modules e2e lib sandbox
 
       - uses: actions/upload-artifact@v3
         with:
