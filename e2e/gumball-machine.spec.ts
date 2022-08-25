@@ -67,7 +67,10 @@ test('instantiate gumball component and buy 1 GUM', async ({
   await expect(extension.locator('text=No transactions found')).toHaveCount(1)
 
   await dApp.locator('#fetchAccountAddress').click()
+
   const accountAddress = await dApp.locator('#accountAddress').innerText()
+
+  expect(accountAddress, 'Check account address').toBeDefined()
 
   await dApp.locator('input#packageFileInput').setInputFiles({
     name: 'gumball_machine.wasm',
@@ -84,13 +87,28 @@ test('instantiate gumball component and buy 1 GUM', async ({
     ),
   ])
 
-  await delayAsync(1000)
+  await dApp.waitForSelector('#packageAddress')
+  const packageAddress = await dApp.locator('#packageAddress').innerText()
+  expect(packageAddress.length, 'Check package address').toBeGreaterThan(0)
 
-  const packageAddress = dApp.locator('#packageAddress')
+  await dApp.locator('#instantiateComponent').click()
 
-  await dApp.locator('#instantiateComponent').click({ delay: 1000 })
+  await delayAsync(2000)
 
-  await delayAsync(100)
+  await Promise.all([
+    await extension.locator('text=Submit').first().click(),
+    extension.waitForResponse((resp) =>
+      resp.url().includes('radixdlt.com/transaction')
+    ),
+  ])
+
+  await dApp.waitForSelector('#componentAddress')
+  const componentAddress = await dApp.locator('#componentAddress').innerText()
+  expect(componentAddress.length, 'Check component address').toBeGreaterThan(0)
+
+  await dApp.locator('#buyGumball').click()
+
+  await delayAsync(2000)
 
   await Promise.all([
     await extension.locator('text=Submit').first().click(),
@@ -99,19 +117,9 @@ test('instantiate gumball component and buy 1 GUM', async ({
     ),
   ])
 
-  await delayAsync(1000)
-
-  await dApp.locator('#buyGumball').click({ delay: 1000 })
-
-  await delayAsync(1000)
-
-  await Promise.all([
-    await extension.locator('text=Submit').first().click(),
-    extension.waitForResponse((resp) =>
-      resp.url().includes('radixdlt.com/transaction')
-    ),
-  ])
-  await delayAsync(1000)
+  await dApp.waitForSelector('#receipt')
+  const receipt = await dApp.locator('#receipt').innerText()
+  expect(receipt.length, 'Check receipt').toBeGreaterThan(0)
 
   await Promise.all([
     await dApp.locator('#checkBalance').first().click(),
@@ -120,8 +128,11 @@ test('instantiate gumball component and buy 1 GUM', async ({
     ),
   ])
 
-  await delayAsync(1000)
+  await dApp.waitForSelector('#userBalance')
+  const userBalance = await dApp.locator('#userBalance').innerText()
+  expect(userBalance.length, 'Check user balance').toBeGreaterThan(0)
 
+  await delayAsync(1000)
   const amount = await dApp.locator('#balance').innerText()
 
   expect(amount, 'Check balance').toBe(
