@@ -1,0 +1,52 @@
+{
+  "manifest_version": 3,
+  "name": "PTE Browser Extension",
+  "version": "0.1.0.0",
+  "version_name": "0.1.0alpha",
+  "description": "Radix Babylon PTE Browser Extension",
+  "icons": {
+    "256": "radix_icon256.png"
+  },
+  "action": {
+    "default_popup": "index.html"
+  },
+  "background": {
+    "service_worker": "service-worker-loader.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "js": [
+        "assets/content-script-loader.content.ts.abab6403.e6ce6165.js"
+      ],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs",
+    "unlimitedStorage"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "web_accessible_resources": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "resources": [
+        "assets/index.ec331754.js",
+        "assets/content.ts.abab6403.js"
+      ],
+      "use_dynamic_url": true
+    }
+  ]
+}
