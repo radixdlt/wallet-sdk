@@ -3,6 +3,7 @@ import {
   BrowserContext,
   chromium,
   expect,
+  Page,
 } from '@playwright/test'
 import path from 'path'
 import fs from 'fs'
@@ -45,7 +46,8 @@ export const test = base.extend<{
 })
 
 const openExtension =
-  (context: BrowserContext, extensionId: string) => async () => {
+  (context: BrowserContext, extensionId: string) => async (oldPage?: Page) => {
+    if (oldPage) await oldPage.close()
     let extension = await context.newPage()
     await extension.goto(`chrome-extension://${extensionId}/index.html`)
     return extension
@@ -89,7 +91,7 @@ test('instantiate gumball component and buy 1 GUM', async ({
 
   await dApp.locator('#publishPackage').click()
 
-  extension = await extensionOpener()
+  extension = await extensionOpener(extension)
 
   await Promise.all([
     extension.waitForResponse(
@@ -107,7 +109,7 @@ test('instantiate gumball component and buy 1 GUM', async ({
 
   await delayAsync(2000)
 
-  extension = await extensionOpener()
+  extension = await extensionOpener(extension)
 
   await Promise.all([
     extension.waitForResponse(
@@ -125,7 +127,7 @@ test('instantiate gumball component and buy 1 GUM', async ({
 
   await delayAsync(2000)
 
-  extension = await extensionOpener()
+  extension = await extensionOpener(extension)
 
   await Promise.all([
     extension.waitForResponse(
