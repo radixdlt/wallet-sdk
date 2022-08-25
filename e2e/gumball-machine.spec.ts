@@ -58,10 +58,11 @@ test('instantiate gumball component and buy 1 GUM', async ({
     '#root > div.MuiBox-root.css-hlmef6 > div > div.MuiBox-root.css-1p021x2 > div > button'
   )
   await Promise.all([
-    createAccount.click(),
-    extension.waitForResponse((resp) =>
-      resp.url().includes('radixdlt.com/transaction')
+    extension.waitForResponse(
+      (resp) =>
+        resp.url().includes('radixdlt.com/transaction') && resp.status() === 200
     ),
+    createAccount.click(),
   ])
 
   await expect(extension.locator('text=No transactions found')).toHaveCount(1)
@@ -81,10 +82,11 @@ test('instantiate gumball component and buy 1 GUM', async ({
   await dApp.locator('#publishPackage').click()
 
   await Promise.all([
-    extension.locator('text=Submit').click(),
-    extension.waitForResponse((resp) =>
-      resp.url().includes('radixdlt.com/transaction')
+    extension.waitForResponse(
+      (resp) =>
+        resp.url().includes('radixdlt.com/transaction') && resp.status() === 200
     ),
+    extension.locator('text=Submit').click(),
   ])
 
   await dApp.waitForSelector('#packageAddress')
@@ -96,10 +98,11 @@ test('instantiate gumball component and buy 1 GUM', async ({
   await delayAsync(2000)
 
   await Promise.all([
-    extension.locator('text=Submit').first().click(),
-    extension.waitForResponse((resp) =>
-      resp.url().includes('radixdlt.com/transaction')
+    extension.waitForResponse(
+      (resp) =>
+        resp.url().includes('radixdlt.com/transaction') && resp.status() === 200
     ),
+    extension.locator('text=Submit').first().click(),
   ])
 
   await dApp.waitForSelector('#componentAddress')
@@ -111,10 +114,11 @@ test('instantiate gumball component and buy 1 GUM', async ({
   await delayAsync(2000)
 
   await Promise.all([
-    extension.locator('text=Submit').first().click(),
-    extension.waitForResponse((resp) =>
-      resp.url().includes('radixdlt.com/transaction')
+    extension.waitForResponse(
+      (resp) =>
+        resp.url().includes('radixdlt.com/transaction') && resp.status() === 200
     ),
+    extension.locator('text=Submit').first().click(),
   ])
 
   await dApp.waitForSelector('#receipt')
@@ -122,10 +126,11 @@ test('instantiate gumball component and buy 1 GUM', async ({
   expect(receipt.length, 'Check receipt').toBeGreaterThan(0)
 
   await Promise.all([
-    dApp.locator('#checkBalance').first().click(),
-    dApp.waitForResponse((resp) =>
-      resp.url().includes('radixdlt.com/component')
+    dApp.waitForResponse(
+      (resp) =>
+        resp.url().includes('radixdlt.com/component') && resp.status() === 200
     ),
+    dApp.locator('#checkBalance').first().click(),
   ])
 
   await dApp.waitForSelector('#userBalance')
