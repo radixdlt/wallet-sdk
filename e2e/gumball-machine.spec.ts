@@ -81,7 +81,7 @@ test('instantiate gumball component and buy 1 GUM', async ({
   await dApp.locator('#publishPackage').click()
 
   await Promise.all([
-    await extension.locator('text=Submit').click(),
+    extension.locator('text=Submit').click(),
     extension.waitForResponse((resp) =>
       resp.url().includes('radixdlt.com/transaction')
     ),
@@ -96,7 +96,7 @@ test('instantiate gumball component and buy 1 GUM', async ({
   await delayAsync(2000)
 
   await Promise.all([
-    await extension.locator('text=Submit').first().click(),
+    extension.locator('text=Submit').first().click(),
     extension.waitForResponse((resp) =>
       resp.url().includes('radixdlt.com/transaction')
     ),
@@ -111,7 +111,7 @@ test('instantiate gumball component and buy 1 GUM', async ({
   await delayAsync(2000)
 
   await Promise.all([
-    await extension.locator('text=Submit').first().click(),
+    extension.locator('text=Submit').first().click(),
     extension.waitForResponse((resp) =>
       resp.url().includes('radixdlt.com/transaction')
     ),
@@ -122,7 +122,7 @@ test('instantiate gumball component and buy 1 GUM', async ({
   expect(receipt.length, 'Check receipt').toBeGreaterThan(0)
 
   await Promise.all([
-    await dApp.locator('#checkBalance').first().click(),
+    dApp.locator('#checkBalance').first().click(),
     dApp.waitForResponse((resp) =>
       resp.url().includes('radixdlt.com/component')
     ),
