@@ -47,7 +47,9 @@ describe('sdk flow', () => {
 
         sdk.__subjects.incomingMessageSubject.next(incomingMessage)
 
-        expect(requestSpy.getValues()).toEqual([ok(incomingMessage.payload)])
+        if ('method' in incomingMessage) {
+          expect(requestSpy.getValues()).toEqual([ok(incomingMessage.payload)])
+        }
       })
 
       it('should send request and receive response from promise', (done) => {
@@ -65,8 +67,10 @@ describe('sdk flow', () => {
           .request(addressRequest)
           .promise()
           .map((message) => {
-            expect(message).toEqual(incomingMessage.payload)
-            done()
+            if ('method' in message && 'method' in incomingMessage) {
+              expect(message).toEqual(incomingMessage.payload)
+              done()
+            }
           })
 
         expect(eventDispatchSpy).toBeCalled()
