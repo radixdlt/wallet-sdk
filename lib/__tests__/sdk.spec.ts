@@ -67,7 +67,7 @@ describe('sdk flow', () => {
           .request(addressRequest)
           .promise()
           .map((message) => {
-            if ('method' in message && 'method' in incomingMessage) {
+            if ('method' in incomingMessage) {
               expect(message).toEqual(incomingMessage.payload)
               done()
             }
