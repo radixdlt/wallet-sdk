@@ -1,9 +1,10 @@
-import { ok, Result } from 'neverthrow'
+import { err, ok, Result } from 'neverthrow'
 import { filter, map, Observable } from 'rxjs'
-import { IncomingMessage, Message, OutgoingMessage, SubjectsType } from '.'
-import { RequestWalletResponse, SdkError } from '../methods'
+import { Message, OutgoingMessage, SubjectsType, SuccessResponse } from '.'
+import { SdkError } from '../errors'
+import { RequestWalletResponse } from '../methods'
 
-export const send = <ResponseType extends IncomingMessage>(
+export const send = <ResponseType extends SuccessResponse>(
   subjects: SubjectsType,
   message: OutgoingMessage
 ): Observable<Result<ResponseType['payload'], SdkError>> => {
@@ -11,7 +12,7 @@ export const send = <ResponseType extends IncomingMessage>(
 
   return subjects.responseSubject.pipe(
     filter((response) => response.requestId === message.requestId),
-    map((message) => ok(message.payload))
+    map((message) => ('method' in message ? ok(message.payload) : err(message)))
   )
 }
 

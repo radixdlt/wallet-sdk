@@ -21,8 +21,7 @@ export const incomingMessage = (subjects: SubjectsType) =>
     }),
     map(alphaBridge.transformIncomingMessage),
     tap((message) => {
-      if (message.method) {
-        subjects.responseSubject.next(message)
-      }
+      log.debug(`⬇️ transformed message\n${JSON.stringify(message, null, 2)}`)
+      subjects.responseSubject.next(message)
     })
   )

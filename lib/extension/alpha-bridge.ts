@@ -1,3 +1,4 @@
+import { createSdkError } from '../errors'
 import { EventType, IncomingMessage, OutgoingMessage } from '../messages'
 
 export const alphaBridge = {
@@ -16,12 +17,18 @@ export const alphaBridge = {
             },
           ],
         }
+      case 'getAccountAddressFailure':
+        return createSdkError('missingAddress', message.action.id)
+
       case 'signTransactionSuccess':
         return {
           method: 'sendTransaction',
           requestId: message.action.id,
           payload: message.action.payload.transactionHash,
         }
+
+      case 'signTransactionFailure':
+        return createSdkError('submitTransaction', message.action.id)
 
       default:
         throw new Error('unhandled incoming message')

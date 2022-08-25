@@ -1,3 +1,4 @@
+import { SdkError } from '../errors'
 import {
   MethodType,
   Request,
@@ -16,6 +17,8 @@ export type OutgoingMessage =
   | Message<'request', Request>
   | Message<'sendTransaction', SendTransaction>
 
-export type IncomingMessage =
+export type SuccessResponse =
   | Message<'request', RequestWalletResponse>
   | Message<'sendTransaction', TransactionWalletResponse>
+
+export type IncomingMessage = SuccessResponse | SdkError

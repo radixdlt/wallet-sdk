@@ -1,6 +1,6 @@
 import { Result, ResultAsync } from 'neverthrow'
 import { firstValueFrom, Observable, first } from 'rxjs'
-import { SdkError } from '../methods'
+import { SdkError } from '../errors'
 import { sdkError } from './error'
 
 export const response = <T>(request$: Observable<Result<T, SdkError>>) => ({
