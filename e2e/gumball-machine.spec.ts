@@ -44,15 +44,23 @@ export const test = base.extend<{
   },
 })
 
+const openExtension =
+  (context: BrowserContext, extensionId: string) => async () => {
+    let extension = await context.newPage()
+    await extension.goto(`chrome-extension://${extensionId}/index.html`)
+    return extension
+  }
+
 test('instantiate gumball component and buy 1 GUM', async ({
   extensionId,
   context,
 }) => {
-  const extension = await context.newPage()
+  const extensionOpener = openExtension(context, extensionId)
   const dApp = await context.newPage()
 
-  await extension.goto(`chrome-extension://${extensionId}/index.html`)
   await dApp.goto('http://localhost:5173')
+
+  let extension = await extensionOpener()
 
   const createAccount = extension.locator(
     '#root > div.MuiBox-root.css-hlmef6 > div > div.MuiBox-root.css-1p021x2 > div > button'
@@ -81,12 +89,14 @@ test('instantiate gumball component and buy 1 GUM', async ({
 
   await dApp.locator('#publishPackage').click()
 
+  extension = await extensionOpener()
+
   await Promise.all([
     extension.waitForResponse(
       (resp) =>
         resp.url().includes('radixdlt.com/transaction') && resp.status() === 200
     ),
-    extension.locator('text=Submit').click(),
+    extension.locator('text=Submit').first().click(),
   ])
 
   await dApp.waitForSelector('#packageAddress')
@@ -96,6 +106,8 @@ test('instantiate gumball component and buy 1 GUM', async ({
   await dApp.locator('#instantiateComponent').click()
 
   await delayAsync(2000)
+
+  extension = await extensionOpener()
 
   await Promise.all([
     extension.waitForResponse(
@@ -112,6 +124,8 @@ test('instantiate gumball component and buy 1 GUM', async ({
   await dApp.locator('#buyGumball').click()
 
   await delayAsync(2000)
+
+  extension = await extensionOpener()
 
   await Promise.all([
     extension.waitForResponse(
