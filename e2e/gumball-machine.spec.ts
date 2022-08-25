@@ -103,12 +103,15 @@ test('instantiate gumball component and buy 1 GUM', async ({
 
   await dApp.locator('#buyGumball').click({ delay: 1000 })
 
+  await delayAsync(1000)
+
   await Promise.all([
     await extension.locator('text=Submit').first().click(),
     extension.waitForResponse((resp) =>
       resp.url().includes('radixdlt.com/transaction')
     ),
   ])
+  await delayAsync(1000)
 
   await Promise.all([
     await dApp.locator('#checkBalance').first().click(),
