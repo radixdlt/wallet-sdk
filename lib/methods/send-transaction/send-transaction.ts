@@ -1,11 +1,12 @@
 import { createMessage, Message, SubjectsType } from '../../messages'
 import { send } from '../../messages/send'
-import { MethodResponse, SdkError } from '../_types'
+import { MethodResponse } from '../_types'
 import { TransactionWalletResponse } from './_types'
 import { response } from '../../utils'
 import loglevel from 'loglevel'
-import { err, Err } from 'neverthrow'
+import { err } from 'neverthrow'
 import { of } from 'rxjs'
+import { createSdkError } from '../../errors'
 
 export const sendTransaction =
   (subjects: SubjectsType) =>
@@ -18,12 +19,17 @@ export const sendTransaction =
     if (result.isErr()) {
       loglevel.error(result.error)
 
-      const error: Err<never, SdkError> = err({
-        error: 'internal',
-        message: 'could not construct outgoing message',
-      })
-
-      return response(of(error))
+      return response(
+        of(
+          err(
+            createSdkError(
+              'internal',
+              '',
+              'could not construct outgoing message'
+            )
+          )
+        )
+      )
     }
 
     const request$ = send<
