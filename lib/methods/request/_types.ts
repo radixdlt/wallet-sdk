@@ -23,7 +23,7 @@ export type RequestResponse = {
 }
 
 export type WalletResponses = {
-   RequestWallet: AccountAddressWalletResponse[]
+  RequestWallet: AccountAddressWalletResponse[]
 }
 
 export type RequestDataInput = Partial<{

@@ -12,7 +12,9 @@ import { err } from 'neverthrow'
 
 export const request =
   (subjects: SubjectsType) =>
-  (input: RequestDataInput): MethodResponse<WalletResponses['RequestWallet']> => {
+  (
+    input: RequestDataInput
+  ): MethodResponse<WalletResponses['RequestWallet']> => {
     const result = createRequestMessage(input)
 
     if (result.isErr()) {
