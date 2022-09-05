@@ -2,7 +2,7 @@ import { err, ok, Result } from 'neverthrow'
 import { filter, map, Observable } from 'rxjs'
 import { Message, OutgoingMessage, SubjectsType, SuccessResponse } from '.'
 import { SdkError } from '../errors'
-import { RequestWalletResponse } from '../methods'
+import { WalletResponses } from '../methods'
 
 export const send = <ResponseType extends SuccessResponse>(
   subjects: SubjectsType,
@@ -17,4 +17,4 @@ export const send = <ResponseType extends SuccessResponse>(
 }
 
 export const sendRequest = (subjects: SubjectsType, message: OutgoingMessage) =>
-  send<Message<'request', RequestWalletResponse>>(subjects, message)
+  send<Message<'request', WalletResponses['RequestWallet']>>(subjects, message)

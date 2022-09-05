@@ -2,9 +2,9 @@ import { SdkError } from '../errors'
 import {
   MethodType,
   Request,
-  RequestWalletResponse,
   SendTransaction,
   TransactionWalletResponse,
+  WalletResponses,
 } from '../methods'
 
 export type Message<M extends MethodType, P> = {
@@ -18,7 +18,7 @@ export type OutgoingMessage =
   | Message<'sendTransaction', SendTransaction>
 
 export type SuccessResponse =
-  | Message<'request', RequestWalletResponse>
+  | Message<'request', WalletResponses['RequestWallet']>
   | Message<'sendTransaction', TransactionWalletResponse>
 
 export type IncomingMessage = SuccessResponse | SdkError

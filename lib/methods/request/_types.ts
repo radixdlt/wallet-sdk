@@ -18,13 +18,13 @@ export type AccountAddressWalletResponse = {
 export type RequestItem = AccountAddressRequest
 export type Request = RequestItem[]
 
-export type RequestWalletResponse = AccountAddressWalletResponse[]
-
 export type RequestResponse = {
   accountAddress: AccountAddressWalletResponse['addresses']
 }
 
-export type WalletResponses = RequestWalletResponse
+export type WalletResponses = {
+   RequestWallet: AccountAddressWalletResponse[]
+}
 
 export type RequestDataInput = Partial<{
   accountAddress: Omit<AccountAddressRequest, 'requestType'>

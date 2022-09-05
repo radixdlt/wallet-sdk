@@ -1,5 +1,5 @@
 import { SubjectsType } from '../../messages/subjects'
-import { RequestDataInput, RequestWalletResponse } from './_types'
+import { RequestDataInput, WalletResponses } from './_types'
 import { send } from '../../messages/send'
 import { createRequestMessage } from './create-request-message'
 import { MethodResponse } from '../_types'
@@ -12,7 +12,7 @@ import { err } from 'neverthrow'
 
 export const request =
   (subjects: SubjectsType) =>
-  (input: RequestDataInput): MethodResponse<RequestWalletResponse> => {
+  (input: RequestDataInput): MethodResponse<WalletResponses['RequestWallet']> => {
     const result = createRequestMessage(input)
 
     if (result.isErr()) {
@@ -31,7 +31,7 @@ export const request =
       )
     }
 
-    const request$ = send<Message<'request', RequestWalletResponse>>(
+    const request$ = send<Message<'request', WalletResponses['RequestWallet']>>(
       subjects,
       result.value
     )
