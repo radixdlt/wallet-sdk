@@ -12,7 +12,7 @@
       "require": "./dist/js-sdk.umd.js"
     }
   },
-  "types": "./dist/main.d.ts",
+  "types": "./dist/sdk.d.ts",
   "scripts": {
     "dev": "vite",
     "build": "vite build && yarn build:types",
