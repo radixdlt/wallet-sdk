@@ -1,6 +1,9 @@
-import { createMessage, Message, SubjectsType } from '../../messages'
+import {
+  createMessage,
+  GenericIncomingMessage,
+  SubjectsType,
+} from '../../messages'
 import { send } from '../../messages/send'
-import { TransactionWalletResponse } from './_types'
 import { response } from '../../utils'
 import loglevel from 'loglevel'
 import { err } from 'neverthrow'
@@ -30,9 +33,10 @@ export const sendTransaction =
       )
     }
 
-    const request$ = send<
-      Message<'sendTransaction', TransactionWalletResponse>
-    >(subjects, result.value)
+    const request$ = send<GenericIncomingMessage<'sendTransaction'>>(
+      subjects,
+      result.value
+    )
 
     return response(request$)
   }
