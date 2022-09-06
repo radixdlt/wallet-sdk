@@ -48,6 +48,16 @@ export type ActionTypes =
   | SignTransactionSuccess
   | SignTransactionFailure
 
+export type IncomingMessage =
+  | Message<GetAccountAddressSuccess>
+  | Message<GetAccountAddressFailure>
+  | Message<SignTransactionSuccess>
+  | Message<SignTransactionFailure>
+
+export type OutgoingMessage =
+  | Message<GetAccountAddress>
+  | Message<SignTransaction>
+
 export enum MessageTarget {
   Extension,
   Dapp,
@@ -63,9 +73,6 @@ export type MessageSenderData = {
   url: string
   createdAt: number
 }
-
-export type MessageStoreItem<Action = ActionTypes> = Message<Action> &
-  MessageSenderData
 
 /**
  *

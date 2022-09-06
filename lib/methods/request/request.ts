@@ -1,40 +1,50 @@
 import { SubjectsType } from '../../messages/subjects'
-import { RequestDataInput, RequestWalletResponse } from './_types'
+import { RequestInput, RequestResponse, requestType } from './_types'
 import { send } from '../../messages/send'
 import { createRequestMessage } from './create-request-message'
-import { MethodResponse } from '../_types'
 import { response } from '../../utils'
-import { Message } from '../../messages'
-import { of } from 'rxjs'
+import { GenericIncomingMessage } from '../../messages'
+import { map } from 'rxjs'
 import loglevel from 'loglevel'
-import { createSdkError } from '../../errors'
-import { err } from 'neverthrow'
+import { createSdkError, SdkError } from '../../errors'
+import { errAsync, Result } from 'neverthrow'
+import { WalletResponses } from '../_types'
 
-export const request =
-  (subjects: SubjectsType) =>
-  (input: RequestDataInput): MethodResponse<RequestWalletResponse> => {
-    const result = createRequestMessage(input)
+const mapRequestResponse = (
+  result: Result<WalletResponses['request'], SdkError>
+) =>
+  result.map((input) =>
+    Object.values(input).reduce<RequestResponse>((acc, value) => {
+      switch (value.requestType) {
+        case 'accountAddresses':
+          return {
+            ...acc,
+            [requestType.accountAddresses]: value.addresses,
+          }
 
-    if (result.isErr()) {
-      loglevel.error(result.error)
+        default:
+          return acc
+      }
+    }, {})
+  )
 
-      return response(
-        of(
-          err(
-            createSdkError(
-              'internal',
-              '',
-              'could not construct outgoing message'
-            )
-          )
-        )
+export const request = (subjects: SubjectsType) => (input: RequestInput) => {
+  const result = createRequestMessage(input)
+
+  if (result.isErr()) {
+    loglevel.error(result.error)
+
+    return response(
+      errAsync(
+        createSdkError('internal', '', 'could not construct outgoing message')
       )
-    }
-
-    const request$ = send<Message<'request', RequestWalletResponse>>(
-      subjects,
-      result.value
     )
-
-    return response(request$)
   }
+
+  const request$ = send<GenericIncomingMessage<'request'>>(
+    subjects,
+    result.value
+  ).pipe(map(mapRequestResponse))
+
+  return response(request$)
+}

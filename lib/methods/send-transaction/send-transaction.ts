@@ -1,6 +1,5 @@
 import { createMessage, Message, SubjectsType } from '../../messages'
 import { send } from '../../messages/send'
-import { MethodResponse } from '../_types'
 import { TransactionWalletResponse } from './_types'
 import { response } from '../../utils'
 import loglevel from 'loglevel'
@@ -9,8 +8,7 @@ import { of } from 'rxjs'
 import { createSdkError } from '../../errors'
 
 export const sendTransaction =
-  (subjects: SubjectsType) =>
-  (transactionManifest: string): MethodResponse<TransactionWalletResponse> => {
+  (subjects: SubjectsType) => (transactionManifest: string) => {
     const result = createMessage({
       method: 'sendTransaction',
       payload: transactionManifest,

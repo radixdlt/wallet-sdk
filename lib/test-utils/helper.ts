@@ -1,18 +1,20 @@
 import { IncomingMessage } from '../messages'
-import { AccountAddressWalletResponse } from '../methods'
+import { AccountAddressWalletResponse, requestType } from '../methods'
 
 const TestHelper = () => {
   const createAddresses = (numberOfAddresses: number) =>
     new Array(numberOfAddresses)
       .fill(null)
-      .map(
-        () =>
-          `rdx${Buffer.from(crypto.randomUUID()).toString('hex').slice(0, 32)}`
-      )
+      .map((_, index) => ({
+        address: `rdx${Buffer.from(crypto.randomUUID())
+          .toString('hex')
+          .slice(0, 32)}`,
+        label: `address-${index}`,
+      }))
   const createAccountAddressResponse = (
     numberOfAddresses: number
   ): AccountAddressWalletResponse => ({
-    requestType: 'accountAddress',
+    requestType: requestType.accountAddresses,
     addresses: createAddresses(numberOfAddresses),
   })
 

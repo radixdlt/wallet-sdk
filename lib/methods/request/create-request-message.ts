@@ -1,15 +1,15 @@
 import { err, ok, Result } from 'neverthrow'
 import { createMessage } from '../../messages'
 import {
-  RequestDataInput,
   AccountAddressRequest,
+  RequestInput,
   RequestItem,
   requestType,
   RequestTypes,
 } from './_types'
 
 export const transformInput = (
-  input: RequestDataInput
+  input: RequestInput
 ): Result<AccountAddressRequest[], Error> => {
   try {
     return ok(
@@ -24,7 +24,7 @@ export const transformInput = (
   }
 }
 
-export const createRequestMessage = (input: RequestDataInput) =>
+export const createRequestMessage = (input: RequestInput) =>
   transformInput(input).andThen((data) =>
     createMessage({
       method: 'request',

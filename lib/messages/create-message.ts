@@ -15,7 +15,7 @@ export const createMessage = (
       ...value,
       requestId: crypto.randomUUID(),
     }
-    loglevel.debug(`💬 message created\n${JSON.stringify(message)}`)
+    loglevel.debug(`💬💫 message created\n${JSON.stringify(message)}`)
     return ok(message)
   } catch (error) {
     return err(error as Error)

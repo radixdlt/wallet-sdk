@@ -10,6 +10,6 @@ export const Subjects = () => ({
   responseSubject: new Subject<IncomingMessage>(),
   dispatchEventSubject: new Subject<{
     event: EventType
-    message: OutgoingMessage
+    payload: OutgoingMessage
   }>(),
 })
