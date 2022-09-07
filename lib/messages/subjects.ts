@@ -1,15 +1,16 @@
 import { Subject } from 'rxjs'
-import { IncomingMessage, OutgoingMessage } from './_types'
+import { IncomingMessageType, OutgoingMessageType } from './_types'
 import { EventType } from './events'
+import { SdkError } from '../errors'
 
 export type SubjectsType = ReturnType<typeof Subjects>
 
 export const Subjects = () => ({
-  outgoingMessageSubject: new Subject<OutgoingMessage>(),
-  incomingMessageSubject: new Subject<IncomingMessage>(),
-  responseSubject: new Subject<IncomingMessage>(),
+  outgoingMessageSubject: new Subject<OutgoingMessageType>(),
+  incomingMessageSubject: new Subject<IncomingMessageType>(),
+  responseSubject: new Subject<IncomingMessageType | SdkError>(),
   dispatchEventSubject: new Subject<{
     event: EventType
-    message: OutgoingMessage
+    payload: OutgoingMessageType
   }>(),
 })

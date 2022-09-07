@@ -1,5 +1,5 @@
 import loglevel from 'loglevel'
-import { IncomingMessage } from './_types'
+import { IncomingMessageType } from './_types'
 import { SubjectsType } from './subjects'
 
 export const OUTGOING_MESSAGE_EVENT = 'radix#chromeExtension#send'
@@ -13,7 +13,7 @@ export type EventType = OutgoingMessageEvent | IncomingMessageEvent
 export const registerEventListeners = (subjects: SubjectsType) => {
   loglevel.debug(`🦻 event listeners registered`)
   const handleIncomingMessage = (event: Event) => {
-    const message = (event as CustomEvent<IncomingMessage>).detail
+    const message = (event as CustomEvent<IncomingMessageType>).detail
     subjects.incomingMessageSubject.next(message)
   }
 

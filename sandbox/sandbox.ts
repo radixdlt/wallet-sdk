@@ -17,18 +17,21 @@ let resourceAddress: string // GUM resource address
 
 document.getElementById('fetchAccountAddress').onclick = async function () {
   // Retrieve extension user account address
-  const result = await sdk
-    .request({
-      accountAddress: {},
-    })
-    .promise()
+  const result = await sdk.request({
+    accountAddresses: {},
+  })
 
-  if (result.isErr()) throw result.error
+  if (result.isErr()) {
+    throw result.error
+  }
 
-  const { addresses } = result.value[0]
+  const { accountAddresses } = result.value
 
-  document.getElementById('accountAddress').innerText = addresses[0]
-  accountAddress = addresses[0]
+  if (!accountAddresses) return
+
+  document.getElementById('accountAddress').innerText =
+    accountAddresses[0].address
+  accountAddress = accountAddresses[0].address
 }
 
 document.getElementById('packageFileInput').onchange = async (
@@ -47,13 +50,14 @@ document.getElementById('packageFileInput').onchange = async (
 document.getElementById('publishPackage').onclick = async function () {
   if (!packageHex) return
   // Construct manifest
-  const result = await sdk
-    .sendTransaction(`PUBLISH_PACKAGE Bytes("${packageHex}");`)
-    .promise()
+  const result = await sdk.sendTransaction(
+    `CALL_METHOD ComponentAddress("${accountAddress}") "lock_fee" Decimal("100");
+PUBLISH_PACKAGE Bytes("${packageHex}");`
+  )
 
   if (result.isErr()) throw result.error
 
-  const transactionHash = result.value
+  const { transactionHash } = result.value
 
   const receipt = await api.getReceipt({
     hash: transactionHash,
@@ -68,15 +72,13 @@ document.getElementById('instantiateComponent').onclick = async function () {
   if (!packageAddress) return
 
   // Send manifest to extension for signing
-  const result = await sdk
-    .sendTransaction(
-      `CALL_FUNCTION PackageAddress("${packageAddress}") "GumballMachine" "instantiate_gumball_machine" Decimal("1.0");`
-    )
-    .promise()
+  const result = await sdk.sendTransaction(
+    `CALL_FUNCTION PackageAddress("${packageAddress}") "GumballMachine" "instantiate_gumball_machine" Decimal("1.0");`
+  )
 
   if (result.isErr()) throw result.error
 
-  const transactionHash = result.value
+  const { transactionHash } = result.value
 
   const receipt = await api.getReceipt({
     hash: transactionHash,
@@ -99,12 +101,12 @@ TAKE_FROM_WORKTOP ResourceAddress("030000000000000000000000000000000000000000000
 CALL_METHOD ComponentAddress("${componentAddress}") "buy_gumball" Bucket("xrd");
 CALL_METHOD_WITH_ALL_RESOURCES ComponentAddress("${accountAddress}") "deposit_batch";`
 
-  const result = await sdk.sendTransaction(manifest).promise()
+  const result = await sdk.sendTransaction(manifest)
 
   if (result.isErr()) throw result.error
 
   // Send manifest to extension for signing
-  const transactionHash = result.value
+  const { transactionHash } = result.value
 
   const receipt = await api.getReceipt({
     hash: transactionHash,

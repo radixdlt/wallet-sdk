@@ -1,31 +1,34 @@
 export const requestType = {
-  accountAddress: 'accountAddress',
+  accountAddresses: 'accountAddresses',
 } as const
 
 export type RequestTypes = keyof typeof requestType
 
-export type AccountAddress = typeof requestType['accountAddress']
+export type AccountAddresses = typeof requestType['accountAddresses']
 
 export type AccountAddressRequest = {
-  requestType: AccountAddress
+  requestType: AccountAddresses
 }
 
-export type AccountAddressWalletResponse = {
-  requestType: AccountAddress
-  addresses: string[]
+export type AccountAddressResponse = {
+  requestType: AccountAddresses
+  addresses: Address[]
 }
 
-export type RequestItem = AccountAddressRequest
-export type Request = RequestItem[]
+type Address = { label: string; address: string }
 
-export type RequestWalletResponse = AccountAddressWalletResponse[]
-
-export type RequestResponse = {
-  accountAddress: AccountAddressWalletResponse['addresses']
+export type RequestWalletResponse = {
+  [requestType.accountAddresses]: AccountAddressResponse
 }
 
-export type WalletResponses = RequestWalletResponse
+export type RequestWalletResponseType = RequestWalletResponse[RequestTypes]
 
-export type RequestDataInput = Partial<{
-  accountAddress: Omit<AccountAddressRequest, 'requestType'>
+export type RequestDataItem = AccountAddressRequest
+
+export type RequestMethodInput = Partial<{
+  accountAddresses: {}
+}>
+
+export type RequestMethodResponse = Partial<{
+  [requestType.accountAddresses]: AccountAddressResponse['addresses']
 }>

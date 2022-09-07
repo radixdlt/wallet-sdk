@@ -1,13 +1,18 @@
-import { Result, ResultAsync } from 'neverthrow'
-import { Observable } from 'rxjs'
-import { Request, SendTransaction } from '.'
-import { SdkError } from '../errors'
+import { RequestDataItem, RequestWalletResponseType } from './request'
 
-export type MethodType = 'request' | 'sendTransaction'
+export const methodType = {
+  request: 'request',
+  sendTransaction: 'sendTransaction',
+} as const
 
-export type Methods = Request | SendTransaction
+export type MethodType = keyof typeof methodType
 
-export type MethodResponse<T> = {
-  promise: () => ResultAsync<T, SdkError>
-  observable$: Observable<Result<T, SdkError>>
+export type WalletRequests = {
+  request: RequestDataItem[]
+  sendTransaction: string
+}
+
+export type WalletResponses = {
+  request: RequestWalletResponseType[]
+  sendTransaction: { transactionHash: string }
 }
