@@ -14,7 +14,7 @@ const mapRequestResponse = (
   result: Result<WalletResponses['request'], SdkError>
 ) =>
   result.map((input) =>
-    Object.values(input).reduce<RequestResponse>((acc, value) => {
+    input.reduce<RequestResponse>((acc, value) => {
       switch (value.requestType) {
         case 'accountAddresses':
           return {
