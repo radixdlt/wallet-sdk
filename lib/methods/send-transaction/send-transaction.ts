@@ -4,11 +4,12 @@ import { errAsync } from 'neverthrow'
 import { createSdkError } from '../../errors'
 import { sendMessage } from '../../messages/send-message'
 import { createMethodResponse } from '../create-method-response'
+import { methodType } from '../_types'
 
 export const sendTransaction =
   (subjects: SubjectsType) => (transactionManifest: string) => {
     const result = createMessage({
-      method: 'sendTransaction',
+      method: methodType.sendTransaction,
       payload: transactionManifest,
     })
 
@@ -22,7 +23,10 @@ export const sendTransaction =
       )
     }
 
-    const request$ = sendMessage<'sendTransaction'>(subjects, result.value)
+    const walletRequest$ = sendMessage<'sendTransaction'>(
+      subjects,
+      result.value
+    )
 
-    return createMethodResponse(request$)
+    return createMethodResponse(walletRequest$)
   }
