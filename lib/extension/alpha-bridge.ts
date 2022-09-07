@@ -1,9 +1,23 @@
-import { createSdkError } from '../errors'
-import { EventType, IncomingMessage, OutgoingMessage } from '../messages'
+import { createSdkError, SdkError } from '../errors'
+import {
+  EventType,
+  IncomingMessageType,
+  OutgoingMessageType,
+} from '../messages'
+import {
+  ActionType,
+  IncomingMessage as AlphaIncomingMessage,
+  MessageTarget,
+  OutgoingMessage as AlphaOutgoingMessage,
+} from '../extension/_types'
+import { requestType } from '../methods'
+import { methodType } from '../methods/_types'
 
 export const alphaBridge = {
-  transformIncomingMessage: (message: any): IncomingMessage => {
-    if (!message?.action?.type) return message
+  transformIncomingMessage: (
+    message: AlphaIncomingMessage | IncomingMessageType
+  ): IncomingMessageType | SdkError => {
+    if (!('action' in message)) return message
 
     switch (message.action.type) {
       case 'getAccountAddressSuccess':
@@ -12,8 +26,10 @@ export const alphaBridge = {
           requestId: message.action.id,
           payload: [
             {
-              requestType: 'accountAddress',
-              addresses: [message.action.payload],
+              requestType: requestType.accountAddresses,
+              addresses: [
+                { address: message.action.payload, label: 'active account' },
+              ],
             },
           ],
         }
@@ -24,49 +40,51 @@ export const alphaBridge = {
         return {
           method: 'sendTransaction',
           requestId: message.action.id,
-          payload: message.action.payload.transactionHash,
+          payload: {
+            transactionHash: message.action.payload.transactionHash,
+          },
         }
 
       case 'signTransactionFailure':
         return createSdkError('submitTransaction', message.action.id)
 
       default:
-        throw new Error('unhandled incoming message')
+        throw new Error('unhandled alpha wallet message')
     }
   },
-  transformOutgoingMessage: (value: {
+  transformOutgoingMessage: (input: {
     event: EventType
-    message: OutgoingMessage
-  }) => {
-    switch (value.message.method) {
-      case 'request':
+    payload: OutgoingMessageType
+  }): { payload: AlphaOutgoingMessage; event: string } => {
+    switch (input.payload.method) {
+      case methodType.request:
         return {
-          event: value.event,
+          event: input.event,
           payload: {
             action: {
-              type: 'getAccountAddress',
+              type: ActionType.GetAccountAddress,
               payload: '',
-              id: value.message.requestId,
+              id: input.payload.requestId,
             },
-            target: 0,
+            target: MessageTarget.Extension,
           },
         }
 
-      case 'sendTransaction':
+      case methodType.sendTransaction:
         return {
-          event: value.event,
+          event: input.event,
           payload: {
             action: {
-              type: 'signTransaction',
-              payload: value.message.payload,
-              id: value.message.requestId,
+              type: ActionType.SignTransaction,
+              payload: input.payload.payload,
+              id: input.payload.requestId,
             },
-            target: 0,
+            target: MessageTarget.Extension,
           },
         }
 
       default:
-        return value.message
+        return input.payload
     }
   },
 }

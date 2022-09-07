@@ -1,40 +1,32 @@
-import { createMessage, Message, SubjectsType } from '../../messages'
-import { send } from '../../messages/send'
-import { MethodResponse } from '../_types'
-import { TransactionWalletResponse } from './_types'
-import { response } from '../../utils'
+import { createMessage, SubjectsType } from '../../messages'
 import loglevel from 'loglevel'
-import { err } from 'neverthrow'
-import { of } from 'rxjs'
+import { errAsync } from 'neverthrow'
 import { createSdkError } from '../../errors'
+import { sendMessage } from '../../messages/send-message'
+import { createMethodResponse } from '../create-method-response'
+import { methodType } from '../_types'
 
 export const sendTransaction =
-  (subjects: SubjectsType) =>
-  (transactionManifest: string): MethodResponse<TransactionWalletResponse> => {
+  (subjects: SubjectsType) => (transactionManifest: string) => {
     const result = createMessage({
-      method: 'sendTransaction',
+      method: methodType.sendTransaction,
       payload: transactionManifest,
     })
 
     if (result.isErr()) {
       loglevel.error(result.error)
 
-      return response(
-        of(
-          err(
-            createSdkError(
-              'internal',
-              '',
-              'could not construct outgoing message'
-            )
-          )
+      return createMethodResponse(
+        errAsync(
+          createSdkError('internal', '', 'could not construct outgoing message')
         )
       )
     }
 
-    const request$ = send<
-      Message<'sendTransaction', TransactionWalletResponse>
-    >(subjects, result.value)
+    const walletRequest$ = sendMessage<'sendTransaction'>(
+      subjects,
+      result.value
+    )
 
-    return response(request$)
+    return createMethodResponse(walletRequest$)
   }

@@ -1,24 +1,27 @@
-import { SdkError } from '../errors'
-import {
-  MethodType,
-  Request,
-  RequestWalletResponse,
-  SendTransaction,
-  TransactionWalletResponse,
-} from '../methods'
+import { MethodType, WalletRequests, WalletResponses } from '../methods/_types'
 
-export type Message<M extends MethodType, P> = {
+export type GenericOutgoingMessage<M extends MethodType> = {
   method: M
   requestId: string
-  payload: P
+  payload: WalletRequests[M]
 }
 
-export type OutgoingMessage =
-  | Message<'request', Request>
-  | Message<'sendTransaction', SendTransaction>
+export type OutgoingMessage = {
+  request: GenericOutgoingMessage<'request'>
+  sendTransaction: GenericOutgoingMessage<'sendTransaction'>
+}
 
-export type SuccessResponse =
-  | Message<'request', RequestWalletResponse>
-  | Message<'sendTransaction', TransactionWalletResponse>
+export type OutgoingMessageType = OutgoingMessage[MethodType]
 
-export type IncomingMessage = SuccessResponse | SdkError
+type GenericIncomingMessage<M extends MethodType> = {
+  method: M
+  requestId: string
+  payload: WalletResponses[M]
+}
+
+export type IncomingMessage = {
+  request: GenericIncomingMessage<'request'>
+  sendTransaction: GenericIncomingMessage<'sendTransaction'>
+}
+
+export type IncomingMessageType = IncomingMessage[keyof IncomingMessage]
