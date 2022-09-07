@@ -1,6 +1,5 @@
 export const requestType = {
   accountAddresses: 'accountAddresses',
-  personaData: 'personaData',
 } as const
 
 export type RequestTypes = keyof typeof requestType
