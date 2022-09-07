@@ -1,5 +1,9 @@
-import { createSdkError } from '../errors'
-import { EventType, IncomingMessage, OutgoingMessage } from '../messages'
+import { createSdkError, SdkError } from '../errors'
+import {
+  EventType,
+  IncomingMessageType,
+  OutgoingMessageType,
+} from '../messages'
 import {
   ActionType,
   IncomingMessage as AlphaIncomingMessage,
@@ -7,53 +11,53 @@ import {
   OutgoingMessage as AlphaOutgoingMessage,
 } from '../extension/_types'
 import { requestType } from '../methods'
+import { methodType } from '../methods/_types'
 
 export const alphaBridge = {
   transformIncomingMessage: (
-    message: AlphaIncomingMessage | IncomingMessage
-  ): IncomingMessage => {
-    if ('action' in message) {
-      switch (message.action.type) {
-        case 'getAccountAddressSuccess':
-          return {
-            method: 'request',
-            requestId: message.action.id,
-            payload: [
-              {
-                requestType: requestType.accountAddresses,
-                addresses: [
-                  { address: message.action.payload, label: 'active account' },
-                ],
-              },
-            ],
-          }
-        case 'getAccountAddressFailure':
-          return createSdkError('missingAddress', message.action.id)
+    message: AlphaIncomingMessage | IncomingMessageType
+  ): IncomingMessageType | SdkError => {
+    if (!('action' in message)) return message
 
-        case 'signTransactionSuccess':
-          return {
-            method: 'sendTransaction',
-            requestId: message.action.id,
-            payload: {
-              transactionHash: message.action.payload.transactionHash,
+    switch (message.action.type) {
+      case 'getAccountAddressSuccess':
+        return {
+          method: 'request',
+          requestId: message.action.id,
+          payload: [
+            {
+              requestType: requestType.accountAddresses,
+              addresses: [
+                { address: message.action.payload, label: 'active account' },
+              ],
             },
-          }
+          ],
+        }
+      case 'getAccountAddressFailure':
+        return createSdkError('missingAddress', message.action.id)
 
-        case 'signTransactionFailure':
-          return createSdkError('submitTransaction', message.action.id)
+      case 'signTransactionSuccess':
+        return {
+          method: 'sendTransaction',
+          requestId: message.action.id,
+          payload: {
+            transactionHash: message.action.payload.transactionHash,
+          },
+        }
 
-        default:
-          throw new Error('unhandled alpha message')
-      }
+      case 'signTransactionFailure':
+        return createSdkError('submitTransaction', message.action.id)
+
+      default:
+        throw new Error('unhandled alpha wallet message')
     }
-    return message
   },
   transformOutgoingMessage: (input: {
     event: EventType
-    payload: OutgoingMessage
+    payload: OutgoingMessageType
   }): { payload: AlphaOutgoingMessage; event: string } => {
     switch (input.payload.method) {
-      case 'request':
+      case methodType.request:
         return {
           event: input.event,
           payload: {
@@ -66,7 +70,7 @@ export const alphaBridge = {
           },
         }
 
-      case 'sendTransaction':
+      case methodType.sendTransaction:
         return {
           event: input.event,
           payload: {

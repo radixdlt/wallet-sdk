@@ -1,18 +1,17 @@
 import loglevel from 'loglevel'
-import { Message, OutgoingMessage } from './_types'
-import { Request, SendTransaction } from '../methods'
+import { OutgoingMessage, OutgoingMessageType } from './_types'
 import { err, ok, Result } from 'neverthrow'
 
 type CreateMessageInput =
-  | Omit<Message<'request', Request>, 'requestId'>
-  | Omit<Message<'sendTransaction', SendTransaction>, 'requestId'>
+  | Omit<OutgoingMessage['request'], 'requestId'>
+  | Omit<OutgoingMessage['sendTransaction'], 'requestId'>
 
 export const createMessage = (
-  value: CreateMessageInput
-): Result<OutgoingMessage, Error> => {
+  input: CreateMessageInput
+): Result<OutgoingMessageType, Error> => {
   try {
     const message = {
-      ...value,
+      ...input,
       requestId: crypto.randomUUID(),
     }
     loglevel.debug(`💬💫 message created\n${JSON.stringify(message)}`)

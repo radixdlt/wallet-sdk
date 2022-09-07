@@ -1,12 +1,13 @@
 import { err, ok, Result } from 'neverthrow'
 import { filter, map, Observable } from 'rxjs'
-import { OutgoingMessage, SubjectsType, SuccessResponse } from '.'
+import { OutgoingMessageType, SubjectsType, IncomingMessage } from '.'
 import { SdkError } from '../errors'
+import { MethodType } from '../methods/_types'
 
-export const send = <ResponseType extends SuccessResponse>(
+export const sendMessage = <M extends MethodType>(
   subjects: SubjectsType,
-  message: OutgoingMessage
-): Observable<Result<ResponseType['payload'], SdkError>> => {
+  message: OutgoingMessageType
+): Observable<Result<IncomingMessage[M]['payload'], SdkError>> => {
   subjects.outgoingMessageSubject.next(message)
 
   return subjects.responseSubject.pipe(

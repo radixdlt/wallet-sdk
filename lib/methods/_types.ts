@@ -1,4 +1,4 @@
-import { AccountAddressWalletResponse } from './request'
+import { AccountAddressWalletResponse, Request } from './request'
 
 export const methodType = {
   request: 'request',

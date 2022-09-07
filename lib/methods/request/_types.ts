@@ -21,7 +21,7 @@ export type RequestItem = AccountAddressRequest
 export type Request = RequestItem[]
 
 export type RequestInput = Partial<{
-  accountAddresses: Omit<AccountAddressRequest, 'requestType'>
+  accountAddresses: {}
 }>
 
 export type RequestResponse = Partial<{

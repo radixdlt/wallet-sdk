@@ -1,6 +1,3 @@
-/**
- * Represents the type of an action.
- */
 export enum ActionType {
   GetAccountAddress = 'getAccountAddress',
   GetAccountAddressSuccess = 'getAccountAddressSuccess',
@@ -11,9 +8,6 @@ export enum ActionType {
   SignTransactionFailure = 'signTransactionFailure',
 }
 
-/**
- * Represents an action.
- */
 export type Action<T extends ActionType, P> = {
   type: T
   payload: P
@@ -66,12 +60,6 @@ export enum MessageTarget {
 export type Message<Action = ActionTypes> = {
   action: Action
   target: MessageTarget
-}
-
-export type MessageSenderData = {
-  tabId: number
-  url: string
-  createdAt: number
 }
 
 /**

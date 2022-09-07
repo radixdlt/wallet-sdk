@@ -1,4 +1,4 @@
-import { IncomingMessage } from '../messages'
+import { IncomingMessageType } from '../messages'
 import { AccountAddressWalletResponse, requestType } from '../methods'
 
 const TestHelper = () => {
@@ -19,7 +19,7 @@ const TestHelper = () => {
   const createRequestReponse = (
     requestId: string,
     input: any
-  ): IncomingMessage => ({
+  ): IncomingMessageType => ({
     requestId,
     method: 'request',
     payload: input,

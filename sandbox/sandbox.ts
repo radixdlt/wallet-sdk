@@ -57,7 +57,7 @@ PUBLISH_PACKAGE Bytes("${packageHex}");`
 
   if (result.isErr()) throw result.error
 
-  const transactionHash = result.value
+  const { transactionHash } = result.value
 
   const receipt = await api.getReceipt({
     hash: transactionHash,
@@ -78,7 +78,7 @@ document.getElementById('instantiateComponent').onclick = async function () {
 
   if (result.isErr()) throw result.error
 
-  const transactionHash = result.value
+  const { transactionHash } = result.value
 
   const receipt = await api.getReceipt({
     hash: transactionHash,
@@ -106,7 +106,7 @@ CALL_METHOD_WITH_ALL_RESOURCES ComponentAddress("${accountAddress}") "deposit_ba
   if (result.isErr()) throw result.error
 
   // Send manifest to extension for signing
-  const transactionHash = result.value
+  const { transactionHash } = result.value
 
   const receipt = await api.getReceipt({
     hash: transactionHash,
