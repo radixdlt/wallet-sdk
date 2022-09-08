@@ -1,6 +1,6 @@
 import { Subjects } from './subjects'
 import { Subscriptions } from './subscriptions'
-import { registerEventListeners } from './events'
+import { registerEventListeners } from './events/register-event-listeners'
 
 export type MessageClientType = ReturnType<typeof MessageClient>
 
