@@ -33,5 +33,5 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: js-sdk.${{ github.sha }}
+          name: wallet-sdk.${{ github.sha }}
           path: .
