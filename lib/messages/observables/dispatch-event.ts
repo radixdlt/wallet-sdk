@@ -1,8 +1,8 @@
 import { SubjectsType } from '../subjects'
 import { map, tap } from 'rxjs'
 import log from 'loglevel'
-import { alphaBridge } from '../../extension/alpha-bridge'
 import { config } from '../../config'
+import { alphaBridge } from '../../extension/alpha-bridge'
 
 export const dispatchEvent = (subjects: SubjectsType) =>
   subjects.dispatchEventSubject.pipe(

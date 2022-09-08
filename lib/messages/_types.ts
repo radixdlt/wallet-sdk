@@ -1,6 +1,7 @@
 import { MethodType, WalletRequests, WalletResponses } from '../methods/_types'
+import { MessageLifeCycleEvent, OutgoingMessageEvent } from './events/_types'
 
-export type GenericOutgoingMessage<M extends MethodType> = {
+type GenericOutgoingMessage<M extends MethodType> = {
   method: M
   requestId: string
   payload: WalletRequests[M]
@@ -22,6 +23,12 @@ type GenericIncomingMessage<M extends MethodType> = {
 export type IncomingMessage = {
   request: GenericIncomingMessage<'request'>
   sendTransaction: GenericIncomingMessage<'sendTransaction'>
+  messageLifeCycleEvent: { eventType: MessageLifeCycleEvent; requestId: string }
 }
 
 export type IncomingMessageType = IncomingMessage[keyof IncomingMessage]
+
+export type MessageDispatch = {
+  event: OutgoingMessageEvent
+  payload: OutgoingMessageType
+}
