@@ -1,9 +1,5 @@
 import { createSdkError, SdkError } from '../errors'
-import {
-  EventType,
-  IncomingMessageType,
-  OutgoingMessageType,
-} from '../messages'
+import { IncomingMessageType, OutgoingMessageType } from '../messages'
 import {
   ActionType,
   IncomingMessage as AlphaIncomingMessage,
@@ -12,6 +8,7 @@ import {
 } from '../extension/_types'
 import { requestType } from '../methods'
 import { methodType } from '../methods/_types'
+import { OutgoingMessageEvent } from '../messages/events/_types'
 
 export const alphaBridge = {
   transformIncomingMessage: (
@@ -53,9 +50,9 @@ export const alphaBridge = {
     }
   },
   transformOutgoingMessage: (input: {
-    event: EventType
+    event: OutgoingMessageEvent
     payload: OutgoingMessageType
-  }): { payload: AlphaOutgoingMessage; event: string } => {
+  }): { payload: AlphaOutgoingMessage; event: OutgoingMessageEvent } => {
     switch (input.payload.method) {
       case methodType.request:
         return {

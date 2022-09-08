@@ -2,7 +2,7 @@ import { createMessage, SubjectsType } from '../../messages'
 import loglevel from 'loglevel'
 import { errAsync } from 'neverthrow'
 import { createSdkError } from '../../errors'
-import { sendMessage } from '../../messages/send-message'
+import { sendMessage } from '../../messages/observables/send-message'
 import { createMethodResponse } from '../create-method-response'
 import { methodType } from '../_types'
 
