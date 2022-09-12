@@ -25,7 +25,7 @@ export const incomingMessage = (subjects: SubjectsType) =>
         : message
     ),
     tap((message) => {
-      log.debug(`💬⬇️ message received\n${JSON.stringify(message)}`)
+      log.debug(`🔵💬⬇️ message received\n${JSON.stringify(message)}`)
       if ('eventType' in message) {
         subjects.messageLifeCycleEventSubject.next(message)
       } else {

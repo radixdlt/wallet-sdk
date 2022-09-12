@@ -10,9 +10,7 @@ export const dispatchEvent = (subjects: SubjectsType) =>
       config.alphaWallet ? alphaBridge.transformOutgoingMessage(input) : input
     ),
     tap(({ event, payload }) => {
-      log.debug(
-        `💬🚀 message dispatched: '${event}'\n${JSON.stringify(payload)}`
-      )
+      log.debug(`🔵💬⬆️ message sent\n${JSON.stringify(payload)}`)
       window.dispatchEvent(
         new CustomEvent(event, {
           detail: payload,
