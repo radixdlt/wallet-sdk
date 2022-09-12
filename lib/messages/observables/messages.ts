@@ -20,12 +20,12 @@ export const outgoingMessage = (subjects: SubjectsType) =>
 export const incomingMessage = (subjects: SubjectsType) =>
   subjects.incomingMessageSubject.pipe(
     map((message) =>
-      config.alphaWallet
+      config.walletExtension
         ? alphaBridge.transformIncomingMessage(message)
         : message
     ),
     tap((message) => {
-      log.debug(`💬⬇️ message received\n${JSON.stringify(message)}`)
+      log.debug(`🔵💬⬇️ message received\n${JSON.stringify(message)}`)
       if ('eventType' in message) {
         subjects.messageLifeCycleEventSubject.next(message)
       } else {

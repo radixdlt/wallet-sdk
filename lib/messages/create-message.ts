@@ -14,6 +14,6 @@ export const createMessage = (
     ...input,
     requestId,
   }).map((message) => {
-    loglevel.debug(`💬💫 message created\n${JSON.stringify(message)}`)
+    loglevel.debug(`🔵💬💫 message created\n${JSON.stringify(message)}`)
     return message
   })
