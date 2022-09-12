@@ -1,3 +1,3 @@
 export const config = {
-  alphaWallet: true,
+  walletExtension: import.meta.env.VITE_APP_WALLET_EXTENSION === 'true',
 }

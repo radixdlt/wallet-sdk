@@ -35,3 +35,16 @@ jobs:
         with:
           name: wallet-sdk.${{ github.sha }}
           path: .
+
+      - name: Build wallet extension
+        run: yarn build
+        env:
+          VITE_APP_WALLET_EXTENSION: true
+
+      - name: Prepare artifact
+        run: rm -rf node_modules e2e lib sandbox
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: wallet-sdk-alpha.${{ github.sha }}
+          path: .

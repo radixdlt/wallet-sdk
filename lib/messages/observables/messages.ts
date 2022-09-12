@@ -20,7 +20,7 @@ export const outgoingMessage = (subjects: SubjectsType) =>
 export const incomingMessage = (subjects: SubjectsType) =>
   subjects.incomingMessageSubject.pipe(
     map((message) =>
-      config.alphaWallet
+      config.walletExtension
         ? alphaBridge.transformIncomingMessage(message)
         : message
     ),
