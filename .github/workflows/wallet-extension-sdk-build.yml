@@ -1,4 +1,4 @@
-name: Build
+name: Wallet extension SDK build
 
 on:
   push:
@@ -27,11 +27,13 @@ jobs:
 
       - name: Build
         run: yarn build
+        env:
+          VITE_APP_WALLET_EXTENSION: true
 
       - name: Prepare artifact
         run: rm -rf node_modules e2e lib sandbox
 
       - uses: actions/upload-artifact@v3
         with:
-          name: wallet-sdk.${{ github.sha }}
+          name: wallet-sdk-alpha.${{ github.sha }}
           path: .
