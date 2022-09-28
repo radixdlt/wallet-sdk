@@ -1,6 +1,6 @@
 {
   "name": "@radixdlt/wallet-sdk",
-  "version": "0.1.0alpha",
+  "version": "0.1.0",
   "files": [
     "dist"
   ],
