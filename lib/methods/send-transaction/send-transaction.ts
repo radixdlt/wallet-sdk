@@ -4,13 +4,13 @@ import { errAsync } from 'neverthrow'
 import { createSdkError } from '../../errors'
 import { sendMessage } from '../../messages/observables/send-message'
 import { createMethodResponse } from '../create-method-response'
-import { methodType } from '../_types'
+import { methodType, WalletRequests } from '../_types'
 
 export const sendTransaction =
-  (subjects: SubjectsType) => (transactionManifest: string) => {
+  (subjects: SubjectsType) => (payload: WalletRequests['sendTransaction']) => {
     const result = createMessage({
       method: methodType.sendTransaction,
-      payload: transactionManifest,
+      payload,
     })
 
     if (result.isErr()) {
