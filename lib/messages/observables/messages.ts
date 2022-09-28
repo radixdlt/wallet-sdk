@@ -1,8 +1,6 @@
 import { SubjectsType } from '../subjects'
 import log from 'loglevel'
 import { tap, share, map } from 'rxjs'
-import { alphaBridge } from '../../extension/alpha-bridge'
-import { config } from '../../config'
 import { eventType } from '../events/_types'
 
 export const outgoingMessage = (subjects: SubjectsType) =>
@@ -19,11 +17,6 @@ export const outgoingMessage = (subjects: SubjectsType) =>
 
 export const incomingMessage = (subjects: SubjectsType) =>
   subjects.incomingMessageSubject.pipe(
-    map((message) =>
-      config.walletExtension
-        ? alphaBridge.transformIncomingMessage(message)
-        : message
-    ),
     tap((message) => {
       log.debug(`🔵💬⬇️ message received\n${JSON.stringify(message)}`)
       if ('eventType' in message) {
