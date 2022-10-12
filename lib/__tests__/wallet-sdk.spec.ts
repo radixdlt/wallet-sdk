@@ -21,74 +21,129 @@ describe('sdk flow', () => {
     sdk.destroy()
   })
 
-  describe('request', () => {
-    describe('happy paths', () => {
-      it('should send request and receive response', (done) => {
-        const eventDispatchSpy = jest.spyOn(globalThis, 'dispatchEvent')
+  describe('request method', () => {
+    it('should send request and receive response', (done) => {
+      const eventDispatchSpy = jest.spyOn(globalThis, 'dispatchEvent')
 
-        const outgoingMessageSpy = subscribeSpyTo(
-          sdk.__subjects.outgoingMessageSubject
+      const outgoingMessageSpy = subscribeSpyTo(
+        sdk.__subjects.outgoingMessageSubject
+      )
+
+      const messageEventSpy = subscribeSpyTo(
+        sdk.__subjects.messageLifeCycleEventSubject
+      )
+
+      const callbackSpy = jest.fn()
+
+      const addresses = testHelper.createAccountAddressResponse(3)
+
+      sdk
+        .request(
+          {
+            accountAddresses: {},
+            personaData: { fields: ['email'] },
+          },
+          callbackSpy
         )
-
-        const messageEventSpy = subscribeSpyTo(
-          sdk.__subjects.messageLifeCycleEventSubject
-        )
-
-        const callbackSpy = jest.fn()
-
-        const addresses = testHelper.createAccountAddressResponse(3)
-
-        sdk
-          .request(
-            {
-              accountAddresses: {},
-              personaData: { fields: ['email'] },
-            },
-            callbackSpy
-          )
-          .map((message) => {
-            expect(message.accountAddresses).toEqual(addresses.addresses)
-            expect(message.personaData).toEqual([
-              { field: 'email', value: 'alex@rdx.works' },
-            ])
-            done()
-          })
-
-        expect(eventDispatchSpy).toBeCalled()
-
-        const outgoingMessage = outgoingMessageSpy.getFirstValue()
-
-        expect(outgoingMessage.metadata.networkId).toBe(Network.mainnet)
-
-        sdk.__subjects.incomingMessageSubject.next({
-          requestId: outgoingMessage.requestId,
-          eventType: messageLifeCycleEvent.receivedByExtension,
+        .map((message) => {
+          expect(message.accountAddresses).toEqual(addresses.addresses)
+          expect(message.personaData).toEqual([
+            { field: 'email', value: 'alex@rdx.works' },
+          ])
+          done()
         })
 
-        const incomingMessage = testHelper.createRequestReponse(
-          outgoingMessage.requestId,
-          [
-            addresses,
-            {
-              requestType: requestType.personaData,
-              personaData: [{ field: 'email', value: 'alex@rdx.works' }],
-            },
-          ]
-        )
+      expect(eventDispatchSpy).toBeCalled()
 
-        sdk.__subjects.incomingMessageSubject.next(incomingMessage)
+      const outgoingMessage = outgoingMessageSpy.getFirstValue()
 
-        expect(messageEventSpy.getValues()).toEqual([
-          {
-            requestId: outgoingMessage.requestId,
-            eventType: messageLifeCycleEvent.receivedByExtension,
-          },
-        ])
+      expect(outgoingMessage.metadata.networkId).toBe(Network.mainnet)
 
-        expect(callbackSpy).toHaveBeenCalledWith(
-          messageLifeCycleEvent.receivedByExtension
-        )
+      sdk.__subjects.incomingMessageSubject.next({
+        requestId: outgoingMessage.requestId,
+        eventType: messageLifeCycleEvent.receivedByExtension,
       })
+
+      const incomingMessage = testHelper.createRequestReponse(
+        outgoingMessage.requestId,
+        [
+          addresses,
+          {
+            requestType: requestType.personaData,
+            personaData: [{ field: 'email', value: 'alex@rdx.works' }],
+          },
+        ]
+      )
+
+      sdk.__subjects.incomingMessageSubject.next(incomingMessage)
+
+      expect(messageEventSpy.getValues()).toEqual([
+        {
+          requestId: outgoingMessage.requestId,
+          eventType: messageLifeCycleEvent.receivedByExtension,
+        },
+      ])
+
+      expect(callbackSpy).toHaveBeenCalledWith(
+        messageLifeCycleEvent.receivedByExtension
+      )
+    })
+  })
+
+  describe('send transaction method', () => {
+    it('should send transaction and receive transaction intent hash', (done) => {
+      const eventDispatchSpy = jest.spyOn(globalThis, 'dispatchEvent')
+
+      const outgoingMessageSpy = subscribeSpyTo(
+        sdk.__subjects.outgoingMessageSubject
+      )
+
+      const messageEventSpy = subscribeSpyTo(
+        sdk.__subjects.messageLifeCycleEventSubject
+      )
+
+      const callbackSpy = jest.fn()
+
+      sdk
+        .sendTransaction(
+          {
+            transactionManifest: `test transaction manifest`,
+            version: 1,
+          },
+          callbackSpy
+        )
+        .map((message) => {
+          expect(message.transactionIntentHash).toEqual('testHash')
+          done()
+        })
+
+      expect(eventDispatchSpy).toBeCalled()
+
+      const outgoingMessage = outgoingMessageSpy.getFirstValue()
+
+      expect(outgoingMessage.metadata.networkId).toBe(Network.mainnet)
+
+      sdk.__subjects.incomingMessageSubject.next({
+        requestId: outgoingMessage.requestId,
+        eventType: messageLifeCycleEvent.receivedByExtension,
+      })
+
+      sdk.__subjects.incomingMessageSubject.next({
+        requestId: outgoingMessage.requestId,
+        method: 'sendTransaction',
+        payload: { transactionIntentHash: 'testHash' },
+      })
+
+      expect(messageEventSpy.getValues()).toEqual([
+        {
+          requestId: outgoingMessage.requestId,
+          eventType: messageLifeCycleEvent.receivedByExtension,
+        },
+      ])
+
+      expect(callbackSpy).toHaveBeenCalledWith(
+        messageLifeCycleEvent.receivedByExtension
+      )
     })
   })
 })
