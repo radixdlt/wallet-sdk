@@ -1,13 +1,14 @@
-import { createMessage, SubjectsType } from '../../messages'
+import { createMessage } from '../../messages'
 import loglevel from 'loglevel'
 import { errAsync } from 'neverthrow'
 import { createSdkError } from '../../errors'
-import { sendMessage } from '../../messages/observables/send-message'
+import { SendMessage } from '../../messages/observables/send-message'
 import { createMethodResponse } from '../create-method-response'
 import { methodType, WalletRequests } from '../_types'
 
 export const sendTransaction =
-  (subjects: SubjectsType) => (payload: WalletRequests['sendTransaction']) => {
+  (sendMessage: SendMessage) =>
+  (payload: WalletRequests['sendTransaction']) => {
     const result = createMessage({
       method: methodType.sendTransaction,
       payload,
@@ -23,10 +24,7 @@ export const sendTransaction =
       )
     }
 
-    const walletRequest$ = sendMessage<'sendTransaction'>(
-      subjects,
-      result.value
-    )
+    const walletRequest$ = sendMessage<'sendTransaction'>(result.value)
 
     return createMethodResponse(walletRequest$)
   }

@@ -7,36 +7,40 @@ import { MethodType } from '../../methods/_types'
 import { MessageLifeCycleEvent } from '../events/_types'
 import { messageEvents } from './message-events'
 
-export const sendMessage = <M extends MethodType>(
-  subjects: SubjectsType,
-  message: OutgoingMessageType,
-  eventCallback?: (eventType: MessageLifeCycleEvent) => void
-): Observable<Result<IncomingMessage[M]['payload'], SdkError>> => {
-  subjects.outgoingMessageSubject.next(message)
+export type SendMessage = ReturnType<typeof sendMessage>
 
-  const response$ = subjects.responseSubject.pipe(
-    filter((response) => response.requestId === message.requestId),
-    map((message) =>
-      'method' in message ? ok(message.payload) : err(message)
-    ),
-    first()
-  )
+export const sendMessage =
+  (networkId: number, subjects: SubjectsType) =>
+  <M extends MethodType>(
+    message: OutgoingMessageType,
+    eventCallback?: (eventType: MessageLifeCycleEvent) => void
+  ): Observable<Result<IncomingMessage[M]['payload'], SdkError>> => {
+    const metadata = { networkId }
+    subjects.outgoingMessageSubject.next({ ...message, metadata })
 
-  const messageEventSubscription = messageEvents(subjects, message.requestId)
-    .pipe(
-      tap((event) => {
-        loglevel.debug(
-          `💬📣⬇️ received message lifecycle event\n${JSON.stringify(event)}`
-        )
-        if (eventCallback) eventCallback(event.eventType)
-      }),
-      takeUntil(response$)
+    const response$ = subjects.responseSubject.pipe(
+      filter((response) => response.requestId === message.requestId),
+      map((message) =>
+        'method' in message ? ok(message.payload) : err(message)
+      ),
+      first()
     )
-    .subscribe()
 
-  return response$.pipe(
-    tap(() => {
-      messageEventSubscription.unsubscribe()
-    })
-  )
-}
+    const messageEventSubscription = messageEvents(subjects, message.requestId)
+      .pipe(
+        tap((event) => {
+          loglevel.debug(
+            `💬📣⬇️ received message lifecycle event\n${JSON.stringify(event)}`
+          )
+          if (eventCallback) eventCallback(event.eventType)
+        }),
+        takeUntil(response$)
+      )
+      .subscribe()
+
+    return response$.pipe(
+      tap(() => {
+        messageEventSubscription.unsubscribe()
+      })
+    )
+  }

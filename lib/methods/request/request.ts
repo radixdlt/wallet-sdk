@@ -1,6 +1,5 @@
-import { SubjectsType } from '../../messages/subjects'
 import { RequestMethodInput } from './_types'
-import { sendMessage } from '../../messages/observables/send-message'
+import { SendMessage } from '../../messages/observables/send-message'
 import { createRequestMessage } from './create-request-message'
 import { map } from 'rxjs'
 import { createSdkError } from '../../errors'
@@ -10,7 +9,7 @@ import { createMethodResponse } from '../create-method-response'
 import { MessageLifeCycleEvent } from '../../messages/events/_types'
 
 export const request =
-  (subjects: SubjectsType) =>
+  (sendMessage: SendMessage) =>
   (
     input: RequestMethodInput,
     eventCallback?: (messageEvent: MessageLifeCycleEvent) => void
@@ -26,11 +25,9 @@ export const request =
 
     const message = result.value
 
-    const walletRequest$ = sendMessage<'request'>(
-      subjects,
-      message,
-      eventCallback
-    ).pipe(map(transformWalletResponse))
+    const walletRequest$ = sendMessage<'request'>(message, eventCallback).pipe(
+      map(transformWalletResponse)
+    )
 
     return createMethodResponse(walletRequest$)
   }
