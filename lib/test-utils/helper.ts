@@ -1,5 +1,5 @@
 import { IncomingMessageType } from '../messages'
-import { AccountAddressResponse, requestType } from '../methods'
+import { RequestWalletResponse, requestType } from '../methods'
 
 const TestHelper = () => {
   const createAddresses = (numberOfAddresses: number) =>
@@ -11,7 +11,7 @@ const TestHelper = () => {
     }))
   const createAccountAddressResponse = (
     numberOfAddresses: number
-  ): AccountAddressResponse => ({
+  ): RequestWalletResponse['accountAddresses'] => ({
     requestType: requestType.accountAddresses,
     addresses: createAddresses(numberOfAddresses),
   })

@@ -15,6 +15,12 @@ export const transformWalletResponse = (
             [requestType.accountAddresses]: value.addresses,
           }
 
+        case requestType.personaData:
+          return {
+            ...acc,
+            [requestType.personaData]: value.personaData,
+          }
+
         default:
           return acc
       }

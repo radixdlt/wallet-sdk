@@ -5,6 +5,7 @@ import { subscribeSpyTo } from '@hirez_io/observer-spy'
 import log from 'loglevel'
 import { testHelper } from '../test-utils/helper'
 import { messageLifeCycleEvent } from '../messages/events/_types'
+import { requestType } from '../methods'
 
 let sdk: WalletSdkType
 
@@ -41,11 +42,15 @@ describe('sdk flow', () => {
           .request(
             {
               accountAddresses: {},
+              personaData: { fields: ['email'] },
             },
             callbackSpy
           )
           .map((message) => {
             expect(message.accountAddresses).toEqual(addresses.addresses)
+            expect(message.personaData).toEqual([
+              { field: 'email', value: 'alex@rdx.works' },
+            ])
             done()
           })
 
@@ -60,7 +65,13 @@ describe('sdk flow', () => {
 
         const incomingMessage = testHelper.createRequestReponse(
           outgoingMessage.requestId,
-          [addresses]
+          [
+            addresses,
+            {
+              requestType: requestType.personaData,
+              personaData: [{ field: 'email', value: 'alex@rdx.works' }],
+            },
+          ]
         )
 
         sdk.__subjects.incomingMessageSubject.next(incomingMessage)
