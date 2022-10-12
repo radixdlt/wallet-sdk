@@ -6,8 +6,11 @@ loglevel.setLevel('debug')
 
 const accountAddressElement = document.getElementById('accountAddress')!
 const emailElement = document.getElementById('email')!
+const fetchAccountAddressButtonElement = document.getElementById(
+  'fetchAccountAddress'
+)!
 
-document.getElementById('fetchAccountAddress')!.onclick = async function () {
+fetchAccountAddressButtonElement.onclick = async () => {
   const result = await sdk.request({
     accountAddresses: {},
     personaData: { fields: ['firstName', 'email'] },

@@ -37,3 +37,5 @@ const WalletSdk = ({
 export type WalletSdk = ReturnType<typeof WalletSdk>
 
 export default WalletSdk
+
+export { ManifestBuilder } from './manifest-builder'

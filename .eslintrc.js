@@ -5,6 +5,7 @@ module.exports = {
     'unused-imports/no-unused-imports': 'error',
     'no-undef': 'off',
     '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+    '@typescript-eslint/explicit-member-accessibility': 'off',
   },
   extends: ['alloy', 'alloy/typescript'],
   overrides: [
