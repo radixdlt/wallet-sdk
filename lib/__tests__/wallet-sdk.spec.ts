@@ -1,6 +1,6 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable max-nested-callbacks */
-import WalletSdk, { WalletSdk as WalletSdkType } from '../wallet-sdk'
+import WalletSdk, { Network, WalletSdk as WalletSdkType } from '../wallet-sdk'
 import { subscribeSpyTo } from '@hirez_io/observer-spy'
 import log from 'loglevel'
 import { testHelper } from '../test-utils/helper'
@@ -57,6 +57,8 @@ describe('sdk flow', () => {
         expect(eventDispatchSpy).toBeCalled()
 
         const outgoingMessage = outgoingMessageSpy.getFirstValue()
+
+        expect(outgoingMessage.metadata.networkId).toBe(Network.mainnet)
 
         sdk.__subjects.incomingMessageSubject.next({
           requestId: outgoingMessage.requestId,
