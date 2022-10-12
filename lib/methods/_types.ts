@@ -11,12 +11,13 @@ export type WalletRequests = {
   request: RequestItem[]
   sendTransaction: {
     transactionManifest: string
+    version: number
     blobs?: string[]
-    metaData?: { message: string }
+    message?: string
   }
 }
 
 export type WalletResponses = {
   request: RequestWalletResponseType[]
-  sendTransaction: { transactionHash: string }
+  sendTransaction: { transactionIntentHash: string }
 }

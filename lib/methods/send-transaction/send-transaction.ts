@@ -5,10 +5,14 @@ import { createSdkError } from '../../errors'
 import { SendMessage } from '../../messages/observables/send-message'
 import { createMethodResponse } from '../create-method-response'
 import { methodType, WalletRequests } from '../_types'
+import { MessageLifeCycleEvent } from '../../messages/events/_types'
 
 export const sendTransaction =
   (sendMessage: SendMessage) =>
-  (payload: WalletRequests['sendTransaction']) => {
+  (
+    payload: WalletRequests['sendTransaction'],
+    eventCallback?: (messageEvent: MessageLifeCycleEvent) => void
+  ) => {
     const result = createMessage({
       method: methodType.sendTransaction,
       payload,
@@ -24,7 +28,10 @@ export const sendTransaction =
       )
     }
 
-    const walletRequest$ = sendMessage<'sendTransaction'>(result.value)
+    const walletRequest$ = sendMessage<'sendTransaction'>(
+      result.value,
+      eventCallback
+    )
 
     return createMethodResponse(walletRequest$)
   }
