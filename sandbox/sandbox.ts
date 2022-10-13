@@ -12,8 +12,12 @@ const fetchAccountAddressButtonElement = document.getElementById(
 
 fetchAccountAddressButtonElement.onclick = async () => {
   const result = await sdk.request({
-    accountAddresses: {},
-    personaData: { fields: ['firstName', 'email'] },
+    accountAddresses: {
+      numberOfAddresses: 1,
+    },
+    personaData: {
+      fields: ['firstName', 'email'],
+    },
   })
 
   if (result.isErr()) {

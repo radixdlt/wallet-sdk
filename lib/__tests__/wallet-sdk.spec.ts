@@ -40,8 +40,11 @@ describe('sdk flow', () => {
       sdk
         .request(
           {
-            accountAddresses: {},
-            personaData: { fields: ['email'] },
+            accountAddresses: { reset: true },
+            personaData: {
+              revokeOngoingAccess: ['firstName'],
+              fields: ['email'],
+            },
           },
           callbackSpy
         )
@@ -58,6 +61,10 @@ describe('sdk flow', () => {
       const outgoingMessage = outgoingMessageSpy.getFirstValue()
 
       expect(outgoingMessage.metadata.networkId).toBe(Network.mainnet)
+      expect((outgoingMessage.payload as any)[0].reset).toBe(true)
+      expect((outgoingMessage.payload as any)[1].revokeOngoingAccess).toEqual([
+        'firstName',
+      ])
 
       sdk.__subjects.incomingMessageSubject.next({
         requestId: outgoingMessage.requestId,
