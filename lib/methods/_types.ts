@@ -1,4 +1,4 @@
-import { RequestItem, RequestWalletResponseType } from './request'
+import { WalletRequestItem, RequestWalletResponseType } from './request'
 
 export const methodType = {
   request: 'request',
@@ -8,7 +8,7 @@ export const methodType = {
 export type MethodType = keyof typeof methodType
 
 export type WalletRequests = {
-  request: RequestItem[]
+  request: WalletRequestItem[]
   sendTransaction: {
     transactionManifest: string
     version: number
