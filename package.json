@@ -5,10 +5,10 @@
     "dist"
   ],
   "main": "./dist/wallet-sdk.umd.js",
-  "module": "./dist/wallet-sdk.es.js",
+  "module": "./dist/wallet-sdk.mjs",
   "exports": {
     ".": {
-      "import": "./dist/wallet-sdk.es.js",
+      "import": "./dist/wallet-sdk.mjs",
       "require": "./dist/wallet-sdk.umd.js"
     }
   },
