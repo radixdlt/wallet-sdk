@@ -5,12 +5,20 @@ import { sendMessage as createSendMessage } from './messages/observables/send-me
 
 type WalletSdkInput = { networkId?: number }
 
-export const Network = { mainnet: 0x01, betanet: 0x00, alphanet: 0x0a } as const
+export const Network = {
+  Mainnet: 0x01,
+  Stokenet: 0x02,
+  Adapanet: 0x0a,
+  Nebunet: 0x0b,
+  Gilganet: 0x20,
+  Enkinet: 0x21,
+  Hammunet: 0x22,
+} as const
 
-const defaultInput = { networkId: Network.mainnet }
+const defaultInput = { networkId: Network.Mainnet }
 
 const WalletSdk = ({
-  networkId = Network.mainnet,
+  networkId = Network.Mainnet,
 }: WalletSdkInput = defaultInput) => {
   log.debug(`🔵 wallet sdk instantiated`)
   const messageClient = MessageClient()

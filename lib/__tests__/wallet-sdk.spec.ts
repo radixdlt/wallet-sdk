@@ -60,7 +60,7 @@ describe('sdk flow', () => {
 
       const outgoingMessage = outgoingMessageSpy.getFirstValue()
 
-      expect(outgoingMessage.metadata.networkId).toBe(Network.mainnet)
+      expect(outgoingMessage.metadata.networkId).toBe(Network.Mainnet)
       expect((outgoingMessage.payload as any)[0].reset).toBe(true)
       expect((outgoingMessage.payload as any)[1].revokeOngoingAccess).toEqual([
         'firstName',
@@ -128,7 +128,7 @@ describe('sdk flow', () => {
 
       const outgoingMessage = outgoingMessageSpy.getFirstValue()
 
-      expect(outgoingMessage.metadata.networkId).toBe(Network.mainnet)
+      expect(outgoingMessage.metadata.networkId).toBe(Network.Mainnet)
 
       sdk.__subjects.incomingMessageSubject.next({
         requestId: outgoingMessage.requestId,
