@@ -9,17 +9,14 @@ test('should ignore invalid request types', () => {
       personaData: {},
     } as any)
   ).toEqual(
-    ok([
-      { requestType: 'accountAddresses', ongoing: false, reset: false },
-      { requestType: 'personaData', ongoing: false, reset: false },
-    ])
+    ok([{ requestType: 'accountAddresses' }, { requestType: 'personaData' }])
   )
 })
 
 test('should create request message', () => {
   const result = createRequestMessage({
     accountAddresses: { numberOfAddresses: 1 },
-    personaData: { fields: ['email'], ongoing: true, reset: true },
+    personaData: { fields: ['email'] },
   })
 
   if (result.isErr()) throw result.error
@@ -35,15 +32,11 @@ test('should create request message', () => {
     payload: [
       {
         requestType: 'accountAddresses',
-        ongoing: false,
         numberOfAddresses: 1,
-        reset: false,
       },
       {
         requestType: 'personaData',
-        ongoing: true,
         fields: ['email'],
-        reset: true,
       },
     ],
   })

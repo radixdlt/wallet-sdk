@@ -21,6 +21,20 @@ export const transformWalletResponse = (
             [requestType.personaData]: value.personaData,
           }
 
+        case requestType.login: {
+          const { challenge, signature, publicKey, identityComponentAddress } =
+            value
+          return {
+            ...acc,
+            [requestType.login]: {
+              challenge,
+              signature,
+              publicKey,
+              identityComponentAddress,
+            },
+          }
+        }
+
         default:
           return acc
       }

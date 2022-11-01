@@ -1,4 +1,4 @@
-import { IncomingMessageType } from '../messages'
+import { IncomingMessage } from '../messages'
 import { RequestWalletResponse, requestType } from '../methods'
 
 const TestHelper = () => {
@@ -17,10 +17,8 @@ const TestHelper = () => {
   })
 
   const createRequestReponse = (
-    requestId: string,
     input: any
-  ): IncomingMessageType => ({
-    requestId,
+  ): Omit<IncomingMessage['request'], 'requestId'> => ({
     method: 'request',
     payload: input,
   })

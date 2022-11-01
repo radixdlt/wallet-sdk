@@ -23,11 +23,10 @@ export const request =
         )
       )
 
-    const message = result.value
-
-    const walletRequest$ = sendMessage<'request'>(message, eventCallback).pipe(
-      map(transformWalletResponse)
-    )
+    const walletRequest$ = sendMessage<'request'>(
+      result.value,
+      eventCallback
+    ).pipe(map(transformWalletResponse))
 
     return createMethodResponse(walletRequest$)
   }

@@ -10,8 +10,6 @@ export const transformInput = (
     Object.entries(input)
       .map(([key, value]) => ({
         requestType: key,
-        ongoing: !!value.ongoing,
-        reset: !!value.reset,
         ...value,
       }))
       .filter((item): item is WalletRequestItem =>

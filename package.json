@@ -14,7 +14,7 @@
   },
   "types": "./dist/wallet-sdk.d.ts",
   "scripts": {
-    "dev": "vite serve sandbox",
+    "dev": "vite serve examples",
     "build": "vite build && yarn build:types",
     "build:types": "tsc --project tsconfig.types.json --emitDeclarationOnly",
     "preview": "vite preview",
