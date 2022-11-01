@@ -10,12 +10,15 @@ import { messageEvents } from './message-events'
 export type SendMessage = ReturnType<typeof sendMessage>
 
 export const sendMessage =
-  (networkId: number, subjects: SubjectsType) =>
+  (
+    { networkId, dAppId }: { networkId: number; dAppId: string },
+    subjects: SubjectsType
+  ) =>
   <M extends MethodType>(
     message: OutgoingMessageType,
     eventCallback?: (eventType: MessageLifeCycleEvent) => void
   ): Observable<Result<IncomingMessage[M]['payload'], SdkError>> => {
-    const metadata = { networkId }
+    const metadata = { networkId, dAppId }
     subjects.outgoingMessageSubject.next({ ...message, metadata })
 
     const response$ = subjects.responseSubject.pipe(

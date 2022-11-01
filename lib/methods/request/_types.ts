@@ -1,6 +1,7 @@
 export const requestType = {
   accountAddresses: 'accountAddresses',
   personaData: 'personaData',
+  login: 'login',
 } as const
 
 export const requestTypeSet = new Set(Object.keys(requestType))
@@ -9,35 +10,31 @@ export type RequestTypes = keyof typeof requestType
 
 type AccountAddressesRequestMethodInput = {
   numberOfAddresses?: number
-  ongoing?: boolean
-  reset?: boolean
 }
 
 type PersonaDataRequestMethodInput = {
   fields: string[]
-  ongoing?: boolean
-  reset?: boolean
-  revokeOngoingAccess?: string[]
+}
+
+type LoginRequestMethodInput = {
+  challenge: string
 }
 
 export type RequestMethodInput = Partial<{
   [requestType.accountAddresses]: AccountAddressesRequestMethodInput
   [requestType.personaData]: PersonaDataRequestMethodInput
+  [requestType.login]: LoginRequestMethodInput
 }>
 
 type AccountAddressesWalletRequestItem = {
   requestType: typeof requestType['accountAddresses']
   ongoing: boolean
   numberOfAddresses?: number
-  reset: boolean
 }
 
 type PersonaDataWalletRequestItem = {
   requestType: typeof requestType['personaData']
-  ongoing: boolean
   fields: string[]
-  reset: boolean
-  revokeOngoingAccess?: string[]
 }
 
 export type WalletRequestItem =
@@ -54,9 +51,18 @@ type PersonaDataRequestWalletResponse = {
   personaData: { field: string; value: string }[]
 }
 
+type LoginRequestWalletResponse = {
+  requestType: typeof requestType['login']
+  challenge: string
+  signature: string
+  publicKey: string
+  identityComponentAddress: string
+}
+
 export type RequestWalletResponse = {
   [requestType.accountAddresses]: AccountAddressesRequestWalletResponse
   [requestType.personaData]: PersonaDataRequestWalletResponse
+  [requestType.login]: LoginRequestWalletResponse
 }
 
 export type RequestWalletResponseType = RequestWalletResponse[RequestTypes]
@@ -64,4 +70,10 @@ export type RequestWalletResponseType = RequestWalletResponse[RequestTypes]
 export type RequestMethodResponse = Partial<{
   [requestType.accountAddresses]: RequestWalletResponse['accountAddresses']['addresses']
   [requestType.personaData]: RequestWalletResponse['personaData']['personaData']
+  [requestType.login]: {
+    challenge: string
+    signature: string
+    publicKey: string
+    identityComponentAddress: string
+  }
 }>
