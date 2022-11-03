@@ -9,12 +9,16 @@ export type MethodType = keyof typeof methodType
 
 export type WalletRequests = {
   request: WalletRequestItem[]
-  sendTransaction: {
-    transactionManifest: string
-    version: number
-    blobs?: string[]
-    message?: string
-  }
+  sendTransaction: [
+    {
+      requestType: typeof methodType.sendTransaction
+      transactionManifest: string
+      version: number
+      accountAddress: string
+      blobs?: string[]
+      message?: string
+    }
+  ]
 }
 
 export type WalletResponses = {

@@ -3,8 +3,10 @@ import { createMessage } from '../../messages'
 import { methodType } from '../_types'
 import { RequestMethodInput, WalletRequestItem, requestTypeSet } from './_types'
 
+type CreateMessageInput = RequestMethodInput
+
 export const transformInput = (
-  input: RequestMethodInput
+  input: CreateMessageInput
 ): Result<WalletRequestItem[], never> =>
   ok(
     Object.entries(input)
@@ -17,7 +19,7 @@ export const transformInput = (
       )
   )
 
-export const createRequestMessage = (input: RequestMethodInput) =>
+export const createRequestMessage = (input: CreateMessageInput) =>
   transformInput(input).andThen((payload) =>
     createMessage({
       method: methodType.request,
