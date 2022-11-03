@@ -1,1 +1,3 @@
-export const config = {}
+export const config = {
+  extensionDetectionTime: 100,
+}
