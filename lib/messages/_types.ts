@@ -14,7 +14,7 @@ export type OutgoingMessage = {
 
 export type OutgoingMessageType = OutgoingMessage[MethodType]
 
-export type Metadata = { networkId: number }
+export type Metadata = { networkId: number; dAppId: string }
 
 type GenericIncomingMessage<M extends MethodType> = {
   method: M

@@ -46,7 +46,6 @@ const mockLoginWalletResponse: RequestWalletResponse['login'] = {
 
 describe('sdk flow', () => {
   let sdk: WalletSdkType
-
   beforeEach(() => {
     log.setLevel('silent')
     sdk = WalletSdk({ dAppId: 'radixDashboard' })
