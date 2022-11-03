@@ -1,22 +1,28 @@
-import { createMessage } from '../../messages'
 import loglevel from 'loglevel'
 import { errAsync } from 'neverthrow'
 import { createSdkError } from '../../errors'
 import { SendMessage } from '../../messages/observables/send-message'
 import { createMethodResponse } from '../create-method-response'
-import { methodType, WalletRequests } from '../_types'
+import { methodType } from '../_types'
 import { MessageLifeCycleEvent } from '../../messages/events/_types'
+import { createMessage } from '../../messages'
+import { SendTransactionMethodInput } from './_types'
+
+export const createSendTransactionMessage = (
+  input: SendTransactionMethodInput
+) =>
+  createMessage({
+    method: methodType.sendTransaction,
+    payload: [{ requestType: methodType.sendTransaction, ...input }],
+  })
 
 export const sendTransaction =
   (sendMessage: SendMessage) =>
   (
-    payload: WalletRequests['sendTransaction'],
+    input: SendTransactionMethodInput,
     eventCallback?: (messageEvent: MessageLifeCycleEvent) => void
   ) => {
-    const result = createMessage({
-      method: methodType.sendTransaction,
-      payload,
-    })
+    const result = createSendTransactionMessage(input)
 
     if (result.isErr()) {
       loglevel.error(result.error)
