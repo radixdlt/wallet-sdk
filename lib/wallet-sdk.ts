@@ -1,7 +1,7 @@
 import { MessageClient } from './messages/message-client'
-import { request, sendTransaction } from './methods'
 import log from 'loglevel'
 import { sendMessage as createSendMessage } from './messages/observables/send-message'
+import { createMethods } from './create-methods'
 
 type WalletSdkInput = { networkId?: number; dAppId: string }
 
@@ -24,15 +24,9 @@ const WalletSdk = ({ networkId = Network.Mainnet, dAppId }: WalletSdkInput) => {
     messageClient.destroy()
   }
 
-  const sendMessage = createSendMessage(
-    { networkId, dAppId },
-    messageClient.subjects
+  const methods = createMethods(
+    createSendMessage({ networkId, dAppId }, messageClient.subjects)
   )
-
-  const methods = {
-    request: request(sendMessage),
-    sendTransaction: sendTransaction(sendMessage),
-  }
 
   return {
     ...methods,
@@ -46,3 +40,5 @@ export type WalletSdk = ReturnType<typeof WalletSdk>
 export default WalletSdk
 
 export { ManifestBuilder } from './manifest-builder'
+export { requestBuilder } from './request-builder'
+export { requestItem } from './IO/request-items/request-item'

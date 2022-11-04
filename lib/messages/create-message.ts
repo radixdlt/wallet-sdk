@@ -1,19 +1,7 @@
-import loglevel from 'loglevel'
-import { OutgoingMessage, OutgoingMessageType } from './_types'
-import { ok, Result } from 'neverthrow'
+import { ok } from 'neverthrow'
 
-type CreateMessageInput =
-  | Omit<OutgoingMessage['request'], 'requestId'>
-  | Omit<OutgoingMessage['sendTransaction'], 'requestId'>
-
-export const createMessage = (
-  input: CreateMessageInput,
-  requestId = crypto.randomUUID()
-): Result<OutgoingMessageType, never> =>
+export const createMessage = <T>(input: T, requestId = crypto.randomUUID()) =>
   ok({
-    ...input,
+    payload: input,
     requestId,
-  }).map((message) => {
-    loglevel.debug(`🔵💬💫 message created\n${JSON.stringify(message)}`)
-    return message
   })

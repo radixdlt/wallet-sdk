@@ -1,25 +1,22 @@
 import { Subject } from 'rxjs'
+import { SdkError } from '../helpers/error'
 import {
   IncomingMessage,
-  IncomingMessageType,
   MessageDispatch,
   Metadata,
-  OutgoingMessageType,
+  OutgoingMessage,
 } from './_types'
-import { SdkError } from '../errors'
 
 export type SubjectsType = ReturnType<typeof Subjects>
 
 export const Subjects = () => ({
   outgoingMessageSubject: new Subject<
-    OutgoingMessageType & { metadata: Metadata }
+    OutgoingMessage & { metadata: Metadata }
   >(),
-  incomingMessageSubject: new Subject<IncomingMessageType>(),
-  responseSubject: new Subject<
-    IncomingMessage['request'] | IncomingMessage['sendTransaction'] | SdkError
+  incomingMessageSubject: new Subject<
+    IncomingMessage['event'] | IncomingMessage['response']
   >(),
-  messageLifeCycleEventSubject: new Subject<
-    IncomingMessage['messageLifeCycleEvent']
-  >(),
+  responseSubject: new Subject<IncomingMessage['response'] | SdkError>(),
+  messageLifeCycleEventSubject: new Subject<IncomingMessage['event']>(),
   dispatchEventSubject: new Subject<MessageDispatch>(),
 })

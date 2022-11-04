@@ -1,6 +1,5 @@
 import loglevel from 'loglevel'
-import WalletSdk from '../lib/wallet-sdk'
-import { Buffer } from 'buffer'
+import WalletSdk, { requestBuilder, requestItem } from '../lib/wallet-sdk'
 import { Result } from 'neverthrow'
 
 const sdk = WalletSdk({ dAppId: 'radixDashboard' })
@@ -57,39 +56,43 @@ const clearResults = () => {
 
 document.getElementById('login-btn')!.onclick = async () => {
   clearResults()
-  // this is for example purposes. The challenge should be generated and stored on the backend to prevent replay attacks
-  const challenge = Buffer.from(
-    crypto.getRandomValues(new Uint8Array(32))
-  ).toString('hex')
 
   displayResults(
-    await sdk.request({
-      login: {
-        challenge,
-      },
-    })
+    await sdk.request(requestBuilder(requestItem.login.withoutChallenge()))
   )
 }
 
 document.getElementById('account-address-btn')!.onclick = async () => {
   clearResults()
-  displayResults(
-    await sdk.request({
-      accountAddresses: {
-        numberOfAddresses: 1,
-      },
-    })
+
+  const result = await sdk.request(
+    requestBuilder(
+      requestItem.oneTimeAccountAddresses.withoutProofOfOwnership()
+    )
   )
+
+  displayResults(result)
+}
+
+document.getElementById('persona-data-btn')!.onclick = async () => {
+  clearResults()
+
+  const result = await sdk.request(
+    requestBuilder(requestItem.oneTimePersonaData('email'))
+  )
+
+  displayResults(result)
 }
 
 document.getElementById('send-tx-btn')!.onclick = async () => {
   clearResults()
-  displayResults(
-    await sdk.sendTransaction({
-      transactionManifest,
-      accountAddress:
-        'account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064',
-      version: 1,
-    })
-  )
+
+  const result = await sdk.sendTransaction({
+    transactionManifest,
+    accountAddress:
+      'account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064',
+    version: 1,
+  })
+
+  displayResults(result)
 }

@@ -51,6 +51,8 @@
     "vite-tsconfig-paths": "^3.5.0"
   },
   "dependencies": {
+    "@types/lodash.flow": "^3.5.7",
+    "lodash.flow": "^3.5.0",
     "loglevel": "^1.8.0",
     "neverthrow": "^5.0.0",
     "rxjs": "^7.5.6"

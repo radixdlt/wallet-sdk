@@ -5,17 +5,15 @@ import WalletSdk, { Network, WalletSdk as WalletSdkType } from '../wallet-sdk'
 import { subscribeSpyTo } from '@hirez_io/observer-spy'
 import log from 'loglevel'
 import { messageLifeCycleEvent } from '../messages/events/_types'
-import {
-  RequestMethodInput,
-  RequestMethodResponse,
-  RequestWalletResponse,
-} from '../methods'
-import { IncomingMessage } from '../messages'
 
-const mockAccountAddressesWalletResponse: RequestWalletResponse['accountAddresses'] =
+import { OneTimeAccountAddresses } from '../IO/request-items/one-time-account-addresses'
+import { Wallet } from '../_types'
+
+const mockAccountAddressesWalletResponse: OneTimeAccountAddresses['wallet']['response'] =
   {
-    requestType: 'accountAddresses',
-    addresses: [
+    requestType: 'oneTimeAccountAddresses',
+    proofOfOwnership: false,
+    accountAddresses: [
       {
         address: 'rdx61333732663539372d383861352d3461',
         label: 'address-0',
@@ -31,19 +29,6 @@ const mockAccountAddressesWalletResponse: RequestWalletResponse['accountAddresse
     ],
   }
 
-const mockPersonaDataWalletResponse: RequestWalletResponse['personaData'] = {
-  requestType: 'personaData',
-  personaData: [{ field: 'email', value: 'alex@rdx.works' }],
-}
-
-const mockLoginWalletResponse: RequestWalletResponse['login'] = {
-  requestType: 'login',
-  challenge: '60ffcd3fae6e57b5fbbc2ac241250575f342dfb8287499171a322a5aaf56ee20',
-  publicKey: '<<TEST_PUBLIC_KEY>>',
-  identityComponentAddress: '<<TEST_IDENTITY_ADDRESS>>',
-  signature: '<<TEST_SIGNATURE>>',
-}
-
 describe('sdk flow', () => {
   let sdk: WalletSdkType
   beforeEach(() => {
@@ -57,16 +42,16 @@ describe('sdk flow', () => {
     sdk.destroy()
   })
 
-  const createRequestHelper = ({
+  const createRequestHelper = <I extends {}>({
     input,
     walletResponse,
     eventCallback,
     callback,
   }: {
-    input: RequestMethodInput
-    walletResponse: Omit<IncomingMessage['request'], 'requestId'>
+    input: I
+    walletResponse: Wallet['response']
     eventCallback?: () => void
-    callback: (message: RequestMethodResponse) => void
+    callback: (message: any) => void
   }) => {
     const eventDispatchSpy = jest.spyOn(globalThis, 'dispatchEvent')
     const outgoingMessageSpy = subscribeSpyTo(
@@ -76,9 +61,7 @@ describe('sdk flow', () => {
       sdk.__subjects.messageLifeCycleEventSubject
     )
 
-    sdk.request(input, eventCallback).map((response) => {
-      callback(response)
-    })
+    sdk.request(input, eventCallback).map(callback)
 
     expect(eventDispatchSpy).toBeCalled()
 
@@ -86,7 +69,7 @@ describe('sdk flow', () => {
     sendReceivedEvent(outgoingMessage.requestId)
 
     sdk.__subjects.incomingMessageSubject.next({
-      ...walletResponse,
+      payload: walletResponse,
       requestId: outgoingMessage.requestId,
     })
 
@@ -105,29 +88,20 @@ describe('sdk flow', () => {
 
   describe('request method', () => {
     it('should request account addresses and persona data', (done) => {
-      const walletResponse: Omit<IncomingMessage['request'], 'requestId'> = {
-        method: 'request',
-        payload: [
-          mockAccountAddressesWalletResponse,
-          mockPersonaDataWalletResponse,
-        ],
-      }
+      const walletResponse = [mockAccountAddressesWalletResponse]
 
       const callbackSpy = jest.fn()
 
       const { outgoingMessage, getMessageEvents } = createRequestHelper({
         input: {
-          accountAddresses: {},
-          personaData: {
-            fields: ['email'],
-          },
+          oneTimeAccountAddresses: {},
         },
         walletResponse,
         eventCallback: callbackSpy,
         callback: (response) => {
           expect({
-            accountAddresses: mockAccountAddressesWalletResponse.addresses,
-            personaData: mockPersonaDataWalletResponse.personaData,
+            oneTimeAccountAddresses:
+              mockAccountAddressesWalletResponse.accountAddresses,
           }).toEqual(response)
           done()
         },
@@ -145,27 +119,6 @@ describe('sdk flow', () => {
       expect(callbackSpy).toHaveBeenCalledWith(
         messageLifeCycleEvent.receivedByExtension
       )
-    })
-    it('should handle login request', (done) => {
-      const walletResponse: Omit<IncomingMessage['request'], 'requestId'> = {
-        method: 'request',
-        payload: [mockLoginWalletResponse],
-      }
-
-      createRequestHelper({
-        input: {
-          login: {
-            challenge:
-              '60ffcd3fae6e57b5fbbc2ac241250575f342dfb8287499171a322a5aaf56ee20',
-          },
-        },
-        walletResponse,
-        callback: (response) => {
-          const { requestType, ...expected } = mockLoginWalletResponse
-          expect({ login: expected }).toEqual(response)
-          done()
-        },
-      })
     })
   })
 
@@ -210,7 +163,6 @@ describe('sdk flow', () => {
 
       sdk.__subjects.incomingMessageSubject.next({
         requestId: outgoingMessage.requestId,
-        method: 'sendTransaction',
         payload: [
           { requestType: 'sendTransaction', transactionIntentHash: 'testHash' },
         ],

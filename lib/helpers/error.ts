@@ -1,3 +1,5 @@
+export const sdkError = (error: unknown) => error as SdkError
+
 export const errorType = {
   missingAddress: 'missingAddress',
   rejectedByUser: 'rejectedByUser',
@@ -7,8 +9,7 @@ export const errorType = {
   submitTransaction: 'submitTransaction',
 } as const
 
-type ErrorTypes = typeof errorType
-type ErrorType = keyof ErrorTypes
+type ErrorType = keyof typeof errorType
 
 type GenericError<T extends ErrorType> = {
   requestId: string
@@ -16,20 +17,7 @@ type GenericError<T extends ErrorType> = {
   message: string
 }
 
-type MissingAddressError = GenericError<'missingAddress'>
-type RejectedByUserError = GenericError<'rejectedByUser'>
-type MissingExtensionError = GenericError<'missingExtension'>
-type UnavailableError = GenericError<'unavailable'>
-type InternalError = GenericError<'internal'>
-type SubmitTransactionError = GenericError<'submitTransaction'>
-
-export type SdkError =
-  | MissingAddressError
-  | RejectedByUserError
-  | MissingExtensionError
-  | UnavailableError
-  | InternalError
-  | SubmitTransactionError
+export type SdkError = GenericError<keyof typeof errorType>
 
 const defaultErrorMessage = {
   [errorType.internal]: 'unknown error',
