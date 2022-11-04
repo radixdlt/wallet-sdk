@@ -211,7 +211,9 @@ describe('sdk flow', () => {
       sdk.__subjects.incomingMessageSubject.next({
         requestId: outgoingMessage.requestId,
         method: 'sendTransaction',
-        payload: { transactionIntentHash: 'testHash' },
+        payload: [
+          { requestType: 'sendTransaction', transactionIntentHash: 'testHash' },
+        ],
       })
 
       expect(messageEventSpy.getValues()).toEqual([
