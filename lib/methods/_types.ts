@@ -23,5 +23,10 @@ export type WalletRequests = {
 
 export type WalletResponses = {
   request: RequestWalletResponseType[]
-  sendTransaction: { transactionIntentHash: string }
+  sendTransaction: [
+    {
+      requestType: typeof methodType.sendTransaction
+      transactionIntentHash: string
+    }
+  ]
 }

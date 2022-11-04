@@ -7,6 +7,7 @@ import { methodType } from '../_types'
 import { MessageLifeCycleEvent } from '../../messages/events/_types'
 import { createMessage } from '../../messages'
 import { SendTransactionMethodInput } from './_types'
+import { map } from 'rxjs'
 
 export const createSendTransactionMessage = (
   input: SendTransactionMethodInput
@@ -37,6 +38,10 @@ export const sendTransaction =
     const walletRequest$ = sendMessage<'sendTransaction'>(
       result.value,
       eventCallback
+    ).pipe(
+      map((result) =>
+        result.map(([{ transactionIntentHash }]) => ({ transactionIntentHash }))
+      )
     )
 
     return createMethodResponse(walletRequest$)
