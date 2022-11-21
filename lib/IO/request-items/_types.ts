@@ -5,6 +5,6 @@ export type AccountAddress = {
 }
 export type OwnershipProof = { challenge: string; signature: string }
 export type AccountAddressWithOwnershipProof = OwnershipProof & {
-  accountAddress: AccountAddress
+  account: AccountAddress
 }
 export type PersonaDataField = { field: string; value: string }
