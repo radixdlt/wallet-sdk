@@ -12,7 +12,7 @@ describe('transformMethodInput', () => {
           actual: requestItem.oneTimeAccountAddresses.withoutProofOfOwnership(),
           expected: {
             requestType: requestType.oneTimeAccountAddresses,
-            proofOfOwnership: false,
+            requiresProofOfOwnership: false,
           },
         },
         {
@@ -20,7 +20,7 @@ describe('transformMethodInput', () => {
             requestItem.oneTimeAccountAddresses.withoutProofOfOwnership(3),
           expected: {
             requestType: requestType.oneTimeAccountAddresses,
-            proofOfOwnership: false,
+            requiresProofOfOwnership: false,
             numberOfAddresses: 3,
           },
         },
@@ -28,14 +28,14 @@ describe('transformMethodInput', () => {
           actual: requestItem.oneTimeAccountAddresses.withProofOfOwnership(),
           expected: {
             requestType: requestType.oneTimeAccountAddresses,
-            proofOfOwnership: true,
+            requiresProofOfOwnership: true,
           },
         },
         {
           actual: requestItem.oneTimeAccountAddresses.withProofOfOwnership(1),
           expected: {
             requestType: requestType.oneTimeAccountAddresses,
-            proofOfOwnership: true,
+            requiresProofOfOwnership: true,
             numberOfAddresses: 1,
           },
         },
@@ -53,7 +53,7 @@ describe('transformMethodInput', () => {
           actual: requestItem.ongoingAccountAddresses.withoutProofOfOwnership(),
           expected: {
             requestType: requestType.ongoingAccountAddresses,
-            proofOfOwnership: false,
+            requiresProofOfOwnership: false,
           },
         },
         {
@@ -61,7 +61,7 @@ describe('transformMethodInput', () => {
             requestItem.ongoingAccountAddresses.withoutProofOfOwnership(3),
           expected: {
             requestType: requestType.ongoingAccountAddresses,
-            proofOfOwnership: false,
+            requiresProofOfOwnership: false,
             numberOfAddresses: 3,
           },
         },
@@ -69,14 +69,14 @@ describe('transformMethodInput', () => {
           actual: requestItem.ongoingAccountAddresses.withProofOfOwnership(),
           expected: {
             requestType: requestType.ongoingAccountAddresses,
-            proofOfOwnership: true,
+            requiresProofOfOwnership: true,
           },
         },
         {
           actual: requestItem.ongoingAccountAddresses.withProofOfOwnership(1),
           expected: {
             requestType: requestType.ongoingAccountAddresses,
-            proofOfOwnership: true,
+            requiresProofOfOwnership: true,
             numberOfAddresses: 1,
           },
         },

@@ -33,11 +33,11 @@ export const oneTimeAccountAddresses =
     ...input,
     oneTimeAccountAddresses: numberOfAddresses
       ? {
-          proofOfOwnership: false,
+          requiresProofOfOwnership: false,
           numberOfAddresses,
         }
       : {
-          proofOfOwnership: false,
+          requiresProofOfOwnership: false,
         },
   })
 
@@ -76,10 +76,10 @@ export const oneTimeAccountAddressesWithProofOfOwnership =
     ...input,
     oneTimeAccountAddressesWithProofOfOwnership: numberOfAddresses
       ? {
-          proofOfOwnership: true,
+          requiresProofOfOwnership: true,
           numberOfAddresses,
         }
       : {
-          proofOfOwnership: true,
+          requiresProofOfOwnership: true,
         },
   })

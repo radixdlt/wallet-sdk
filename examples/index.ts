@@ -67,7 +67,9 @@ document.getElementById('account-address-btn')!.onclick = async () => {
 
   const result = await sdk.request(
     requestBuilder(
-      requestItem.oneTimeAccountAddresses.withoutProofOfOwnership()
+      requestItem.login.withoutChallenge(),
+      requestItem.oneTimePersonaData('email'),
+      requestItem.ongoingAccountAddresses.withProofOfOwnership()
     )
   )
 
@@ -89,8 +91,6 @@ document.getElementById('send-tx-btn')!.onclick = async () => {
 
   const result = await sdk.sendTransaction({
     transactionManifest,
-    accountAddress:
-      'account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064',
     version: 1,
   })
 
