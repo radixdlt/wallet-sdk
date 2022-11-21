@@ -141,7 +141,6 @@ describe('sdk flow', () => {
           {
             transactionManifest: `test transaction manifest`,
             version: 1,
-            accountAddress: 'abc123',
           },
           callbackSpy
         )
