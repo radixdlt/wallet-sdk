@@ -5,7 +5,6 @@ export type SendTransaction = {
       requestType: 'sendTransaction'
       transactionManifest: string
       version: number
-      accountAddress: string
       blobs?: string[]
       message?: string
     }
@@ -18,7 +17,6 @@ export type SendTransaction = {
     input: {
       transactionManifest: string
       version: number
-      accountAddress: string
       blobs?: string[]
       message?: string
     }
