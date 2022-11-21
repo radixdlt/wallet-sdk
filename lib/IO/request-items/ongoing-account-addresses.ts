@@ -38,11 +38,11 @@ export const ongoingAccountAddresses =
     ...input,
     ongoingAccountAddresses: numberOfAddresses
       ? {
-          proofOfOwnership: false,
+          requiresProofOfOwnership: false,
           numberOfAddresses,
         }
       : {
-          proofOfOwnership: false,
+          requiresProofOfOwnership: false,
         },
   })
 
@@ -85,8 +85,8 @@ export const ongoingAccountAddressesWithProofOfOwnership =
     ...input,
     ongoingAccountAddressesWithProofOfOwnership: numberOfAddresses
       ? {
-          proofOfOwnership: true,
+          requiresProofOfOwnership: true,
           numberOfAddresses,
         }
-      : { proofOfOwnership: true },
+      : { requiresProofOfOwnership: true },
   })
