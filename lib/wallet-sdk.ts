@@ -1,9 +1,14 @@
 import { MessageClient } from './messages/message-client'
-import log from 'loglevel'
+import log, { LogLevelDesc } from 'loglevel'
 import { sendMessage as createSendMessage } from './messages/observables/send-message'
 import { createMethods } from './create-methods'
+import { config } from './config'
 
-type WalletSdkInput = { networkId?: number; dAppId: string }
+type WalletSdkInput = {
+  networkId?: number
+  dAppId: string
+  logLevel?: LogLevelDesc
+}
 
 export const Network = {
   Mainnet: 0x01,
@@ -15,7 +20,12 @@ export const Network = {
   Hammunet: 0x22,
 } as const
 
-const WalletSdk = ({ networkId = Network.Mainnet, dAppId }: WalletSdkInput) => {
+const WalletSdk = ({
+  networkId = Network.Mainnet,
+  dAppId,
+  logLevel = config.logLevel,
+}: WalletSdkInput) => {
+  log.setLevel(logLevel)
   log.debug(`🔵 wallet sdk instantiated`)
   const messageClient = MessageClient()
 

@@ -1,9 +1,7 @@
-import loglevel from 'loglevel'
 import WalletSdk, { requestBuilder, requestItem } from '../lib/wallet-sdk'
 import { Result } from 'neverthrow'
 
-const sdk = WalletSdk({ dAppId: 'radixDashboard' })
-loglevel.setLevel('debug')
+const sdk = WalletSdk({ dAppId: 'radixDashboard', logLevel: 'DEBUG' })
 
 const transactionManifest = `# Withdraw XRD from account
 CALL_METHOD ComponentAddress("account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064") "withdraw_by_amount" Decimal("5.0") ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
@@ -67,9 +65,7 @@ document.getElementById('account-address-btn')!.onclick = async () => {
 
   const result = await sdk.request(
     requestBuilder(
-      requestItem.login.withoutChallenge(),
-      requestItem.oneTimePersonaData('email'),
-      requestItem.ongoingAccountAddresses.withProofOfOwnership()
+      requestItem.oneTimeAccountAddresses.withoutProofOfOwnership()
     )
   )
 
