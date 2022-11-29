@@ -51,6 +51,9 @@ const displayResults = (result: Result<any, any>) => {
 const clearResults = () => {
   document.getElementById('results')!.innerHTML = ``
 }
+const accountAddressInputElement = document.getElementById(
+  'account-address-input'
+)! as HTMLInputElement
 
 document.getElementById('login-btn')!.onclick = async () => {
   clearResults()
@@ -63,9 +66,13 @@ document.getElementById('login-btn')!.onclick = async () => {
 document.getElementById('account-address-btn')!.onclick = async () => {
   clearResults()
 
+  const value = accountAddressInputElement.value
+
   const result = await sdk.request(
     requestBuilder(
-      requestItem.oneTimeAccountAddresses.withoutProofOfOwnership()
+      requestItem.oneTimeAccountAddresses.withoutProofOfOwnership(
+        parseInt(value, 10)
+      )
     )
   )
 
@@ -92,3 +99,10 @@ document.getElementById('send-tx-btn')!.onclick = async () => {
 
   displayResults(result)
 }
+
+sdk.request(
+  requestBuilder(
+    requestItem.usePersona('abc'),
+    requestItem.ongoingAccountAddresses.withoutProofOfOwnership()
+  )
+)
