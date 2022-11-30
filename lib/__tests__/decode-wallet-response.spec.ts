@@ -1,43 +1,37 @@
 import { decodeWalletResponse } from '../IO/decode-wallet-response'
-import { requestType, Wallet } from '../_types'
+import { RequestTypeSchema, WalletSuccessResponse } from '../IO/schemas'
 
 describe('decodeWalletResponse', () => {
   it('should output correct value', () => {
-    const walletResponse: Wallet['response'] = [
-      { requestType: requestType.login, personaId: 'abc' },
+    const walletResponse: WalletSuccessResponse['items'] = [
+      { requestType: RequestTypeSchema.loginRead.value, personaId: 'abc' },
       {
-        requestType: requestType.oneTimeAccountAddresses,
-        accountAddresses: [
-          { label: 'main account', address: 'abc', appearanceId: 0 },
-        ],
-        proofOfOwnership: false,
+        requestType: RequestTypeSchema.oneTimeAccountsRead.value,
+        accounts: [{ label: 'main account', address: 'abc', appearanceId: 0 }],
       },
       {
-        requestType: requestType.ongoingAccountAddresses,
-        accountAddresses: [
-          { label: 'main account', address: 'abc', appearanceId: 1 },
-        ],
-        proofOfOwnership: false,
+        requestType: RequestTypeSchema.ongoingAccountsRead.value,
+        accounts: [{ label: 'main account', address: 'abc', appearanceId: 1 }],
       },
       {
-        requestType: requestType.oneTimePersonaData,
-        personaData: [{ field: 'email', value: 'abc' }],
+        requestType: RequestTypeSchema.oneTimePersonaDataRead.value,
+        fields: [{ field: 'email', value: 'abc' }],
       },
       {
-        requestType: requestType.ongoingPersonaData,
-        personaData: [{ field: 'email', value: 'abc' }],
+        requestType: RequestTypeSchema.ongoingPersonaDataRead.value,
+        fields: [{ field: 'email', value: 'abc' }],
       },
       {
-        requestType: requestType.sendTransaction,
+        requestType: RequestTypeSchema.sendTransactionWrite.value,
         transactionIntentHash: 'abc',
       },
     ]
     expect(decodeWalletResponse(walletResponse)).toEqual({
       login: { personaId: 'abc' },
-      oneTimeAccountAddresses: [
+      oneTimeAccounts: [
         { label: 'main account', address: 'abc', appearanceId: 0 },
       ],
-      ongoingAccountAddresses: [
+      ongoingAccounts: [
         { label: 'main account', address: 'abc', appearanceId: 1 },
       ],
       oneTimePersonaData: [{ field: 'email', value: 'abc' }],

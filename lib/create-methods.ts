@@ -1,16 +1,23 @@
 import { ResultAsync } from 'neverthrow'
 import { SdkError } from './helpers/error'
+import { validateWalletRequest } from './helpers/validate-wallet-request'
+import { validateWalletResponse } from './helpers/validate-wallet-response'
 import { decodeWalletResponse } from './IO/decode-wallet-response'
+import { Metadata, WalletRequest, WalletSuccessResponse } from './IO/schemas'
 import { transformMethodInput } from './IO/transform-method-input'
 import { createMessage } from './messages/create-message'
 import { MessageLifeCycleEvent } from './messages/events/_types'
-import { OutgoingMessage } from './messages/_types'
-import { Method, requestType, Wallet } from './_types'
+import { Method, requestType } from './_types'
+
+type EventCallbackFn = ((eventType: 'receivedByExtension') => void) | undefined
+
+type SendWalletRequest = (
+  eventCallback?: EventCallbackFn
+) => (message: WalletRequest) => ResultAsync<WalletSuccessResponse, SdkError>
 
 export const createMethods = (
-  sendMessageToWallet: (
-    eventCallback?: ((eventType: 'receivedByExtension') => void) | undefined
-  ) => (message: OutgoingMessage) => ResultAsync<Wallet['response'], SdkError>
+  metadata: Metadata,
+  sendMessageToWallet: SendWalletRequest
 ) => {
   const request = <
     Input extends Method['request']['input'],
@@ -26,8 +33,11 @@ export const createMethods = (
     eventCallback?: (messageEvent: MessageLifeCycleEvent) => void
   ) =>
     transformMethodInput(input)
-      .andThen(createMessage)
-      .asyncAndThen(sendMessageToWallet(eventCallback))
+      .andThen(createMessage(metadata))
+      .asyncAndThen(validateWalletRequest)
+      .andThen(sendMessageToWallet(eventCallback))
+      .andThen(validateWalletResponse)
+      .map((response) => response.items)
       .map(decodeWalletResponse<Output>)
 
   const sendTransaction = (
@@ -35,8 +45,11 @@ export const createMethods = (
     eventCallback?: (messageEvent: MessageLifeCycleEvent) => void
   ) =>
     transformMethodInput({ [requestType.sendTransaction]: input })
-      .andThen(createMessage)
-      .asyncAndThen(sendMessageToWallet(eventCallback))
+      .andThen(createMessage(metadata))
+      .asyncAndThen(validateWalletRequest)
+      .andThen(sendMessageToWallet(eventCallback))
+      .andThen(validateWalletResponse)
+      .map((response) => response.items)
       .map(decodeWalletResponse<Method['sendTransaction']['output']>)
 
   return {

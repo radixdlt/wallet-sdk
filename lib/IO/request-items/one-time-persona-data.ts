@@ -1,32 +1,24 @@
-import { PersonaDataField } from './_types'
-
-const oneTimePersonaDataRequestType = 'oneTimePersonaData'
-type OneTimePersonaDataRequestType = typeof oneTimePersonaDataRequestType
+import {
+  OneTimePersonaDataReadRequestItem,
+  OneTimePersonaDataResponseItem,
+} from '../schemas'
 
 export type OneTimePersonaData = {
-  requestType: OneTimePersonaDataRequestType
   wallet: {
-    request: {
-      requestType: OneTimePersonaDataRequestType
-    } & OneTimePersonaDataOutput
-    response: {
-      requestType: OneTimePersonaDataRequestType
-      personaData: PersonaDataField[]
-    }
+    request: OneTimePersonaDataReadRequestItem
+    response: OneTimePersonaDataResponseItem
   }
   method: {
-    output: { oneTimePersonaData: PersonaDataField[] }
-    input: OneTimePersonaDataOutput
+    output: { oneTimePersonaData: OneTimePersonaDataResponseItem['fields'] }
+    input: { fields: string[] }
   }
 }
 
-type OneTimePersonaDataOutput = ReturnType<
-  ReturnType<typeof oneTimePersonaData>
->[OneTimePersonaDataRequestType]
+type NotAllowedKeys = { oneTimePersonaData: any }
 
 export const oneTimePersonaData =
   (...fields: string[]) =>
-  <I>(input: I extends { oneTimePersonaData: any } ? never : I) => ({
+  <I>(input: I extends NotAllowedKeys ? never : I) => ({
     ...input,
     oneTimePersonaData: { fields },
   })

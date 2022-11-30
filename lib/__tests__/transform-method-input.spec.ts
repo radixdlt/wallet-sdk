@@ -1,81 +1,79 @@
 /* eslint-disable max-nested-callbacks */
 import { ok } from 'neverthrow'
+import { RequestTypeSchema } from '../IO/schemas'
 import { transformMethodInput } from '../IO/transform-method-input'
 import { requestItem } from '../wallet-sdk'
-import { requestType } from '../_types'
 
 describe('transformMethodInput', () => {
-  describe('oneTimeAccountAddresses', () => {
+  describe('oneTimeAccounts', () => {
     it('should return correct transformed value', () => {
       ;[
         {
-          actual: requestItem.oneTimeAccountAddresses.withoutProofOfOwnership(),
+          actual: requestItem.oneTimeAccounts.withoutProofOfOwnership(),
           expected: {
-            requestType: requestType.oneTimeAccountAddresses,
+            requestType: RequestTypeSchema.oneTimeAccountsRead.value,
             requiresProofOfOwnership: false,
           },
         },
         {
-          actual:
-            requestItem.oneTimeAccountAddresses.withoutProofOfOwnership(3),
+          actual: requestItem.oneTimeAccounts.withoutProofOfOwnership(3),
           expected: {
-            requestType: requestType.oneTimeAccountAddresses,
+            requestType: RequestTypeSchema.oneTimeAccountsRead.value,
             requiresProofOfOwnership: false,
             numberOfAddresses: 3,
           },
         },
         {
-          actual: requestItem.oneTimeAccountAddresses.withProofOfOwnership(),
+          actual: requestItem.oneTimeAccounts.withProofOfOwnership(),
           expected: {
-            requestType: requestType.oneTimeAccountAddresses,
+            requestType: RequestTypeSchema.oneTimeAccountsRead.value,
             requiresProofOfOwnership: true,
           },
         },
         {
-          actual: requestItem.oneTimeAccountAddresses.withProofOfOwnership(1),
+          actual: requestItem.oneTimeAccounts.withProofOfOwnership(1),
           expected: {
-            requestType: requestType.oneTimeAccountAddresses,
+            requestType: RequestTypeSchema.oneTimeAccountsRead.value,
             requiresProofOfOwnership: true,
             numberOfAddresses: 1,
           },
         },
       ].forEach((testItem) => {
-        expect(transformMethodInput(testItem.actual({}))).toEqual(
+        expect(transformMethodInput(testItem.actual({} as any))).toEqual(
           ok([testItem.expected])
         )
       })
     })
   })
-  describe('ongoingAccountAddresses', () => {
+  describe('ongoingAccounts', () => {
     it('should return correct transformed value', () => {
       ;[
         {
-          actual: requestItem.ongoingAccountAddresses.withoutProofOfOwnership(),
+          actual: requestItem.ongoingAccounts.withoutProofOfOwnership(),
           expected: {
-            requestType: requestType.ongoingAccountAddresses,
+            requestType: RequestTypeSchema.ongoingAccountsRead.value,
             requiresProofOfOwnership: false,
           },
         },
         {
-          actual:
-            requestItem.ongoingAccountAddresses.withoutProofOfOwnership(3),
+          actual: requestItem.ongoingAccounts.withoutProofOfOwnership(3),
           expected: {
-            requestType: requestType.ongoingAccountAddresses,
+            requestType: RequestTypeSchema.ongoingAccountsRead.value,
             requiresProofOfOwnership: false,
             numberOfAddresses: 3,
           },
         },
         {
-          actual: requestItem.ongoingAccountAddresses.withProofOfOwnership(),
+          actual: requestItem.ongoingAccounts.withProofOfOwnership(),
           expected: {
-            requestType: requestType.ongoingAccountAddresses,
+            requestType: RequestTypeSchema.ongoingAccountsRead.value,
             requiresProofOfOwnership: true,
           },
         },
         {
-          actual: requestItem.ongoingAccountAddresses.withProofOfOwnership(1),
+          actual: requestItem.ongoingAccounts.withProofOfOwnership(1),
           expected: {
-            requestType: requestType.ongoingAccountAddresses,
+            requestType: RequestTypeSchema.ongoingAccountsRead.value,
             requiresProofOfOwnership: true,
             numberOfAddresses: 1,
           },
@@ -93,14 +91,14 @@ describe('transformMethodInput', () => {
         {
           actual: requestItem.login.withChallenge('abc'),
           expected: {
-            requestType: requestType.login,
+            requestType: RequestTypeSchema.loginRead.value,
             challenge: 'abc',
           },
         },
         {
           actual: requestItem.login.withoutChallenge(),
           expected: {
-            requestType: requestType.login,
+            requestType: RequestTypeSchema.loginRead.value,
           },
         },
       ].forEach((testItem) => {
@@ -110,13 +108,13 @@ describe('transformMethodInput', () => {
       })
     })
   })
-  describe('persona', () => {
+  describe('usePersona', () => {
     it('should return correct transformed value', () => {
       ;[
         {
           actual: requestItem.usePersona('abc'),
           expected: {
-            requestType: requestType.persona,
+            requestType: RequestTypeSchema.usePersonaRead.value,
             id: 'abc',
           },
         },
@@ -133,7 +131,7 @@ describe('transformMethodInput', () => {
         {
           actual: requestItem.oneTimePersonaData('email'),
           expected: {
-            requestType: requestType.oneTimePersonaData,
+            requestType: RequestTypeSchema.oneTimePersonaDataRead.value,
             fields: ['email'],
           },
         },
@@ -150,7 +148,7 @@ describe('transformMethodInput', () => {
         {
           actual: requestItem.ongoingPersonaData('email'),
           expected: {
-            requestType: requestType.ongoingPersonaData,
+            requestType: RequestTypeSchema.ongoingPersonaDataRead.value,
             fields: ['email'],
           },
         },
@@ -171,7 +169,7 @@ describe('transformMethodInput', () => {
             accountAddress: 'abc',
           },
           expected: {
-            requestType: requestType.sendTransaction,
+            requestType: RequestTypeSchema.sendTransactionWrite.value,
             transactionManifest: 'test',
             version: 1,
             accountAddress: 'abc',

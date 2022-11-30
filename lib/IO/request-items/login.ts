@@ -1,87 +1,47 @@
-const loginRequestType = 'login'
-type LoginRequestType = typeof loginRequestType
-
-export type LoginResponse = {
-  personaId: string
-}
+import { LoginReadRequestItem, LoginResponseItem } from '../schemas'
 
 export type Login = {
-  requestType: LoginRequestType
-  wallet: {
-    request: {
-      requestType: LoginRequestType
-    } & LoginOutput
-    response: {
-      requestType: LoginRequestType
-    } & LoginResponse
-  }
-  method: {
-    output: {
-      login: LoginResponse
+  WithoutChallenge: {
+    wallet: {
+      request: LoginReadRequestItem
+      response: LoginResponseItem
     }
-    input: LoginOutput
-  }
-}
-
-type LoginOutput = ReturnType<ReturnType<typeof login>>[LoginRequestType]
-
-export const login =
-  () =>
-  <I>(
-    input: I extends
-      | { persona: { id: string } }
-      | { login: any }
-      | { loginWithChallenge: any }
-      ? never
-      : I
-  ) => ({
-    ...input,
-    login: {},
-  })
-
-const loginWithChallengeRequestType = 'loginWithChallenge'
-type LoginWithChallengeRequestType = typeof loginWithChallengeRequestType
-
-export type LoginResponseWithChallenge = LoginResponse & {
-  challenge: string
-  publicKey: string
-  identityComponentAddress: string
-  signature: string
-}
-
-export type LoginWithChallenge = {
-  requestType: LoginWithChallengeRequestType
-  wallet: {
-    request: {
-      requestType: LoginRequestType
-      challenge: string
+    method: {
+      input: {}
+      output: {
+        login: { personaId: string }
+      }
     }
-    response: {
-      requestType: LoginRequestType
-    } & LoginResponseWithChallenge
   }
-  method: {
-    output: { login: LoginResponseWithChallenge }
-    input: LoginWithChallengeOutput
+  WithChallenge: {
+    wallet: {
+      request: LoginReadRequestItem
+      response: LoginResponseItem
+    }
+    method: {
+      output: { login: { personaId: string } }
+      input: { challenge: string }
+    }
   }
 }
 
-type LoginWithChallengeOutput = ReturnType<
-  ReturnType<typeof loginWithChallenge>
->[LoginWithChallengeRequestType]
+type NotAllowedKeys = Partial<{
+  persona: any
+  loginWithoutChallenge: any
+  loginWithChallenge: any
+}>
 
-export const loginWithChallenge =
-  (challenge: string) =>
-  <I>(
-    input: I extends
-      | { persona: { id: string } }
-      | { login: any }
-      | { loginWithChallenge: any }
-      ? never
-      : I
-  ) => ({
-    ...input,
-    loginWithChallenge: {
-      challenge,
-    },
-  })
+export const login = {
+  withoutChallenge:
+    () =>
+    <I>(input: I extends NotAllowedKeys ? never : I) => ({
+      ...input,
+      loginWithoutChallenge: {},
+    }),
+  withChallenge:
+    (challenge: string) =>
+    <I>(input: I extends NotAllowedKeys ? never : I) => ({
+      ...input,
+      loginWithChallenge: { challenge },
+    }),
+}

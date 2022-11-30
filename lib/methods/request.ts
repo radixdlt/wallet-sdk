@@ -1,25 +1,19 @@
-import { Login, LoginWithChallenge } from '../IO/request-items/login'
-import {
-  OneTimeAccountAddresses,
-  OneTimeAccountAddressesWithProofOfOwnership,
-} from '../IO/request-items/one-time-account-addresses'
+import { Login } from '../IO/request-items/login'
+import { OneTimeAccounts } from '../IO/request-items/one-time-accounts'
 import { OneTimePersonaData } from '../IO/request-items/one-time-persona-data'
-import {
-  OngoingAccountAddresses,
-  OngoingAccountAddressesWithProofOfOwnership,
-} from '../IO/request-items/ongoing-account-addresses'
-import { OngoingPersonaData } from '../IO/request-items/ongoing-time-persona-data'
-import { Persona } from '../IO/request-items/persona'
+import { OngoingAccounts } from '../IO/request-items/ongoing-accounts'
+import { OngoingPersonaData } from '../IO/request-items/ongoing-persona-data'
+import { UsePersona } from '../IO/request-items/use-persona'
 
 export const requestMethodRequestType = {
-  persona: 'persona',
-  oneTimeAccountAddresses: 'oneTimeAccountAddresses',
-  oneTimeAccountAddressesWithProofOfOwnership:
-    'oneTimeAccountAddressesWithProofOfOwnership',
-  ongoingAccountAddresses: 'ongoingAccountAddresses',
-  ongoingAccountAddressesWithProofOfOwnership:
-    'ongoingAccountAddressesWithProofOfOwnership',
-  login: 'login',
+  oneTimeAccountsWithoutProofOfOwnership:
+    'oneTimeAccountsWithoutProofOfOwnership',
+  oneTimeAccountsWithProofOfOwnership: 'oneTimeAccountsWithProofOfOwnership',
+  ongoingAccountsWithoutProofOfOwnership:
+    'ongoingAccountsWithoutProofOfOwnership',
+  ongoingAccountsWithProofOfOwnership: 'ongoingAccountsWithProofOfOwnership',
+  usePersona: 'usePersona',
+  loginWithoutChallenge: 'loginWithoutChallenge',
   loginWithChallenge: 'loginWithChallenge',
   oneTimePersonaData: 'oneTimePersonaData',
   ongoingPersonaData: 'ongoingPersonaData',
@@ -28,13 +22,13 @@ export const requestMethodRequestType = {
 type RequestMethodRequestTypes = keyof typeof requestMethodRequestType
 
 type RequestItems = {
-  [requestMethodRequestType.persona]: Persona
-  [requestMethodRequestType.oneTimeAccountAddresses]: OneTimeAccountAddresses
-  [requestMethodRequestType.oneTimeAccountAddressesWithProofOfOwnership]: OneTimeAccountAddressesWithProofOfOwnership
-  [requestMethodRequestType.ongoingAccountAddresses]: OngoingAccountAddresses
-  [requestMethodRequestType.ongoingAccountAddressesWithProofOfOwnership]: OngoingAccountAddressesWithProofOfOwnership
-  [requestMethodRequestType.login]: Login
-  [requestMethodRequestType.loginWithChallenge]: LoginWithChallenge
+  [requestMethodRequestType.oneTimeAccountsWithoutProofOfOwnership]: OneTimeAccounts['WithoutProofOfOwnership']
+  [requestMethodRequestType.oneTimeAccountsWithProofOfOwnership]: OneTimeAccounts['WithProofOfOwnership']
+  [requestMethodRequestType.ongoingAccountsWithoutProofOfOwnership]: OngoingAccounts['WithoutProofOfOwnership']
+  [requestMethodRequestType.ongoingAccountsWithProofOfOwnership]: OngoingAccounts['WithProofOfOwnership']
+  [requestMethodRequestType.usePersona]: UsePersona
+  [requestMethodRequestType.loginWithoutChallenge]: Login['WithoutChallenge']
+  [requestMethodRequestType.loginWithChallenge]: Login['WithChallenge']
   [requestMethodRequestType.oneTimePersonaData]: OneTimePersonaData
   [requestMethodRequestType.ongoingPersonaData]: OngoingPersonaData
 }

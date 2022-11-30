@@ -1,30 +1,15 @@
-import { login, loginWithChallenge } from './login'
-import {
-  oneTimeAccountAddresses,
-  oneTimeAccountAddressesWithProofOfOwnership,
-} from './one-time-account-addresses'
-import {
-  ongoingAccountAddresses,
-  ongoingAccountAddressesWithProofOfOwnership,
-} from './ongoing-account-addresses'
-import { usePersona } from './persona'
+import { login } from './login'
+import { oneTimeAccounts } from './one-time-accounts'
+import { ongoingAccounts } from './ongoing-accounts'
+import { usePersona } from './use-persona'
 import { oneTimePersonaData } from './one-time-persona-data'
-import { ongoingPersonaData } from './ongoing-time-persona-data'
+import { ongoingPersonaData } from './ongoing-persona-data'
 
 export const requestItem = {
-  usePersona,
-  oneTimeAccountAddresses: {
-    withoutProofOfOwnership: oneTimeAccountAddresses,
-    withProofOfOwnership: oneTimeAccountAddressesWithProofOfOwnership,
-  },
-  ongoingAccountAddresses: {
-    withoutProofOfOwnership: ongoingAccountAddresses,
-    withProofOfOwnership: ongoingAccountAddressesWithProofOfOwnership,
-  },
-  login: {
-    withoutChallenge: login,
-    withChallenge: loginWithChallenge,
-  },
+  oneTimeAccounts,
+  ongoingAccounts,
   oneTimePersonaData,
   ongoingPersonaData,
+  login,
+  usePersona,
 } as const

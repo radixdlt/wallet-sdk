@@ -1,4 +1,4 @@
-import { Err, err, ok, ResultAsync } from 'neverthrow'
+import { Err, err, ok, Result, ResultAsync } from 'neverthrow'
 import {
   filter,
   first,
@@ -12,24 +12,24 @@ import {
   timer,
 } from 'rxjs'
 import { config } from '../../config'
-import { createSdkError, SdkError } from '../../helpers/error'
+import { createSdkError, errorType, SdkError } from '../../helpers/error'
 import { unwrapObservable } from '../../helpers/unwrap-observable'
-import { Wallet } from '../../_types'
+import { WalletRequest, WalletSuccessResponse } from '../../IO/schemas'
 import { MessageLifeCycleEvent } from '../events/_types'
 import { SubjectsType } from '../subjects'
-import { Metadata, OutgoingMessage } from '../_types'
 import { messageEvents } from './message-events'
 
 export type SendMessage = ReturnType<typeof sendMessage>
 
 export const sendMessage =
-  (metadata: Metadata, subjects: SubjectsType) =>
+  (subjects: SubjectsType) =>
   (eventCallback?: (eventType: MessageLifeCycleEvent) => void) =>
-  (message: OutgoingMessage): ResultAsync<Wallet['response'], SdkError> => {
+  (message: WalletRequest): ResultAsync<WalletSuccessResponse, SdkError> => {
     const response$ = subjects.responseSubject.pipe(
       filter((response) => response.requestId === message.requestId),
-      map((message) =>
-        'payload' in message ? ok(message.payload) : err(message)
+      map(
+        (message): Result<WalletSuccessResponse, SdkError> =>
+          'items' in message ? ok(message) : err(message)
       ),
       first()
     )
@@ -45,7 +45,9 @@ export const sendMessage =
     const messageEventSubscription = messageEvent$.subscribe()
 
     const missingExtensionError$ = timer(config.extensionDetectionTime).pipe(
-      map(() => err(createSdkError('missingExtension', message.requestId)))
+      map(() =>
+        err(createSdkError(errorType.missingExtension, message.requestId))
+      )
     )
 
     const extensionDetection$ = merge(
@@ -58,10 +60,7 @@ export const sendMessage =
 
     const sendMessage$ = of(true).pipe(
       tap(() => {
-        subjects.outgoingMessageSubject.next({
-          ...message,
-          metadata,
-        })
+        subjects.outgoingMessageSubject.next(message)
       }),
       filter(() => false)
     ) as Observable<never>

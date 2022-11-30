@@ -66,12 +66,12 @@ document.getElementById('login-btn')!.onclick = async () => {
 document.getElementById('account-address-btn')!.onclick = async () => {
   clearResults()
 
-  const value = accountAddressInputElement.value
-
   const result = await sdk.request(
     requestBuilder(
-      requestItem.oneTimeAccountAddresses.withoutProofOfOwnership(
-        parseInt(value, 10)
+      requestItem.oneTimeAccounts.withoutProofOfOwnership(
+        accountAddressInputElement.value
+          ? parseInt(accountAddressInputElement.value, 10)
+          : undefined
       )
     )
   )
@@ -83,7 +83,7 @@ document.getElementById('persona-data-btn')!.onclick = async () => {
   clearResults()
 
   const result = await sdk.request(
-    requestBuilder(requestItem.oneTimePersonaData('email'))
+    requestBuilder(requestItem.oneTimePersonaData('firstName', 'email'))
   )
 
   displayResults(result)
@@ -99,10 +99,3 @@ document.getElementById('send-tx-btn')!.onclick = async () => {
 
   displayResults(result)
 }
-
-sdk.request(
-  requestBuilder(
-    requestItem.usePersona('abc'),
-    requestItem.ongoingAccountAddresses.withoutProofOfOwnership()
-  )
-)
