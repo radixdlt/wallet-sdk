@@ -129,20 +129,6 @@ module.exports = {
       },
     ],
     '@semantic-release/npm',
-    [
-      '@semantic-release/github',
-      {
-        assets: [
-          {
-            path: 'radix-connect.zip',
-            label: 'radix-connect.zip',
-          },
-          {
-            path: 'radix-connect-dev.zip',
-            label: 'radix-connect-dev.zip',
-          },
-        ],
-      },
-    ],
+    '@semantic-release/github',
   ],
 }
