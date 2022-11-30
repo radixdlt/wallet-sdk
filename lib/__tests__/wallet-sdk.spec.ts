@@ -6,14 +6,13 @@ import { subscribeSpyTo } from '@hirez_io/observer-spy'
 import log from 'loglevel'
 import { messageLifeCycleEvent } from '../messages/events/_types'
 
-import { OneTimeAccountAddresses } from '../IO/request-items/one-time-account-addresses'
-import { Wallet } from '../_types'
+import { OneTimeAccounts } from '../IO/request-items/one-time-accounts'
+import { WalletSuccessResponse } from '../IO/schemas'
 
-const mockAccountAddressesWalletResponse: OneTimeAccountAddresses['wallet']['response'] =
+const mockAccountWalletResponse: OneTimeAccounts['WithoutProofOfOwnership']['wallet']['response'] =
   {
-    requestType: 'oneTimeAccountAddresses',
-    proofOfOwnership: false,
-    accountAddresses: [
+    requestType: 'oneTimeAccountsRead',
+    accounts: [
       {
         address: 'rdx61333732663539372d383861352d3461',
         label: 'address-0',
@@ -32,12 +31,17 @@ const mockAccountAddressesWalletResponse: OneTimeAccountAddresses['wallet']['res
     ],
   }
 
+const delay = (millis: number) =>
+  new Promise<void>((resolve) => {
+    setTimeout(() => {
+      resolve()
+    }, millis)
+  })
+
 describe('sdk flow', () => {
   let sdk: WalletSdkType
   beforeEach(() => {
-    log.setLevel('silent')
-    sdk = WalletSdk({ dAppId: 'radixDashboard' })
-    log.setLevel('debug')
+    sdk = WalletSdk({ dAppId: 'radixDashboard', logLevel: 'debug' })
   })
 
   afterEach(() => {
@@ -45,16 +49,16 @@ describe('sdk flow', () => {
     sdk.destroy()
   })
 
-  const createRequestHelper = <I extends {}>({
+  const createRequestHelper = async <I extends {}>({
     input,
     walletResponse,
     eventCallback,
     callback,
   }: {
     input: I
-    walletResponse: Wallet['response']
+    walletResponse: WalletSuccessResponse['items']
     eventCallback?: () => void
-    callback: (message: any) => void
+    callback: (error: any, message: any) => void
   }) => {
     const eventDispatchSpy = jest.spyOn(globalThis, 'dispatchEvent')
     const outgoingMessageSpy = subscribeSpyTo(
@@ -64,7 +68,14 @@ describe('sdk flow', () => {
       sdk.__subjects.messageLifeCycleEventSubject
     )
 
-    sdk.request(input, eventCallback).map(callback)
+    sdk
+      .request(input, eventCallback)
+      .map((response) => callback(null, response))
+      .mapErr((err) => {
+        callback(err, null)
+      })
+
+    await delay(0)
 
     expect(eventDispatchSpy).toBeCalled()
 
@@ -72,7 +83,7 @@ describe('sdk flow', () => {
     sendReceivedEvent(outgoingMessage.requestId)
 
     sdk.__subjects.incomingMessageSubject.next({
-      payload: walletResponse,
+      items: walletResponse,
       requestId: outgoingMessage.requestId,
     })
 
@@ -91,37 +102,39 @@ describe('sdk flow', () => {
 
   describe('request method', () => {
     it('should request account addresses and persona data', (done) => {
-      const walletResponse = [mockAccountAddressesWalletResponse]
+      const walletResponse = [mockAccountWalletResponse]
 
       const callbackSpy = jest.fn()
 
-      const { outgoingMessage, getMessageEvents } = createRequestHelper({
+      createRequestHelper({
         input: {
-          oneTimeAccountAddresses: {},
+          oneTimeAccountsWithoutProofOfOwnership: {},
         },
         walletResponse,
         eventCallback: callbackSpy,
-        callback: (response) => {
+        callback: (error, response) => {
+          if (error) {
+            throw error
+          }
           expect({
-            oneTimeAccountAddresses:
-              mockAccountAddressesWalletResponse.accountAddresses,
+            oneTimeAccounts: mockAccountWalletResponse.accounts,
           }).toEqual(response)
           done()
         },
+      }).then(({ outgoingMessage, getMessageEvents }) => {
+        expect(outgoingMessage.metadata.networkId).toBe(Network.Mainnet)
+
+        expect(getMessageEvents()).toEqual([
+          {
+            requestId: outgoingMessage.requestId,
+            eventType: messageLifeCycleEvent.receivedByExtension,
+          },
+        ])
+
+        expect(callbackSpy).toHaveBeenCalledWith(
+          messageLifeCycleEvent.receivedByExtension
+        )
       })
-
-      expect(outgoingMessage.metadata.networkId).toBe(Network.Mainnet)
-
-      expect(getMessageEvents()).toEqual([
-        {
-          requestId: outgoingMessage.requestId,
-          eventType: messageLifeCycleEvent.receivedByExtension,
-        },
-      ])
-
-      expect(callbackSpy).toHaveBeenCalledWith(
-        messageLifeCycleEvent.receivedByExtension
-      )
     })
   })
 
@@ -152,34 +165,39 @@ describe('sdk flow', () => {
           done()
         })
 
-      expect(eventDispatchSpy).toBeCalled()
+      setTimeout(() => {
+        expect(eventDispatchSpy).toBeCalled()
 
-      const outgoingMessage = outgoingMessageSpy.getFirstValue()
+        const outgoingMessage = outgoingMessageSpy.getFirstValue()
 
-      expect(outgoingMessage.metadata.networkId).toBe(Network.Mainnet)
+        expect(outgoingMessage.metadata.networkId).toBe(Network.Mainnet)
 
-      sdk.__subjects.incomingMessageSubject.next({
-        requestId: outgoingMessage.requestId,
-        eventType: messageLifeCycleEvent.receivedByExtension,
-      })
-
-      sdk.__subjects.incomingMessageSubject.next({
-        requestId: outgoingMessage.requestId,
-        payload: [
-          { requestType: 'sendTransaction', transactionIntentHash: 'testHash' },
-        ],
-      })
-
-      expect(messageEventSpy.getValues()).toEqual([
-        {
+        sdk.__subjects.incomingMessageSubject.next({
           requestId: outgoingMessage.requestId,
           eventType: messageLifeCycleEvent.receivedByExtension,
-        },
-      ])
+        })
 
-      expect(callbackSpy).toHaveBeenCalledWith(
-        messageLifeCycleEvent.receivedByExtension
-      )
+        sdk.__subjects.incomingMessageSubject.next({
+          requestId: outgoingMessage.requestId,
+          items: [
+            {
+              requestType: 'sendTransactionWrite',
+              transactionIntentHash: 'testHash',
+            },
+          ],
+        })
+
+        expect(messageEventSpy.getValues()).toEqual([
+          {
+            requestId: outgoingMessage.requestId,
+            eventType: messageLifeCycleEvent.receivedByExtension,
+          },
+        ])
+
+        expect(callbackSpy).toHaveBeenCalledWith(
+          messageLifeCycleEvent.receivedByExtension
+        )
+      }, 1)
     })
   })
 })

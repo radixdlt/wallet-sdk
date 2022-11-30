@@ -59,7 +59,8 @@
     "lodash.flow": "^3.5.0",
     "loglevel": "^1.8.0",
     "neverthrow": "^5.0.0",
-    "rxjs": "^7.5.6"
+    "rxjs": "^7.5.6",
+    "zod": "^3.19.1"
   },
   "repository": {
     "type": "git",

@@ -1,17 +1,12 @@
+import {
+  SendTransactionResponseItem,
+  SendTransactionWriteRequestItem,
+} from '../schemas'
+
 export type SendTransaction = {
-  requestType: 'sendTransaction'
   wallet: {
-    request: {
-      requestType: 'sendTransaction'
-      transactionManifest: string
-      version: number
-      blobs?: string[]
-      message?: string
-    }
-    response: {
-      requestType: 'sendTransaction'
-      transactionIntentHash: string
-    }
+    request: SendTransactionWriteRequestItem
+    response: SendTransactionResponseItem
   }
   method: {
     input: {

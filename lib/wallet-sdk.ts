@@ -35,7 +35,8 @@ const WalletSdk = ({
   }
 
   const methods = createMethods(
-    createSendMessage({ networkId, dAppId }, messageClient.subjects)
+    { networkId, dAppId },
+    createSendMessage(messageClient.subjects)
   )
 
   return {

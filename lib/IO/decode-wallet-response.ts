@@ -1,34 +1,44 @@
-import { requestType, Wallet } from '../_types'
+import { RequestTypeSchema, WalletSuccessResponse } from './schemas'
 
-export const decodeWalletResponse = <R>(walletResponse: Wallet['response']) =>
-  walletResponse.reduce((acc, curr) => {
+export const decodeWalletResponse = <R>(
+  items: WalletSuccessResponse['items']
+) =>
+  items.reduce((acc, curr) => {
     switch (curr.requestType) {
-      case requestType.persona:
-        return { ...acc, persona: curr.persona }
+      case RequestTypeSchema.usePersonaRead.value: {
+        const { requestType, ...rest } = curr
+        return { ...acc, persona: rest }
+      }
 
-      case requestType.login: {
+      case RequestTypeSchema.loginRead.value: {
         const { requestType, ...rest } = curr
         return { ...acc, login: rest }
       }
 
-      case requestType.oneTimeAccountAddresses:
-      case requestType.ongoingAccountAddresses: {
-        return {
-          ...acc,
-          [curr.requestType]: curr.accountAddresses,
-        }
+      case RequestTypeSchema.oneTimeAccountsRead.value: {
+        const { requestType, ...rest } = curr
+        return { ...acc, oneTimeAccounts: rest.accounts }
       }
 
-      case requestType.oneTimePersonaData:
-      case requestType.ongoingPersonaData: {
-        return {
-          ...acc,
-          [curr.requestType]: curr.personaData,
-        }
+      case RequestTypeSchema.ongoingAccountsRead.value: {
+        const { requestType, ...rest } = curr
+        return { ...acc, ongoingAccounts: rest.accounts }
       }
 
-      case requestType.sendTransaction:
-        return { ...acc, transactionIntentHash: curr.transactionIntentHash }
+      case RequestTypeSchema.oneTimePersonaDataRead.value: {
+        const { requestType, ...rest } = curr
+        return { ...acc, oneTimePersonaData: rest.fields }
+      }
+
+      case RequestTypeSchema.ongoingPersonaDataRead.value: {
+        const { requestType, ...rest } = curr
+        return { ...acc, ongoingPersonaData: rest.fields }
+      }
+
+      case RequestTypeSchema.sendTransactionWrite.value: {
+        const { requestType, ...rest } = curr
+        return { ...acc, ...rest }
+      }
 
       default:
         return acc
