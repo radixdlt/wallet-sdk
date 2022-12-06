@@ -61,40 +61,25 @@ describe('scrypto value', () => {
       Enum('Foo', String('some string'), Bool(false)),
       'Enum("Foo","some string",false)',
     ],
-    [Enum('Some', String('foobar')), 'Enum("Some", "foobar")'],
-    [Enum('Some', U128('128')), 'Enum("Some", 128u128)'],
-    [Enum('Some', Decimal(219.01234)), 'Enum("Some", Decimal("219.01234"))'],
-    [Enum('None'), 'None'],
+    [Enum('Some', String('foobar')), 'Enum("Some","foobar")'],
+    [Enum('Some', U128('128')), 'Enum("Some",128u128)'],
+    [Enum('Some', Decimal(219.01234)), 'Enum("Some",Decimal("219.01234"))'],
+    [Enum('None'), 'Enum("None")'],
     [Tuple(Decimal(42.42), String('foo')), 'Tuple(Decimal("42.42"),"foo")'],
     [Tuple(Decimal(42.42), String('foo')), 'Tuple(Decimal("42.42"),"foo")'],
     [
       Array(TypeId.String, String('foo'), String('bar')),
-      'Vec<String>("foo","bar")',
+      'Array<String>("foo","bar")',
     ],
     [
       Array(TypeId.Decimal, Decimal(42.42), Decimal(42.42)),
-      'Vec<Decimal>(Decimal("42.42"),Decimal("42.42"))',
-    ],
-    [
-      Array(TypeId.String, String('foo'), String('bar')),
-      'List<String>("foo","bar")',
-    ],
-    [
-      Array(TypeId.Decimal, Decimal(42.42), Decimal(42.42)),
-      'List<Decimal>(Decimal("42.42"),Decimal("42.42"))',
-    ],
-    [
-      Array(TypeId.String, String('foo'), String('bar')),
-      'Set<String>("foo","bar")',
-    ],
-    [
-      Array(TypeId.Decimal, Decimal(42.42), Decimal(42.42)),
-      'Set<Decimal>(Decimal("42.42"),Decimal("42.42"))',
+      'Array<Decimal>(Decimal("42.42"),Decimal("42.42"))',
     ],
     [PackageAddress('package_foo'), 'PackageAddress("package_foo")'],
     [ComponentAddress('component_foo'), 'ComponentAddress("component_foo")'],
+    [ComponentAddress('account_foo'), 'ComponentAddress("account_foo")'],
     [ResourceAddress('resource_foo'), 'ResourceAddress("resource_foo")'],
-    [SystemAddress('system_foo'), 'ResourceAddress("system_foo")'],
+    [SystemAddress('system_foo'), 'SystemAddress("system_foo")'],
     [NonFungibleAddress('foobar'), 'NonFungibleAddress("foobar")'],
     [Bucket(String('foo')), 'Bucket("foo")'],
     [Bucket(U32(35)), 'Bucket(35u32)'],
@@ -109,7 +94,7 @@ describe('scrypto value', () => {
     [EddsaEd25519Signature('a'), 'EddsaEd25519Signature("a")'],
     [Decimal(1.234), 'Decimal("1.234")'],
     [PreciseDecimal(1.234), 'PreciseDecimal("1.234")'],
-    [NonFungibleId('id'), 'NonFungibleId("NonFungibleId")'],
+    [NonFungibleId('id'), 'NonFungibleId("id")'],
   ])('should correctly return %s as %s', (test, expected) => {
     expect(test).toBe(expected)
   })

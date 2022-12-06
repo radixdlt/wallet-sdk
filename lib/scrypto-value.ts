@@ -1,3 +1,8 @@
+export type PackageAddressType = `package_${string}`
+export type ResourceAddressType = `resource_${string}`
+export type ComponentAddressType = `component_${string}` | `account_${string}`
+export type SystemAddressType = `system_${string}`
+
 export enum TypeId {
   I8 = 'i8',
   I16 = 'i16',
@@ -152,9 +157,9 @@ export const Tuple = <T extends string[]>(...args: T): `Tuple(${string})` => {
 export const Array = <T extends TypeId>(
   type: T,
   ...args: string[]
-): `Vec<${T}>(${string})` => {
+): `Array<${T}>(${string})` => {
   validateArrayElements(type, args)
-  return `Vec<${type}>(${args.join(',')})`
+  return `Array<${type}>(${args.join(',')})`
 }
 
 export const PackageAddress = (
