@@ -12,7 +12,6 @@ import {
   ResourceAddress,
   ResourceAddressType,
   TreeSet,
-  Blob,
 } from './scrypto-value'
 
 export class Manifest {
@@ -350,7 +349,6 @@ export class ManifestBuilder {
     return this
   }
 
-
   /**
    * Calls a native function
    *
@@ -366,12 +364,12 @@ export class ManifestBuilder {
   ): ManifestBuilder {
     this.instructions.push(
       'CALL_NATIVE_FUNCTION "' +
-      blueprintName +
-      '" "' +
-      functionName +
-      '" ' +
-      args.join(' ') +
-      ';'
+        blueprintName +
+        '" "' +
+        functionName +
+        '" ' +
+        args.join(' ') +
+        ';'
     )
     return this
   }
@@ -391,12 +389,12 @@ export class ManifestBuilder {
   ): ManifestBuilder {
     this.instructions.push(
       'CALL_NATIVE_METHOD ' +
-      receiver +
-      ' "' +
-      methodName +
-      '" ' +
-      args.join(' ') +
-      ';'
+        receiver +
+        ' "' +
+        methodName +
+        '" ' +
+        args.join(' ') +
+        ';'
     )
     return this
   }
@@ -406,20 +404,37 @@ export class ManifestBuilder {
    * @param abi_hash The package ABI hash
    * @param owner_badge The owner badge
    */
-  publishPackageWithOwner(code_hash: string, abi_hash: string, owner_badge: string): ManifestBuilder {
+  publishPackageWithOwner(
+    code_hash: string,
+    abi_hash: string,
+    owner_badge: string
+  ): ManifestBuilder {
     this.instructions.push(
-      'PUBLISH_PACKAGE Blob("' + code_hash + '")  Blob("' + abi_hash + '") NonFungibleAddress("' + owner_badge + '");'
+      'PUBLISH_PACKAGE Blob("' +
+        code_hash +
+        '")  Blob("' +
+        abi_hash +
+        '") NonFungibleAddress("' +
+        owner_badge +
+        '");'
     )
     return this
   }
 
   /**
-   * Create resource 
+   * Create resource
    * @param bucketName The name of the bucket to burn
    * @returns
    */
-  createResource(resource_type: string, metadata: string, access_rules: string, mint_params: string): ManifestBuilder {
-    this.instructions.push(`CREATE_RESOURCE ${resource_type} ${metadata} ${access_rules} ${mint_params};`)
+  createResource(
+    resource_type: string,
+    metadata: string,
+    access_rules: string,
+    mint_params: string
+  ): ManifestBuilder {
+    this.instructions.push(
+      `CREATE_RESOURCE ${resource_type} ${metadata} ${access_rules} ${mint_params};`
+    )
     return this
   }
 
@@ -450,9 +465,6 @@ export class ManifestBuilder {
     )
     return this
   }
-
-
-
 
   /**
    * Withdraws all the given resource from account.
@@ -583,8 +595,6 @@ export class ManifestBuilder {
     )
     return this
   }
-
-
 
   /**
    * Builds a transaction manifest.
