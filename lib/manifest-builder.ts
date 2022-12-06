@@ -1,17 +1,12 @@
 import {
-  AccountAddressType,
-  BasicType,
+  TypeId,
   Bucket,
   ComponentAddress,
-  ComponentAddressType,
   Decimal,
   NonFungibleId,
   PackageAddress,
-  PackageAddressType,
   Proof,
   ResourceAddress,
-  ResourceAddressType,
-  TreeSet,
 } from './scrypto-value'
 
 export class Manifest {
@@ -607,6 +602,6 @@ export class ManifestBuilder {
 
   private formatNonFungibleIds(nonFungibleIds: string[]) {
     let ids = nonFungibleIds.map((id) => NonFungibleId(id))
-    return TreeSet(BasicType.NonFungibleId, ids)
+    return TreeSet(TypeId.NonFungibleId, ids)
   }
 }

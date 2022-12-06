@@ -3,9 +3,7 @@
 
 import {
   Bool,
-  Box,
   Bucket,
-  CollectionType,
   ComponentAddress,
   Decimal,
   Enum,
@@ -15,27 +13,29 @@ import {
   I32,
   I64,
   I8,
-  List,
-  Map,
   NonFungibleAddress,
-  Option,
   PackageAddress,
   PreciseDecimal,
   ResourceAddress,
-  Result,
-  Set,
+  EcdsaSecp256k1PublicKey,
+  EcdsaSecp256k1Signature,
+  EddsaEd25519PublicKey,
+  EddsaEd25519Signature,
+  NonFungibleId,
   String,
   ScryptoValueError,
   Tuple,
-  BasicType,
+  TypeId,
+  Proof,
   U128,
   U16,
   U32,
   U64,
   U8,
   Unit,
-  Vec,
+  Array,
   Expression,
+  SystemAddress,
 } from '../scrypto-value'
 
 describe('scrypto value', () => {
@@ -61,82 +61,56 @@ describe('scrypto value', () => {
       Enum('Foo', String('some string'), Bool(false)),
       'Enum("Foo","some string",false)',
     ],
-    [Option.Some(String('foobar')), 'Some("foobar")'],
-    [Option.Some(U128('128')), 'Some(128u128)'],
-    [Option.Some(Decimal(219.01234)), 'Some(Decimal("219.01234"))'],
-    [Option.None, 'None'],
-    [Box(U64('64')), 'Box(64u64)'],
-    [Box(Decimal(42.42)), 'Box(Decimal("42.42"))'],
+    [Enum('Some', String('foobar')), 'Enum("Some", "foobar")'],
+    [Enum('Some', U128('128')), 'Enum("Some", 128u128)'],
+    [Enum('Some', Decimal(219.01234)), 'Enum("Some", Decimal("219.01234"))'],
+    [Enum('None'), 'None'],
     [Tuple(Decimal(42.42), String('foo')), 'Tuple(Decimal("42.42"),"foo")'],
     [Tuple(Decimal(42.42), String('foo')), 'Tuple(Decimal("42.42"),"foo")'],
-    [Result.Ok(Decimal(42.42)), 'Ok(Decimal("42.42"))'],
     [
-      Result.Ok(Tuple(Decimal(42.42), I128('256'))),
-      'Ok(Tuple(Decimal("42.42"),256i128))',
-    ],
-    [
-      Vec(BasicType.String, String('foo'), String('bar')),
+      Array(TypeId.String, String('foo'), String('bar')),
       'Vec<String>("foo","bar")',
     ],
     [
-      Vec(BasicType.Decimal, Decimal(42.42), Decimal(42.42)),
+      Array(TypeId.Decimal, Decimal(42.42), Decimal(42.42)),
       'Vec<Decimal>(Decimal("42.42"),Decimal("42.42"))',
     ],
     [
-      List(BasicType.String, String('foo'), String('bar')),
+      Array(TypeId.String, String('foo'), String('bar')),
       'List<String>("foo","bar")',
     ],
     [
-      List(BasicType.Decimal, Decimal(42.42), Decimal(42.42)),
+      Array(TypeId.Decimal, Decimal(42.42), Decimal(42.42)),
       'List<Decimal>(Decimal("42.42"),Decimal("42.42"))',
     ],
     [
-      Set(BasicType.String, String('foo'), String('bar')),
+      Array(TypeId.String, String('foo'), String('bar')),
       'Set<String>("foo","bar")',
     ],
     [
-      Set(BasicType.Decimal, Decimal(42.42), Decimal(42.42)),
+      Array(TypeId.Decimal, Decimal(42.42), Decimal(42.42)),
       'Set<Decimal>(Decimal("42.42"),Decimal("42.42"))',
-    ],
-    [
-      Map(BasicType.String, BasicType.String, String('foo'), String('bar')),
-      'Map<String,String>("foo","bar")',
-    ],
-    [
-      Map(BasicType.String, BasicType.Decimal, String('foo'), Decimal(42.42)),
-      'Map<String,Decimal>("foo",Decimal("42.42"))',
     ],
     [PackageAddress('package_foo'), 'PackageAddress("package_foo")'],
     [ComponentAddress('component_foo'), 'ComponentAddress("component_foo")'],
     [ResourceAddress('resource_foo'), 'ResourceAddress("resource_foo")'],
+    [SystemAddress('system_foo'), 'ResourceAddress("system_foo")'],
     [NonFungibleAddress('foobar'), 'NonFungibleAddress("foobar")'],
-    [Hash('hashfoo'), 'Hash("hashfoo")'],
     [Bucket(String('foo')), 'Bucket("foo")'],
     [Bucket(U32(35)), 'Bucket(35u32)'],
+    [Proof(String('foo')), 'Proof("foo")'],
+    [Proof(U32(35)), 'Proof(35u32)'],
+    [Bucket(String('foo')), 'Bucket("foo")'],
+    [Bucket(U32(35)), 'Bucket(35u32)'],
+    [Hash('hashfoo'), 'Hash("hashfoo")'],
+    [EcdsaSecp256k1PublicKey('a'), 'EcdsaSecp256k1PublicKey("a")'],
+    [EcdsaSecp256k1Signature('a'), 'EcdsaSecp256k1Signature("a")'],
+    [EddsaEd25519PublicKey('a'), 'EddsaEd25519PublicKey("a")'],
+    [EddsaEd25519Signature('a'), 'EddsaEd25519Signature("a")'],
+    [Decimal(1.234), 'Decimal("1.234")'],
+    [PreciseDecimal(1.234), 'PreciseDecimal("1.234")'],
+    [NonFungibleId('id'), 'NonFungibleId("NonFungibleId")'],
   ])('should correctly return %s as %s', (test, expected) => {
-    expect(test).toBe(expected)
-  })
-
-  it.each([
-    [
-      Box(
-        Map(
-          BasicType.String,
-          CollectionType.Vec(BasicType.U8),
-          String('foo'),
-          Vec(BasicType.U8, U8(1), U8(2), U8(3))
-        )
-      ),
-      'Box(Map<String,Vec<u8>>("foo",Vec<u8>(1u8,2u8,3u8)))',
-    ],
-    [
-      Vec(
-        CollectionType.Set(BasicType.U8),
-        Set(BasicType.U8, U8(1), U8(2), U8(3))
-      ),
-      'Vec<Set<u8>>(Set<u8>(1u8,2u8,3u8))',
-    ],
-  ])('should correctly return complex data type %s as %s', (test, expected) => {
     expect(test).toBe(expected)
   })
 
@@ -171,24 +145,14 @@ describe('scrypto value', () => {
       'Number range exceeded u128',
     ],
     [
-      () => Vec(BasicType.String, String('foo'), U32(32)),
-      'Vec<String> expects the same type',
-    ],
-    [() => Vec(BasicType.U8, U8(25), U32(25)), 'Vec<u8> expects the same type'],
-    [
-      () => List(BasicType.String, String('foo'), U32(32)),
-      'List<String> expects the same type',
+      () => Array(TypeId.String, String('foo'), U32(32)),
+      'Array<String> expects the same type',
     ],
     [
-      () => List(BasicType.U8, U8(25), U32(25)),
-      'List<u8> expects the same type',
+      () => Array(TypeId.U8, U8(25), U32(25)),
+      'Array<u8> expects the same type',
     ],
-    [
-      () => Set(BasicType.String, String('foo'), U32(32)),
-      'Set<String> expects the same type',
-    ],
-    [() => Set(BasicType.U8, U8(25), U32(25)), 'Set<u8> expects the same type'],
-  ])('should fail with TransactionSpecError', (test, expected) => {
+  ])('should fail with ScryptoValueError', (test, expected) => {
     expect(test).toThrowError(new ScryptoValueError(expected))
   })
 })

@@ -1,4 +1,4 @@
-export enum BasicType {
+export enum TypeId {
   I8 = 'i8',
   I16 = 'i16',
   I32 = 'i32',
@@ -12,54 +12,31 @@ export enum BasicType {
   Unit = 'Unit',
   Bool = 'Bool',
   String = 'String',
-  Struct = 'Struct',
   Enum = 'Enum',
-  Option = 'Option',
-  Box = 'Box',
+  Array = 'Array',
   Tuple = 'Tuple',
-  Result = 'Result',
-  Map = 'Map',
-  Decimal = 'Decimal',
-  PreciseDecimal = 'PreciseDecimal',
+
   PackageAddress = 'PackageAddress',
   ComponentAddress = 'ComponentAddress',
   ResourceAddress = 'ResourceAddress',
-  NonFungibleAddress = 'NonFungibleAddress',
-  Hash = 'Hash',
+  SystemAddress = 'SystemAddress',
+
   Bucket = 'Bucket',
   Proof = 'Proof',
+
+  Expression = 'Expression',
+  Blob = 'Blob',
+  NonFungibleAddress = 'NonFungibleAddress',
+
+  Hash = 'Hash',
+  EcdsaSecp256k1PublicKey = 'EcdsaSecp256k1PublicKey',
+  EcdsaSecp256k1Signature = 'EcdsaSecp256k1Signature',
+  EddsaEd25519PublicKey = 'EddsaEd25519PublicKey',
+  EddsaEd25519Signature = 'EddsaEd25519Signature',
+  Decimal = 'Decimal',
+  PreciseDecimal = 'PreciseDecimal',
   NonFungibleId = 'NonFungibleId',
 }
-
-type Vec<T extends string> = `Vec<${T}>`
-type List<T extends string> = `List<${T}>`
-type Set<T extends string> = `Set<${T}>`
-type TreeSet<T extends string> = `TreeSet<${T}>`
-
-export type Collection =
-  | Vec<BasicType>
-  | List<BasicType>
-  | Set<BasicType>
-  | TreeSet<BasicType>
-
-export type Type = BasicType | Collection
-export type ResourceAddressType = `resource_${string}`
-export type AccountAddressType = `account_${string}`
-export type ComponentAddressType = `component_${string}`
-export type PackageAddressType = `package_${string}`
-
-export const CollectionType = {
-  Vec: <T extends Type>(type: T): Vec<T> => `Vec<${type}>`,
-  List: <T extends Type>(type: T): List<T> => `List<${type}>`,
-  Set: <T extends Type>(type: T): Set<T> => `Set<${type}>`,
-  TreeSet: <T extends Type>(type: T): TreeSet<T> => `TreeSet<${type}>`,
-} as const
-
-export type TypeValue =
-  | Type
-  | `Vec<${Collection}>`
-  | `List<${Type | Collection}>`
-  | `Set<${Type | Collection}>`
 
 export class ScryptoValueError extends Error {
   constructor(errorMessage: string) {
@@ -168,113 +145,16 @@ export const Enum = (field: string, ...args: string[]): string => {
     : `Enum("${field}")`
 }
 
-export const Option = {
-  Some: <T extends string>(value: T): `Some(${T})` => {
-    return `Some(${value})`
-  },
-  None: 'None',
-}
-
-export const Box = <T extends string>(value: T): `Box(${T})` => {
-  return `Box(${value})`
-}
-
 export const Tuple = <T extends string[]>(...args: T): `Tuple(${string})` => {
   return `Tuple(${args.join(',')})`
 }
 
-export const Result = {
-  Ok: <T extends string>(value: T): `Ok(${T})` => {
-    return `Ok(${value})`
-  },
-  Err: <T extends string>(value: T): `Err(${T})` => {
-    return `Err(${value})`
-  },
-}
-
-const validateType = (
-  type: TypeValue,
-  args: string[],
-  typeReported: TypeValue
-) => {
-  if (type === BasicType.String) {
-    if (args.some((a) => !a.startsWith('"') && !a.endsWith('"'))) {
-      throw new ScryptoValueError(`${typeReported} expects the same type`)
-    }
-  } else if (type === BasicType.Result) {
-    if (args.some((a) => !a.match(/^Ok|^Err/))) {
-      throw new ScryptoValueError(`${typeReported} expects the same type`)
-    }
-  } else if (type === BasicType.Option) {
-    if (args.some((a) => !a.match(/^Some|^None/))) {
-      throw new ScryptoValueError(`${typeReported} expects the same type`)
-    }
-  } else if (type === BasicType.Unit) {
-    if (args.some((a) => a !== '()')) {
-      throw new ScryptoValueError(`${typeReported} expects the same type`)
-    }
-  } else {
-    if (args.some((a) => !a.includes(type))) {
-      throw new ScryptoValueError(`${typeReported} expects the same type`)
-    }
-  }
-}
-
-export const Vec = <T extends Type>(
+export const Array = <T extends TypeId>(
   type: T,
   ...args: string[]
 ): `Vec<${T}>(${string})` => {
-  validateType(type, args, CollectionType.Vec(type))
+  validateArrayElements(type, args)
   return `Vec<${type}>(${args.join(',')})`
-}
-
-export const List = <T extends Type>(
-  type: T,
-  ...args: string[]
-): `List<${T}>(${string})` => {
-  validateType(type, args, CollectionType.List(type))
-  return `List<${type}>(${args.join(',')})`
-}
-
-export const Set = <T extends Type>(
-  type: T,
-  ...args: string[]
-): `Set<${T}>(${string})` => {
-  validateType(type, args, CollectionType.Set(type))
-  return `Set<${type}>(${args.join(',')})`
-}
-
-export const TreeSet = <T extends Type>(
-  type: T,
-  set: string[]
-): `TreeSet<${T}>(${string})` => {
-  return `TreeSet<${type}>(${set.join(',')})`
-}
-
-export const Map = (
-  keyType: TypeValue,
-  valueType: TypeValue,
-  ...args: string[]
-): string => {
-  validateType(
-    keyType,
-    args.filter((_, i) => i % 2 === 0),
-    BasicType.Map
-  )
-  validateType(
-    valueType,
-    args.filter((_, i) => i % 2 !== 0),
-    BasicType.Map
-  )
-  return `Map<${keyType},${valueType}>(${args.join(',')})`
-}
-
-export const Decimal = (num: number): `Decimal("${string}")` => {
-  return `Decimal("${num}")`
-}
-
-export const PreciseDecimal = (num: number): `PreciseDecimal("${string}")` => {
-  return `PreciseDecimal("${num}")`
 }
 
 export const PackageAddress = (
@@ -295,14 +175,10 @@ export const ResourceAddress = (
   return `ResourceAddress("${resourceAddress}")`
 }
 
-export const NonFungibleAddress = (
-  nonFungibleAddress: string
-): `NonFungibleAddress("${string}")` => {
-  return `NonFungibleAddress("${nonFungibleAddress}")`
-}
-
-export const Hash = (hash: string): `Hash("${string}")` => {
-  return `Hash("${hash}")`
+export const SystemAddress = (
+  systemAddress: `system_${string}`
+): `SystemAddress("${string}")` => {
+  return `SystemAddress("${systemAddress}")`
 }
 
 export const Bucket = (
@@ -315,12 +191,6 @@ export const Proof = (proofId: string | `${string}u32`): `Proof(${string})` => {
   return `Proof(${proofId})`
 }
 
-export const NonFungibleId = (
-  nonFungibleId: string
-): `NonFungibleId("${string}")` => {
-  return `NonFungibleId("${nonFungibleId}")`
-}
-
 export const Expression = <T extends string | 'ENTIRE_WORKTOP'>(
   expression: T
 ): `Expression("${T}")` => {
@@ -329,4 +199,66 @@ export const Expression = <T extends string | 'ENTIRE_WORKTOP'>(
 
 export const Blob = <T extends string>(blob: T): `Blob("${T}")` => {
   return `Blob("${blob}")`
+}
+
+export const NonFungibleAddress = (
+  nonFungibleAddress: string
+): `NonFungibleAddress("${string}")` => {
+  return `NonFungibleAddress("${nonFungibleAddress}")`
+}
+
+export const Hash = (hash: string): `Hash("${string}")` => {
+  return `Hash("${hash}")`
+}
+
+export const EcdsaSecp256k1PublicKey = (
+  pk: string
+): `EcdsaSecp256k1PublicKey("${string}")` => {
+  return `EcdsaSecp256k1PublicKey("${pk}")`
+}
+
+export const EcdsaSecp256k1Signature = (
+  sig: string
+): `EcdsaSecp256k1Signature("${string}")` => {
+  return `EcdsaSecp256k1Signature("${sig}")`
+}
+
+export const EddsaEd25519PublicKey = (
+  pk: string
+): `EddsaEd25519PublicKey("${string}")` => {
+  return `EddsaEd25519PublicKey("${pk}")`
+}
+
+export const EddsaEd25519Signature = (
+  sig: string
+): `EddsaEd25519Signature("${string}")` => {
+  return `EddsaEd25519Signature("${sig}")`
+}
+
+export const Decimal = (num: number): `Decimal("${string}")` => {
+  return `Decimal("${num}")`
+}
+
+export const PreciseDecimal = (num: number): `PreciseDecimal("${string}")` => {
+  return `PreciseDecimal("${num}")`
+}
+
+export const NonFungibleId = (id: string): `NonFungibleId("${string}")` => {
+  return `NonFungibleId("${id}")`
+}
+
+const validateArrayElements = (type: TypeId, args: string[]) => {
+  if (type === TypeId.String) {
+    if (args.some((a) => !a.startsWith('"') && !a.endsWith('"'))) {
+      throw new ScryptoValueError(`Array<${type}> expects the same type`)
+    }
+  } else if (type === TypeId.Unit) {
+    if (args.some((a) => a !== '()')) {
+      throw new ScryptoValueError(`Array<${type}> expects the same type`)
+    }
+  } else {
+    if (args.some((a) => !a.includes(type))) {
+      throw new ScryptoValueError(`Array<${type}> expects the same type`)
+    }
+  }
 }
