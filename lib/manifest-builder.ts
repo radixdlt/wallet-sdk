@@ -350,17 +350,109 @@ export class ManifestBuilder {
     return this
   }
 
+
+  /**
+   * Calls a native function
+   *
+   * @param blueprintName  The blueprint name
+   * @param functionName  The function name
+   * @param args The arguments, which must be in manifest format, e.g. `1u8`, `"string"`, `Bucket("name")`
+   */
+  // eslint-disable-next-line max-params
+  callNativeFunction(
+    blueprintName: string,
+    functionName: string,
+    args: string[]
+  ): ManifestBuilder {
+    this.instructions.push(
+      'CALL_NATIVE_FUNCTION "' +
+      blueprintName +
+      '" "' +
+      functionName +
+      '" ' +
+      args.join(' ') +
+      ';'
+    )
+    return this
+  }
+
+  /**
+   * Calls a method on a component.
+   *
+   * @param componentAddress  The component address
+   * @param methodName The method name
+   * @param args The arguments, which must be in manifest format, e.g. `1u8`, `"string"`, `Bucket("name")`
+   * @returns
+   */
+  callNativeMethod(
+    receiver: string,
+    methodName: string,
+    args: string[]
+  ): ManifestBuilder {
+    this.instructions.push(
+      'CALL_NATIVE_METHOD ' +
+      receiver +
+      ' "' +
+      methodName +
+      '" ' +
+      args.join(' ') +
+      ';'
+    )
+    return this
+  }
   /**
    * Publishes a package.
    * @param code_hash The package wasm code hash
    * @param abi_hash The package ABI hash
+   * @param owner_badge The owner badge
    */
-  publishPackage(code_hash: string, abi_hash: string): ManifestBuilder {
+  publishPackageWithOwner(code_hash: string, abi_hash: string, owner_badge: string): ManifestBuilder {
     this.instructions.push(
-      `PUBLISH_PACKAGE ${Blob(code_hash)} ${Blob(abi_hash)};`
+      'PUBLISH_PACKAGE Blob("' + code_hash + '")  Blob("' + abi_hash + '") NonFungibleAddress("' + owner_badge + '");'
     )
     return this
   }
+
+  /**
+   * Create resource 
+   * @param bucketName The name of the bucket to burn
+   * @returns
+   */
+  createResource(resource_type: string, metadata: string, access_rules: string, mint_params: string): ManifestBuilder {
+    this.instructions.push(`CREATE_RESOURCE ${resource_type} ${metadata} ${access_rules} ${mint_params};`)
+    return this
+  }
+
+  /**
+   * Burns a bucket
+   *
+   * @param bucketName The name of the bucket to burn
+   * @returns
+   */
+  burnBucket(bucketName: string): ManifestBuilder {
+    this.instructions.push(`BURN_BUCKET ${Bucket(bucketName)};`)
+    return this
+  }
+
+  /**
+   * Mints additional fungible token
+   *
+   * @param resourceAddress The resource address of the fungible resource
+   * @param amount The amount to mint
+   * @returns
+   */
+  mintFungible(
+    resourceAddress: ResourceAddressType,
+    amount: number
+  ): ManifestBuilder {
+    this.instructions.push(
+      `MINT_FUNGIBLE ${ResourceAddress(resourceAddress)} ${Decimal(amount)};`
+    )
+    return this
+  }
+
+
+
 
   /**
    * Withdraws all the given resource from account.
@@ -492,33 +584,7 @@ export class ManifestBuilder {
     return this
   }
 
-  /**
-   * Burns a bucket
-   *
-   * @param bucketName The name of the bucket to burn
-   * @returns
-   */
-  burnBucket(bucketName: string): ManifestBuilder {
-    this.instructions.push(`BURN_BUCKET ${Bucket(bucketName)};`)
-    return this
-  }
 
-  /**
-   * Mints additional fungible token
-   *
-   * @param resourceAddress The resource address of the fungible resource
-   * @param amount The amount to mint
-   * @returns
-   */
-  mintFungible(
-    resourceAddress: ResourceAddressType,
-    amount: number
-  ): ManifestBuilder {
-    this.instructions.push(
-      `MINT_FUNGIBLE ${ResourceAddress(resourceAddress)} ${Decimal(amount)};`
-    )
-    return this
-  }
 
   /**
    * Builds a transaction manifest.
