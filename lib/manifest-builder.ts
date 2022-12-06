@@ -13,7 +13,7 @@ import {
   ResourceAddressType,
   TreeSet,
   Blob,
-} from './transaction-spec'
+} from './scrypto-value'
 
 export class Manifest {
   instructions: string[]
