@@ -352,7 +352,6 @@ export class ManifestBuilder {
    * @param functionName  The function name
    * @param args The arguments, which must be in manifest format, e.g. `1u8`, `"string"`, `Bucket("name")`
    */
-  // eslint-disable-next-line max-params
   callNativeFunction(
     blueprintName: string,
     functionName: string,
