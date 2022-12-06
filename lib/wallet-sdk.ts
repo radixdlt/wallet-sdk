@@ -51,5 +51,6 @@ export type WalletSdk = ReturnType<typeof WalletSdk>
 export default WalletSdk
 
 export { ManifestBuilder } from './manifest-builder'
+export * as TransactionSpec from './transaction-spec'
 export { requestBuilder } from './request-builder'
 export { requestItem } from './IO/request-items/request-item'
