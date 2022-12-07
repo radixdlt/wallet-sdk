@@ -1,7 +1,7 @@
-export type PackageAddressType = `package_${string}`
-export type ResourceAddressType = `resource_${string}`
-export type ComponentAddressType = `component_${string}` | `account_${string}`
-export type SystemAddressType = `system_${string}`
+export type PackageAddressString = `package_${string}`
+export type ResourceAddressString = `resource_${string}`
+export type ComponentAddressString = `component_${string}` | `account_${string}`
+export type SystemAddressString = `system_${string}`
 
 export enum TypeId {
   I8 = 'i8',
@@ -163,25 +163,25 @@ export const Array = <T extends TypeId>(
 }
 
 export const PackageAddress = (
-  packageAddress: `package_${string}`
+  packageAddress: PackageAddressString
 ): `PackageAddress("${string}")` => {
   return `PackageAddress("${packageAddress}")`
 }
 
 export const ComponentAddress = (
-  componentAddress: `component_${string}` | `account_${string}`
+  componentAddress: ComponentAddressString
 ): `ComponentAddress("${string}")` => {
   return `ComponentAddress("${componentAddress}")`
 }
 
 export const ResourceAddress = (
-  resourceAddress: `resource_${string}`
+  resourceAddress: ResourceAddressString
 ): `ResourceAddress("${string}")` => {
   return `ResourceAddress("${resourceAddress}")`
 }
 
 export const SystemAddress = (
-  systemAddress: `system_${string}`
+  systemAddress: SystemAddressString
 ): `SystemAddress("${string}")` => {
   return `SystemAddress("${systemAddress}")`
 }
@@ -207,9 +207,10 @@ export const Blob = <T extends string>(blob: T): `Blob("${T}")` => {
 }
 
 export const NonFungibleAddress = (
-  nonFungibleAddress: string
-): `NonFungibleAddress("${string}")` => {
-  return `NonFungibleAddress("${nonFungibleAddress}")`
+  resourceAddress: ResourceAddressString,
+  non_fungible_id: string
+): `NonFungibleAddress(${string}, ${string})` => {
+  return `NonFungibleAddress("${resourceAddress}", ${non_fungible_id})`
 }
 
 export const Hash = (hash: string): `Hash("${string}")` => {

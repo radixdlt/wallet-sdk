@@ -5,9 +5,9 @@ import {
   PackageAddress,
   Proof,
   ResourceAddress,
-  ResourceAddressType,
-  PackageAddressType,
-  ComponentAddressType,
+  ResourceAddressString,
+  PackageAddressString,
+  ComponentAddressString,
 } from './scrypto-value'
 
 export class Manifest {
@@ -43,7 +43,7 @@ export class ManifestBuilder {
    * @returns
    */
   takeFromWorktop(
-    resourceAddress: ResourceAddressType,
+    resourceAddress: ResourceAddressString,
     bucketName: string
   ): ManifestBuilder {
     this.instructions.push(
@@ -65,7 +65,7 @@ export class ManifestBuilder {
    */
   takeFromWorktopByAmount(
     amount: number,
-    resourceAddress: ResourceAddressType,
+    resourceAddress: ResourceAddressString,
     bucketName: string
   ): ManifestBuilder {
     this.instructions.push(
@@ -87,7 +87,7 @@ export class ManifestBuilder {
    */
   takeFromWorktopByIds(
     nonFungibleIds: string,
-    resourceAddress: ResourceAddressType,
+    resourceAddress: ResourceAddressString,
     bucketName: string
   ): ManifestBuilder {
     this.instructions.push(
@@ -116,7 +116,9 @@ export class ManifestBuilder {
    * @param resourceAddress The resource address
    * @returns
    */
-  assertWorktopContains(resourceAddress: ResourceAddressType): ManifestBuilder {
+  assertWorktopContains(
+    resourceAddress: ResourceAddressString
+  ): ManifestBuilder {
     this.instructions.push(
       `ASSERT_WORKTOP_CONTAINS ${ResourceAddress(resourceAddress)};`
     )
@@ -132,7 +134,7 @@ export class ManifestBuilder {
    */
   assertWorktopContainsByAmount(
     amount: number,
-    resourceAddress: ResourceAddressType
+    resourceAddress: ResourceAddressString
   ): ManifestBuilder {
     this.instructions.push(
       `ASSERT_WORKTOP_CONTAINS_BY_AMOUNT ${Decimal(amount)} ${ResourceAddress(
@@ -151,7 +153,7 @@ export class ManifestBuilder {
    */
   assertWorktopContainsByIds(
     nonFungibleIds: string,
-    resourceAddress: ResourceAddressType
+    resourceAddress: ResourceAddressString
   ): ManifestBuilder {
     this.instructions.push(
       `ASSERT_WORKTOP_CONTAINS_BY_IDS ${nonFungibleIds} ${ResourceAddress(
@@ -202,7 +204,7 @@ export class ManifestBuilder {
    * @returns
    */
   createProofFromAuthZone(
-    resourceAddress: ResourceAddressType,
+    resourceAddress: ResourceAddressString,
     proofName: string
   ): ManifestBuilder {
     this.instructions.push(
@@ -224,7 +226,7 @@ export class ManifestBuilder {
    */
   createProofFromAuthZoneByAmount(
     amount: number,
-    resourceAddress: ResourceAddressType,
+    resourceAddress: ResourceAddressString,
     proofName: string
   ): ManifestBuilder {
     this.instructions.push(
@@ -246,7 +248,7 @@ export class ManifestBuilder {
    */
   createProofFromAuthZoneByIds(
     nonFungibleIds: string,
-    resourceAddress: ResourceAddressType,
+    resourceAddress: ResourceAddressString,
     proofName: string
   ): ManifestBuilder {
     this.instructions.push(
@@ -311,7 +313,7 @@ export class ManifestBuilder {
    * @param args The arguments, which must be in manifest format, e.g. `1u8`, `"string"`, `Bucket("name")`
    */
   callFunction(
-    packageAddress: PackageAddressType,
+    packageAddress: PackageAddressString,
     blueprintName: string,
     functionName: string,
     args: string[]
@@ -333,7 +335,7 @@ export class ManifestBuilder {
    * @returns
    */
   callMethod(
-    componentAddress: ComponentAddressType,
+    componentAddress: ComponentAddressString,
     methodName: string,
     args: string[]
   ): ManifestBuilder {
@@ -405,13 +407,13 @@ export class ManifestBuilder {
     owner_badge: string
   ): ManifestBuilder {
     this.instructions.push(
-      'PUBLISH_PACKAGE Blob("' +
+      'PUBLISH_PACKAGE_WITH_OWNER Blob("' +
         code_hash +
-        '")  Blob("' +
+        '") Blob("' +
         abi_hash +
-        '") NonFungibleAddress("' +
+        '") ' +
         owner_badge +
-        '");'
+        ';'
     )
     return this
   }
@@ -452,7 +454,7 @@ export class ManifestBuilder {
    * @returns
    */
   mintFungible(
-    resourceAddress: ResourceAddressType,
+    resourceAddress: ResourceAddressString,
     amount: number
   ): ManifestBuilder {
     this.instructions.push(
@@ -469,8 +471,8 @@ export class ManifestBuilder {
    * @returns
    */
   withdrawFromAccount(
-    accountAddress: ComponentAddressType,
-    resourceAddress: ResourceAddressType
+    accountAddress: ComponentAddressString,
+    resourceAddress: ResourceAddressString
   ): ManifestBuilder {
     this.instructions.push(
       `CALL_METHOD ${ComponentAddress(
@@ -489,9 +491,9 @@ export class ManifestBuilder {
    * @returns
    */
   withdrawFromAccountByAmount(
-    accountAddress: ComponentAddressType,
+    accountAddress: ComponentAddressString,
     amount: number,
-    resourceAddress: ResourceAddressType
+    resourceAddress: ResourceAddressString
   ): ManifestBuilder {
     this.instructions.push(
       `CALL_METHOD ${ComponentAddress(
@@ -512,9 +514,9 @@ export class ManifestBuilder {
    * @returns
    */
   withdrawFromAccountByIds(
-    accountAddress: ComponentAddressType,
+    accountAddress: ComponentAddressString,
     nonFungibleIds: string,
-    resourceAddress: ResourceAddressType
+    resourceAddress: ResourceAddressString
   ): ManifestBuilder {
     this.instructions.push(
       `CALL_METHOD ${ComponentAddress(
@@ -534,8 +536,8 @@ export class ManifestBuilder {
    * @returns
    */
   createProofFromAccount(
-    accountAddress: ComponentAddressType,
-    resourceAddress: ResourceAddressType
+    accountAddress: ComponentAddressString,
+    resourceAddress: ResourceAddressString
   ): ManifestBuilder {
     this.instructions.push(
       `CALL_METHOD ${ComponentAddress(
@@ -554,9 +556,9 @@ export class ManifestBuilder {
    * @returns
    */
   createProofFromAccountByAmount(
-    accountAddress: ComponentAddressType,
+    accountAddress: ComponentAddressString,
     amount: number,
-    resourceAddress: ResourceAddressType
+    resourceAddress: ResourceAddressString
   ): ManifestBuilder {
     this.instructions.push(
       `CALL_METHOD ${ComponentAddress(
@@ -577,9 +579,9 @@ export class ManifestBuilder {
    * @returns
    */
   createProofFromAccountByIds(
-    accountAddress: ComponentAddressType,
+    accountAddress: ComponentAddressString,
     nonFungibleIds: string,
-    resourceAddress: ResourceAddressType
+    resourceAddress: ResourceAddressString
   ): ManifestBuilder {
     this.instructions.push(
       `CALL_METHOD ${ComponentAddress(

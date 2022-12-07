@@ -81,7 +81,10 @@ describe('scrypto value', () => {
     [ComponentAddress('account_foo'), 'ComponentAddress("account_foo")'],
     [ResourceAddress('resource_foo'), 'ResourceAddress("resource_foo")'],
     [SystemAddress('system_foo'), 'SystemAddress("system_foo")'],
-    [NonFungibleAddress('foobar'), 'NonFungibleAddress("foobar")'],
+    [
+      NonFungibleAddress('resource_foo', '123u32'),
+      'NonFungibleAddress("resource_foo", 123u32)',
+    ],
     [Bucket(String('foo')), 'Bucket("foo")'],
     [Bucket(U32(35)), 'Bucket(35u32)'],
     [Proof(String('foo')), 'Proof("foo")'],
@@ -216,9 +219,17 @@ describe('manifest builder', () => {
           Enum('Some', Enum('Fungible', Decimal(1.0))),
         ])
         .callNativeMethod(
-          'component_sim1q2f9vmyrmeladvz0ejfttcztqv3genlsgpu9vue83mcs835hum',
+          'Global("component_sim1q2f9vmyrmeladvz0ejfttcztqv3genlsgpu9vue83mcs835hum")',
           'claim_royalty',
           []
+        )
+        .publishPackageWithOwner(
+          '985792bf3aa28de2793e33983607f4c39bed3e96626cb05a99fdc75caf2d111e',
+          '985792bf3aa28de2793e33983607f4c39bed3e96626cb05a99fdc75caf2d111e',
+          NonFungibleAddress(
+            'resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag',
+            '1u32'
+          )
         )
         .createResource(
           Enum('Fungible', U8(0)),
@@ -267,7 +278,8 @@ DROP_PROOF Proof(proof6);
 CALL_FUNCTION PackageAddress("package_sim1qyqzcexvnyg60z7lnlwauh66nhzg3m8tch2j8wc0e70qkydk8r") "GumballMachine" "new" ;
 CALL_METHOD ComponentAddress("account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064") "withdraw_by_amount" Decimal("5") ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
 CALL_NATIVE_FUNCTION "ResourceManger" "create" Enum("Fungible",0u8) Array<Tuple>() Array<Tuple>() Enum("Some",Enum("Fungible",Decimal("1")));
-CALL_NATIVE_METHOD component_sim1q2f9vmyrmeladvz0ejfttcztqv3genlsgpu9vue83mcs835hum "claim_royalty" ;
+CALL_NATIVE_METHOD Global("component_sim1q2f9vmyrmeladvz0ejfttcztqv3genlsgpu9vue83mcs835hum") "claim_royalty" ;
+PUBLISH_PACKAGE_WITH_OWNER Blob("985792bf3aa28de2793e33983607f4c39bed3e96626cb05a99fdc75caf2d111e") Blob("985792bf3aa28de2793e33983607f4c39bed3e96626cb05a99fdc75caf2d111e") NonFungibleAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag", 1u32);
 CREATE_RESOURCE Enum("Fungible",0u8) Array<Tuple>() Array<Tuple>() Enum("Some",Enum("Fungible",Decimal("1")));
 BURN_BUCKET Bucket(bucket1);
 MINT_FUNGIBLE ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Decimal("5");
