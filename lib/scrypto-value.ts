@@ -186,14 +186,20 @@ export const SystemAddress = (
   return `SystemAddress("${systemAddress}")`
 }
 
-export const Bucket = (
-  bucketId: string | `${string}u32`
-): `Bucket(${string})` => {
-  return `Bucket(${bucketId})`
+export const Bucket = (bucketId: string | number): `Bucket(${string})` => {
+  if (typeof bucketId === 'string') {
+    return `Bucket("${bucketId}")`
+  } else {
+    return `Bucket(${bucketId}u32)`
+  }
 }
 
-export const Proof = (proofId: string | `${string}u32`): `Proof(${string})` => {
-  return `Proof(${proofId})`
+export const Proof = (proofId: string | number): `Proof(${string})` => {
+  if (typeof proofId === 'string') {
+    return `Proof("${proofId}")`
+  } else {
+    return `Proof(${proofId}u32)`
+  }
 }
 
 export const Expression = <T extends string | 'ENTIRE_WORKTOP'>(
