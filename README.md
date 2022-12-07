@@ -1,6 +1,6 @@
 # radix-js
 
-### Build manifest with transaction spec
+### Build manifest
 
 ```typescript
 import {ManifestBuilder, Decimal, ResourceAddress, Bucket, Expression} from '@radixdlt/wallet-sdk';
