@@ -248,8 +248,8 @@ export const PreciseDecimal = (num: number): `PreciseDecimal("${string}")` => {
   return `PreciseDecimal("${num}")`
 }
 
-export const NonFungibleId = (id: string): `NonFungibleId("${string}")` => {
-  return `NonFungibleId("${id}")`
+export const NonFungibleId = (id: string): `NonFungibleId(${string})` => {
+  return `NonFungibleId(${id})`
 }
 
 const validateArrayElements = (type: TypeId, args: string[]) => {

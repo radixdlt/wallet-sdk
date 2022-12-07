@@ -1,6 +1,7 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable max-nested-callbacks */
 
+import { ManifestBuilder } from '../manifest-builder'
 import {
   Bool,
   Bucket,
@@ -94,7 +95,7 @@ describe('scrypto value', () => {
     [EddsaEd25519Signature('a'), 'EddsaEd25519Signature("a")'],
     [Decimal(1.234), 'Decimal("1.234")'],
     [PreciseDecimal(1.234), 'PreciseDecimal("1.234")'],
-    [NonFungibleId('id'), 'NonFungibleId("id")'],
+    [NonFungibleId('id'), 'NonFungibleId(id)'],
   ])('should correctly return %s as %s', (test, expected) => {
     expect(test).toBe(expected)
   })
@@ -139,5 +140,139 @@ describe('scrypto value', () => {
     ],
   ])('should fail with ScryptoValueError', (test, expected) => {
     expect(test).toThrowError(new ScryptoValueError(expected))
+  })
+})
+
+describe('manifest builder', () => {
+  it('complex', () => {
+    expect(
+      new ManifestBuilder()
+        .takeFromWorktop(
+          'resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag',
+          'bucket1'
+        )
+        .takeFromWorktopByAmount(
+          5,
+          'resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag',
+          'bucket2'
+        )
+        .takeFromWorktopByIds(
+          Array(TypeId.NonFungibleId, NonFungibleId('123u32')),
+          'resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag',
+          'bucket3'
+        )
+        .returnToWorktop('bucket3')
+        .assertWorktopContains(
+          'resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag'
+        )
+        .assertWorktopContainsByAmount(
+          5,
+          'resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag'
+        )
+        .assertWorktopContainsByIds(
+          Array(TypeId.NonFungibleId, NonFungibleId('Bytes("deadbeef")')),
+          'resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag'
+        )
+        .popFromAuthZone('proof1')
+        .pushToAuthZone('proof1')
+        .clearAuthZone()
+        .createProofFromAuthZone(
+          'resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag',
+          'proof2'
+        )
+        .createProofFromAuthZoneByAmount(
+          5,
+          'resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag',
+          'proof3'
+        )
+        .createProofFromAuthZoneByIds(
+          Array(TypeId.NonFungibleId, NonFungibleId('"hello"')),
+          'resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag',
+          'proof4'
+        )
+        .createProofFromBucket('bucket2', 'proof5')
+        .cloneProof('proof5', 'proof6')
+        .dropProof('proof6')
+        .callFunction(
+          'package_sim1qyqzcexvnyg60z7lnlwauh66nhzg3m8tch2j8wc0e70qkydk8r',
+          'GumballMachine',
+          'new',
+          []
+        )
+        .callMethod(
+          'account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064',
+          'withdraw_by_amount',
+          [
+            Decimal(5.0),
+            ResourceAddress(
+              'resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag'
+            ),
+          ]
+        )
+        .callNativeFunction('ResourceManger', 'create', [
+          Enum('Fungible', U8(0)),
+          Array(TypeId.Tuple),
+          Array(TypeId.Tuple),
+          Enum('Some', Enum('Fungible', Decimal(1.0))),
+        ])
+        .callNativeMethod(
+          'component_sim1q2f9vmyrmeladvz0ejfttcztqv3genlsgpu9vue83mcs835hum',
+          'claim_royalty',
+          []
+        )
+        .createResource(
+          Enum('Fungible', U8(0)),
+          Array(TypeId.Tuple),
+          Array(TypeId.Tuple),
+          Enum('Some', Enum('Fungible', Decimal(1.0)))
+        )
+        .burnBucket('bucket1')
+        .mintFungible(
+          'resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag',
+          5
+        )
+        .withdrawFromAccount(
+          'account_sim1qwcwzxdr4s33ahvvjyvmeqeje5cepqu0ngset7xlukuq33gx97',
+          'resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag'
+        )
+        .withdrawFromAccountByAmount(
+          'account_sim1qwcwzxdr4s33ahvvjyvmeqeje5cepqu0ngset7xlukuq33gx97',
+          5,
+          'resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag'
+        )
+        .withdrawFromAccountByIds(
+          'account_sim1qwcwzxdr4s33ahvvjyvmeqeje5cepqu0ngset7xlukuq33gx97',
+          Array(TypeId.NonFungibleId, NonFungibleId('123u32')),
+          'resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag'
+        )
+        .build()
+        .toString()
+    )
+      .toBe(`TAKE_FROM_WORKTOP ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Bucket(bucket1);
+TAKE_FROM_WORKTOP_BY_AMOUNT Decimal("5") ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Bucket(bucket2);
+TAKE_FROM_WORKTOP_BY_IDS Array<NonFungibleId>(NonFungibleId(123u32)) ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Bucket(bucket3);
+RETURN_TO_WORKTOP Bucket(bucket3);
+ASSERT_WORKTOP_CONTAINS ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
+ASSERT_WORKTOP_CONTAINS_BY_AMOUNT Decimal("5") ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
+ASSERT_WORKTOP_CONTAINS_BY_IDS Array<NonFungibleId>(NonFungibleId(Bytes("deadbeef"))) ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
+POP_FROM_AUTH_ZONE Proof(proof1);
+PUSH_TO_AUTH_ZONE Proof(proof1);
+CLEAR_AUTH_ZONE;
+CREATE_PROOF_FROM_AUTH_ZONE ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Proof(proof2);
+CREATE_PROOF_FROM_AUTH_ZONE_BY_AMOUNT Decimal("5") ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Proof(proof3);
+CREATE_PROOF_FROM_AUTH_ZONE_BY_IDS Array<NonFungibleId>(NonFungibleId("hello")) ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Proof(proof4);
+CREATE_PROOF_FROM_BUCKET Bucket(bucket2) Proof(proof5);
+CLONE_PROOF Proof(proof5) Proof(proof6);
+DROP_PROOF Proof(proof6);
+CALL_FUNCTION PackageAddress("package_sim1qyqzcexvnyg60z7lnlwauh66nhzg3m8tch2j8wc0e70qkydk8r") "GumballMachine" "new" ;
+CALL_METHOD ComponentAddress("account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064") "withdraw_by_amount" Decimal("5") ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
+CALL_NATIVE_FUNCTION "ResourceManger" "create" Enum("Fungible",0u8) Array<Tuple>() Array<Tuple>() Enum("Some",Enum("Fungible",Decimal("1")));
+CALL_NATIVE_METHOD component_sim1q2f9vmyrmeladvz0ejfttcztqv3genlsgpu9vue83mcs835hum "claim_royalty" ;
+CREATE_RESOURCE Enum("Fungible",0u8) Array<Tuple>() Array<Tuple>() Enum("Some",Enum("Fungible",Decimal("1")));
+BURN_BUCKET Bucket(bucket1);
+MINT_FUNGIBLE ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Decimal("5");
+CALL_METHOD ComponentAddress("account_sim1qwcwzxdr4s33ahvvjyvmeqeje5cepqu0ngset7xlukuq33gx97") "withdraw" ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
+CALL_METHOD ComponentAddress("account_sim1qwcwzxdr4s33ahvvjyvmeqeje5cepqu0ngset7xlukuq33gx97") "withdraw_by_amount" Decimal("5") ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
+CALL_METHOD ComponentAddress("account_sim1qwcwzxdr4s33ahvvjyvmeqeje5cepqu0ngset7xlukuq33gx97") "withdraw_by_ids" Array<NonFungibleId>(NonFungibleId(123u32)) ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");`)
   })
 })
