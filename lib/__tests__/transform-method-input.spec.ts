@@ -20,7 +20,7 @@ describe('transformMethodInput', () => {
           expected: {
             requestType: RequestTypeSchema.oneTimeAccountsRead.value,
             requiresProofOfOwnership: false,
-            numberOfAddresses: 3,
+            numberOfAccounts: 3,
           },
         },
         {
@@ -35,7 +35,7 @@ describe('transformMethodInput', () => {
           expected: {
             requestType: RequestTypeSchema.oneTimeAccountsRead.value,
             requiresProofOfOwnership: true,
-            numberOfAddresses: 1,
+            numberOfAccounts: 1,
           },
         },
       ].forEach((testItem) => {
@@ -60,7 +60,7 @@ describe('transformMethodInput', () => {
           expected: {
             requestType: RequestTypeSchema.ongoingAccountsRead.value,
             requiresProofOfOwnership: false,
-            numberOfAddresses: 3,
+            numberOfAccounts: 3,
           },
         },
         {
@@ -75,7 +75,7 @@ describe('transformMethodInput', () => {
           expected: {
             requestType: RequestTypeSchema.ongoingAccountsRead.value,
             requiresProofOfOwnership: true,
-            numberOfAddresses: 1,
+            numberOfAccounts: 1,
           },
         },
       ].forEach((testItem) => {

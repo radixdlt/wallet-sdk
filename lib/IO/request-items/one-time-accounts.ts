@@ -13,7 +13,7 @@ export type OneTimeAccounts = {
       response: OneTimeAccountsWithoutProofOfOwnershipResponseItem
     }
     method: {
-      input: { numberOfAddresses?: number }
+      input: { numberOfAccounts?: number }
       output: {
         oneTimeAccounts: Account[]
       }
@@ -25,7 +25,7 @@ export type OneTimeAccounts = {
       response: OneTimeAccountsWithProofOfOwnershipResponseItem
     }
     method: {
-      input: { numberOfAddresses?: number }
+      input: { numberOfAccounts?: number }
       output: {
         oneTimeAccounts: AccountWithProofOfOwnership[]
       }
@@ -40,21 +40,21 @@ type NotAllowedKeys = Partial<{
 
 export const oneTimeAccounts = {
   withoutProofOfOwnership:
-    (numberOfAddresses?: number) =>
+    (numberOfAccounts?: number) =>
     <I>(input: I extends NotAllowedKeys ? never : I) => ({
       ...input,
       oneTimeAccountsWithoutProofOfOwnership: {
         requiresProofOfOwnership: false,
-        numberOfAddresses,
+        numberOfAccounts,
       },
     }),
   withProofOfOwnership:
-    (numberOfAddresses?: number) =>
+    (numberOfAccounts?: number) =>
     <I>(input: I extends NotAllowedKeys ? never : I) => ({
       ...input,
       oneTimeAccountsWithProofOfOwnership: {
         requiresProofOfOwnership: true,
-        numberOfAddresses,
+        numberOfAccounts,
       },
     }),
 }
