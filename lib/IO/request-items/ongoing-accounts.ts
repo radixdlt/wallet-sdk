@@ -12,7 +12,7 @@ export type OngoingAccounts = {
       response: OngoingAccountsResponseItem
     }
     method: {
-      input: { numberOfAddresses?: number }
+      input: { numberOfAccounts?: number }
       output: { ongoingAccounts: Account[] }
     }
   }
@@ -22,7 +22,7 @@ export type OngoingAccounts = {
       response: OngoingAccountsResponseItem
     }
     method: {
-      input: { numberOfAddresses?: number }
+      input: { numberOfAccounts?: number }
       output: { ongoingAccounts: AccountWithProofOfOwnership[] }
     }
   }
@@ -40,21 +40,21 @@ type NotAllowedKeys = Partial<{
 
 export const ongoingAccounts = {
   withoutProofOfOwnership:
-    (numberOfAddresses?: number) =>
+    (numberOfAccounts?: number) =>
     <I extends RequiredKeys>(input: I extends NotAllowedKeys ? never : I) => ({
       ...input,
       ongoingAccountsWithoutProofOfOwnership: {
         requiresProofOfOwnership: false,
-        numberOfAddresses,
+        numberOfAccounts,
       },
     }),
   withProofOfOwnership:
-    (numberOfAddresses?: number) =>
+    (numberOfAccounts?: number) =>
     <I extends RequiredKeys>(input: I extends NotAllowedKeys ? never : I) => ({
       ...input,
       ongoingAccountsWithProofOfOwnership: {
         requiresProofOfOwnership: true,
-        numberOfAddresses,
+        numberOfAccounts,
       },
     }),
 }
