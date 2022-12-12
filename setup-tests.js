@@ -1,3 +1,3 @@
-import { Crypto } from '@peculiar/webcrypto'
+import { randomUUID } from 'node:crypto'
 
-global.crypto = new Crypto()
+global.crypto.randomUUID = randomUUID
