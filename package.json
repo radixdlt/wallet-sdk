@@ -42,8 +42,6 @@
     "prepare": "npx husky install",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
-    "test:e2e": "playwright test",
-    "test:e2e:ci": "xvfb-run playwright test",
     "semantic-release": "semantic-release"
   },
   "devDependencies": {
@@ -53,7 +51,6 @@
     "@commitlint/config-conventional": "^17.3.0",
     "@hirez_io/observer-spy": "^2.2.0",
     "@peculiar/webcrypto": "^1.4.0",
-    "@playwright/test": "^1.25.1",
     "@types/jest": "^28.1.7",
     "@typescript-eslint/eslint-plugin": "^5.36.2",
     "@typescript-eslint/parser": "^5.36.2",
