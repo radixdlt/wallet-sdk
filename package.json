@@ -1,6 +1,25 @@
 {
   "name": "@radixdlt/wallet-sdk",
   "version": "0.0.0",
+  "description": "Radix JavaScript Wallet SDK repository",
+  "homepage": "https://developers.radixdlt.com",
+  "keywords": [
+    "radix",
+    "wallet",
+    "sdk",
+    "dlt",
+    "web3",
+    "dApp"
+  ],
+  "authors": [
+    "Alex Stelea <alex.stelea@rdx.works>",
+    "Dawid Sowa <dawid.sowa@rdx.works>"
+  ],
+  "bugs": "https://github.com/radixdlt/wallet-sdk/issues",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "files": [
     "dist"
   ],
