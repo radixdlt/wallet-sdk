@@ -19,7 +19,15 @@ export type Login = {
       response: LoginResponseItem
     }
     method: {
-      output: { login: { personaId: string } }
+      output: {
+        login: {
+          challenge: string
+          personaId: string
+          publicKey: string
+          signature: string
+          identityComponentAddress: string
+        }
+      }
       input: { challenge: string }
     }
   }
