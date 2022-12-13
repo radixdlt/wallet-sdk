@@ -9,7 +9,9 @@
     "sdk",
     "dlt",
     "web3",
-    "dApp"
+    "dApp",
+    "crypto",
+    "DeFi"
   ],
   "authors": [
     "Alex Stelea <alex.stelea@rdx.works>",
