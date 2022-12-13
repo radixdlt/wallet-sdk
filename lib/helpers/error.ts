@@ -5,6 +5,17 @@ export const errorType = {
   missingExtension: 'missingExtension',
   walletRequestValidation: 'walletRequestValidation',
   walletResponseValidation: 'walletResponseValidation',
+  wrongNetwork: 'wrongNetwork',
+  failedToPrepareTransaction: 'failedToPrepareTransaction',
+  failedToCompileTransaction: 'failedToCompileTransaction',
+  failedToSignTransaction: 'failedToSignTransaction',
+  failedToSubmitTransaction: 'failedToSubmitTransaction',
+  failedToPollSubmittedTransaction: 'failedToPollSubmittedTransaction',
+  submittedTransactionWasDuplicate: 'submittedTransactionWasDuplicate',
+  submittedTransactionHasFailedTransactionStatus:
+    'submittedTransactionHasFailedTransactionStatus',
+  submittedTransactionHasRejectedTransactionStatus:
+    'submittedTransactionHasRejectedTransactionStatus',
 } as const
 
 type ErrorType = keyof typeof errorType
@@ -17,12 +28,9 @@ type GenericError<T extends ErrorType> = {
 
 export type SdkError = GenericError<keyof typeof errorType>
 
-const defaultErrorMessage = {
-  [errorType.missingExtension]: 'extension could not be found',
-  [errorType.rejectedByUser]: 'user rejected request',
-  [errorType.walletRequestValidation]: '',
-  [errorType.walletResponseValidation]: '',
-}
+const defaultErrorMessage = new Map<ErrorType, string>()
+  .set(errorType.missingExtension, 'extension could not be found')
+  .set(errorType.rejectedByUser, 'user rejected request')
 
 export const createSdkError = (
   error: ErrorType,
@@ -31,5 +39,5 @@ export const createSdkError = (
 ): SdkError => ({
   error,
   requestId,
-  message: message || defaultErrorMessage[error],
+  message: message || defaultErrorMessage.get(error) || '',
 })
