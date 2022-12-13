@@ -44,7 +44,6 @@ export const oneTimeAccounts = {
     <I>(input: I extends NotAllowedKeys ? never : I) => ({
       ...input,
       oneTimeAccountsWithoutProofOfOwnership: {
-        requiresProofOfOwnership: false,
         numberOfAccounts,
       },
     }),
@@ -53,7 +52,6 @@ export const oneTimeAccounts = {
     <I>(input: I extends NotAllowedKeys ? never : I) => ({
       ...input,
       oneTimeAccountsWithProofOfOwnership: {
-        requiresProofOfOwnership: true,
         numberOfAccounts,
       },
     }),
