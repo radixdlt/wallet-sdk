@@ -56,6 +56,35 @@ export const transformMethodInput = <I extends {}>(input: I) =>
                 requiresProofOfOwnership: false,
               },
             ]
+          case requestMethodRequestType.oneTimeAccountsWithProofOfOwnership:
+            return [
+              ...acc,
+              {
+                requestType: RequestTypeSchema.oneTimeAccountsRead.value,
+                ...value,
+                requiresProofOfOwnership: true,
+              },
+            ]
+
+          case requestMethodRequestType.ongoingAccountsWithProofOfOwnership:
+            return [
+              ...acc,
+              {
+                requestType: RequestTypeSchema.ongoingAccountsRead.value,
+                ...value,
+                requiresProofOfOwnership: true,
+              },
+            ]
+
+          case requestMethodRequestType.ongoingAccountsWithoutProofOfOwnership:
+            return [
+              ...acc,
+              {
+                requestType: RequestTypeSchema.ongoingAccountsRead.value,
+                ...value,
+                requiresProofOfOwnership: false,
+              },
+            ]
 
           default:
             return [

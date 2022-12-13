@@ -53,6 +53,7 @@ describe('transformMethodInput', () => {
           expected: {
             requestType: RequestTypeSchema.ongoingAccountsRead.value,
             requiresProofOfOwnership: false,
+            numberOfAccounts: undefined,
           },
         },
         {
@@ -68,6 +69,7 @@ describe('transformMethodInput', () => {
           expected: {
             requestType: RequestTypeSchema.ongoingAccountsRead.value,
             requiresProofOfOwnership: true,
+            numberOfAccounts: undefined,
           },
         },
         {

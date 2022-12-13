@@ -44,7 +44,6 @@ export const ongoingAccounts = {
     <I extends RequiredKeys>(input: I extends NotAllowedKeys ? never : I) => ({
       ...input,
       ongoingAccountsWithoutProofOfOwnership: {
-        requiresProofOfOwnership: false,
         numberOfAccounts,
       },
     }),
@@ -53,7 +52,6 @@ export const ongoingAccounts = {
     <I extends RequiredKeys>(input: I extends NotAllowedKeys ? never : I) => ({
       ...input,
       ongoingAccountsWithProofOfOwnership: {
-        requiresProofOfOwnership: true,
         numberOfAccounts,
       },
     }),
