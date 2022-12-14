@@ -6,13 +6,11 @@ import { decodeWalletResponse } from './IO/decode-wallet-response'
 import { Metadata, WalletRequest, WalletSuccessResponse } from './IO/schemas'
 import { transformMethodInput } from './IO/transform-method-input'
 import { createMessage } from './messages/create-message'
-import { MessageLifeCycleEvent } from './messages/events/_types'
+import { CallbackFns } from './messages/events/_types'
 import { Method, requestType } from './_types'
 
-type EventCallbackFn = ((eventType: 'receivedByExtension') => void) | undefined
-
 type SendWalletRequest = (
-  eventCallback?: EventCallbackFn
+  callbackFns: Partial<CallbackFns>
 ) => (message: WalletRequest) => ResultAsync<WalletSuccessResponse, SdkError>
 
 export const createMethods = (
@@ -30,24 +28,24 @@ export const createMethods = (
       : never
   >(
     input: Input,
-    eventCallback?: (messageEvent: MessageLifeCycleEvent) => void
+    callbackFns: Partial<CallbackFns> = {}
   ) =>
     transformMethodInput(input)
       .andThen(createMessage(metadata))
       .asyncAndThen(validateWalletRequest)
-      .andThen(sendMessageToWallet(eventCallback))
+      .andThen(sendMessageToWallet(callbackFns))
       .andThen(validateWalletResponse)
       .map((response) => response.items)
       .map(decodeWalletResponse<Output>)
 
   const sendTransaction = (
     input: Method['sendTransaction']['input'],
-    eventCallback?: (messageEvent: MessageLifeCycleEvent) => void
+    callbackFns: Partial<CallbackFns> = {}
   ) =>
     transformMethodInput({ [requestType.sendTransaction]: input })
       .andThen(createMessage(metadata))
       .asyncAndThen(validateWalletRequest)
-      .andThen(sendMessageToWallet(eventCallback))
+      .andThen(sendMessageToWallet(callbackFns))
       .andThen(validateWalletResponse)
       .map((response) => response.items)
       .map(decodeWalletResponse<Method['sendTransaction']['output']>)

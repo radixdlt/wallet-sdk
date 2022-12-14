@@ -11,3 +11,8 @@ export const messageLifeCycleEvent = {
 } as const
 
 export type MessageLifeCycleEvent = keyof typeof messageLifeCycleEvent
+
+export type CallbackFns = {
+  eventCallback: (messageEvent: MessageLifeCycleEvent) => void
+  requestControl: (api: { cancelRequest: () => void }) => void
+}
