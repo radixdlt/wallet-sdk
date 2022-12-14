@@ -1,3 +1,4 @@
+import log from 'loglevel'
 import { Err, err, ok, Result, ResultAsync } from 'neverthrow'
 import {
   filter,
@@ -7,6 +8,7 @@ import {
   Observable,
   of,
   share,
+  Subject,
   takeUntil,
   tap,
   timer,
@@ -15,7 +17,7 @@ import { config } from '../../config'
 import { createSdkError, errorType, SdkError } from '../../helpers/error'
 import { unwrapObservable } from '../../helpers/unwrap-observable'
 import { WalletRequest, WalletSuccessResponse } from '../../IO/schemas'
-import { MessageLifeCycleEvent } from '../events/_types'
+import { CallbackFns } from '../events/_types'
 import { SubjectsType } from '../subjects'
 import { messageEvents } from './message-events'
 
@@ -23,20 +25,49 @@ export type SendMessage = ReturnType<typeof sendMessage>
 
 export const sendMessage =
   (subjects: SubjectsType) =>
-  (eventCallback?: (eventType: MessageLifeCycleEvent) => void) =>
+  (callbackFns: Partial<CallbackFns>) =>
   (message: WalletRequest): ResultAsync<WalletSuccessResponse, SdkError> => {
+    const cancelRequestSubject = new Subject<void>()
+
+    if (callbackFns.requestControl)
+      callbackFns.requestControl({
+        cancelRequest: () => {
+          log.debug(
+            `🔵⬆️❌ wallet request canceled\n${JSON.stringify(
+              message,
+              null,
+              2
+            )}`
+          )
+          return cancelRequestSubject.next()
+        },
+      })
+
+    const cancelRequest$ = cancelRequestSubject
+      .asObservable()
+      .pipe(
+        map(() =>
+          err(createSdkError(errorType.canceledByUser, message.requestId))
+        )
+      )
+
     const response$ = subjects.responseSubject.pipe(
       filter((response) => response.requestId === message.requestId),
       map(
         (message): Result<WalletSuccessResponse, SdkError> =>
           'items' in message ? ok(message) : err(message)
-      ),
-      first()
+      )
     )
+
+    const walletResponseOrCancelRequestError$ = merge(
+      response$,
+      cancelRequest$
+    ).pipe(first())
 
     const messageEvent$ = messageEvents(subjects, message.requestId).pipe(
       tap((event) => {
-        if (eventCallback) eventCallback(event.eventType)
+        if (callbackFns.eventCallback)
+          callbackFns.eventCallback(event.eventType)
       }),
       takeUntil(response$),
       share()
@@ -66,7 +97,7 @@ export const sendMessage =
     ) as Observable<never>
 
     const walletResponse$ = merge(
-      response$,
+      walletResponseOrCancelRequestError$,
       extensionDetection$,
       sendMessage$
     ).pipe(

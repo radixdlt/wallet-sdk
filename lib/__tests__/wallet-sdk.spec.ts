@@ -49,17 +49,9 @@ describe('sdk flow', () => {
     sdk.destroy()
   })
 
-  const createRequestHelper = async <I extends {}>({
-    input,
-    walletResponse,
-    eventCallback,
-    callback,
-  }: {
-    input: I
-    walletResponse: WalletSuccessResponse['items']
-    eventCallback?: () => void
-    callback: (error: any, message: any) => void
-  }) => {
+  const createRequestHelper = (
+    input: () => ReturnType<WalletSdkType['request']>
+  ) => {
     const eventDispatchSpy = jest.spyOn(globalThis, 'dispatchEvent')
     const outgoingMessageSpy = subscribeSpyTo(
       sdk.__subjects.outgoingMessageSubject
@@ -68,28 +60,30 @@ describe('sdk flow', () => {
       sdk.__subjects.messageLifeCycleEventSubject
     )
 
-    sdk
-      .request(input, eventCallback)
-      .map((response) => callback(null, response))
-      .mapErr((err) => {
-        callback(err, null)
-      })
+    const request = input()
 
-    await delay(0)
+    let requestId: string | undefined
 
-    expect(eventDispatchSpy).toBeCalled()
-
-    const outgoingMessage = outgoingMessageSpy.getFirstValue()
-    sendReceivedEvent(outgoingMessage.requestId)
-
-    sdk.__subjects.incomingMessageSubject.next({
-      items: walletResponse,
-      requestId: outgoingMessage.requestId,
+    delay(0).then(() => {
+      expect(eventDispatchSpy).toBeCalled()
+      const outgoingMessage = outgoingMessageSpy.getFirstValue()
+      requestId = outgoingMessage.requestId
+      sendReceivedEvent(outgoingMessage.requestId)
     })
 
+    const getRequestId = () => requestId!
+
     return {
-      outgoingMessage,
       getMessageEvents: () => messageEventSpy.getValues(),
+      getRequestId,
+      outgoingMessageSpy,
+      sendIncomingMessage: (walletResponse: WalletSuccessResponse['items']) => {
+        sdk.__subjects.incomingMessageSubject.next({
+          items: walletResponse,
+          requestId: getRequestId(),
+        })
+      },
+      request,
     }
   }
 
@@ -101,40 +95,66 @@ describe('sdk flow', () => {
   }
 
   describe('request method', () => {
-    it('should request account addresses and persona data', (done) => {
+    it('should cancel request', async () => {
+      let cancel: (() => void) | undefined
+
+      const { request } = createRequestHelper(() =>
+        sdk.request(
+          { oneTimeAccountsWithoutProofOfOwnership: {} },
+          {
+            requestControl: ({ cancelRequest }) => {
+              cancel = cancelRequest
+            },
+          }
+        )
+      )
+
+      // trigger a request cancelation
+      delay(300).then(() => {
+        cancel!()
+      })
+
+      const result = await request
+
+      if (result.isOk()) throw new Error('should not get a success response')
+
+      expect(result.error.error).toBe('canceledByUser')
+    })
+
+    it('should request account addresses and persona data', async () => {
       const walletResponse = [mockAccountWalletResponse]
 
       const callbackSpy = jest.fn()
 
-      createRequestHelper({
-        input: {
-          oneTimeAccountsWithoutProofOfOwnership: {},
-        },
-        walletResponse,
-        eventCallback: callbackSpy,
-        callback: (error, response) => {
-          if (error) {
-            throw error
-          }
-          expect({
-            oneTimeAccounts: mockAccountWalletResponse.accounts,
-          }).toEqual(response)
-          done()
-        },
-      }).then(({ outgoingMessage, getMessageEvents }) => {
-        expect(outgoingMessage.metadata.networkId).toBe(Network.Mainnet)
-
-        expect(getMessageEvents()).toEqual([
-          {
-            requestId: outgoingMessage.requestId,
-            eventType: messageLifeCycleEvent.receivedByExtension,
-          },
-        ])
-
-        expect(callbackSpy).toHaveBeenCalledWith(
-          messageLifeCycleEvent.receivedByExtension
+      const { request, sendIncomingMessage, outgoingMessageSpy } =
+        createRequestHelper(() =>
+          sdk.request(
+            { oneTimeAccountsWithoutProofOfOwnership: {} },
+            {
+              eventCallback: callbackSpy,
+            }
+          )
         )
+
+      // mock a wallet response
+      delay(300).then(() => {
+        sendIncomingMessage(walletResponse)
       })
+
+      const result = await request
+
+      if (result.isErr()) throw new Error('should not get a error response')
+
+      expect((result.value as any).oneTimeAccounts).toEqual(
+        walletResponse[0].accounts
+      )
+
+      expect(outgoingMessageSpy.getFirstValue().metadata).toEqual({
+        dAppId: 'radixDashboard',
+        networkId: 1,
+      })
+
+      expect(callbackSpy).toBeCalledWith('receivedByExtension')
     })
   })
 
@@ -158,7 +178,7 @@ describe('sdk flow', () => {
             transactionManifest: `test transaction manifest`,
             version: 1,
           },
-          callbackSpy
+          { eventCallback: callbackSpy }
         )
         .map((message) => {
           expect(message.transactionIntentHash).toEqual('testHash')
