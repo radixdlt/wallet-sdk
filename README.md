@@ -302,13 +302,25 @@ const value = result.value
 
 ### Login
 
-This request type results in the Radix Wallet asking the user to select a Persona to login to this dApp, and providing cryptographic proof of control – by way of the associated on-ledger Identity component that the wallet has created.
+Sometimes your dApp may want a more personalized, consistent user experience and the Radix Wallet is able to login users with a Persona.
+
+For a pure frontend dApp without any server backend, you may simply want to request such a login from the users's wallet so that the wallet keeps track of data sharing preferences for your dApp and they don't have to re-select that data each time they connect.
+
+If your dApp does have a server backend and you are keeping track of users to personalize their experience, a Persona-based login provides strong proof of user identity, and the ID returned from the wallet provides a unique index for that user.
+
+Once your dApp has a given `personaId`, it may be used for future requests for data that the user has given "ongoing" permission to share.
+
+
+#### loginWithChallenge
+
+This request type results in the Radix Wallet asking the user to select a Persona to login to this dApp (or suggest one already used in the past there), and providing cryptographic proof of control.
+
+This proof comes in the form of a signed "challenge" against an on-ledger Identity component. For each Persona a user creates in the Radix Wallet, the wallet automatically creates an associated on-ledger Identity (which contains none of the personal data held in the wallet). This Identity includes a public key in its metadata, and the signature on the challenge uses the corresponding private key. ROLA (Radix Off-Ledger Authentication) may be used in your dApp backend to check if the login challenge is correct against on-ledger state.
 
 The on-ledger address of this Identity will be the `personaId` used to identify that user – in future queries, or perhaps in your dApp's own user database.
 
-If you have already identified the user via a login (perhaps for a given active session), you may specify a `personaId` directly without requesting a login from the wallet.
+If you are building a pure frontend dApp where the login is for pure user convenience, you may safely ignore the challenge and simply keep track of the `personaId` in the user's session for use in data requests that require it.
 
-#### loginWithChallenge
 
 ```typescript
 const result = await walletSdk.request(
@@ -333,26 +345,11 @@ if (result.isErr()) {
 const value = result.value
 ```
 
-#### loginWithoutChallenge
 
-```typescript
-const result = await walletSdk.request(
-  requestBuilder(requestItem.login.withoutChallenge())
-)
-
-if (result.isErr()) {
-  // code to handle the exception
-}
-
-// {
-//   login: {
-//     personaId: string
-//   }
-// }
-const value = result.value
-```
 
 #### usePersona
+
+If you have already identified the user via a login (perhaps for a given active session), you may specify a `personaId` directly without requesting a login from the wallet.
 
 ```typescript
 const result = await walletSdk.request(
