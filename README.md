@@ -8,13 +8,12 @@ The current version only supports desktop browser webapps with requests made via
 
 You may wish to consider using this with the [√ Connect Button](https://github.com/radixdlt/connect-button), which works with this SDK to provide additional features for your application and users.
 
-
 - [Installation](#installation)
 - [Usage](#usage)
   - [Getting started](#getting-started)
   - [Get Wallet Data](#get-wallet-data)
     - [Wallet support](#wallet-support)
-    - [OneTime VS Ongoing requests](#onetime-vs-ongoing-requests)
+    - [About oneTime VS ongoing requests](#about-onetime-vs-ongoing-requests)
     - [Get list of Accounts](#get-list-of-accounts)
       - [oneTimeAccountsWithoutProofOfOwnership](#onetimeaccountswithoutproofofownership)
       - [oneTimeAccountsWithProofOfOwnership](#onetimeaccountswithproofofownership)
@@ -24,11 +23,10 @@ You may wish to consider using this with the [√ Connect Button](https://github
       - [oneTimePersonaData](#onetimepersonadata)
       - [ongoingPersonaData](#ongoingpersonadata)
     - [Login](#login)
-      - [loginWithChallenge](#loginwithchallenge)
-      - [loginWithoutChallenge](#loginwithoutchallenge)
+      - [login](#login-1)
       - [usePersona](#usepersona)
   - [Send transaction](#send-transaction)
-    - [Build manifest](#build-manifest)
+    - [Build transaction manifest](#build-transaction-manifest)
     - [sendTransaction](#sendtransaction)
   - [Errors](#errors)
 
@@ -73,18 +71,18 @@ type WalletSdkInput = {
 ### Wallet support
 
 | Requests                                                                          | Current Radix Wallet support |
-| :-------------------------------------------------------------------------------- | :------------: |
-| [oneTimeAccountsWithoutProofOfOwnership](#onetimeaccountswithoutproofofownership) |       ✅       |
-| [oneTimeAccountsWithProofOfOwnership](#onetimeaccountswithproofofownership)       |       ❌       |
-| [ongoingAccountsWithoutProofOfOwnership](#ongoingaccountswithoutproofofownership) |       ❌       |
-| [ongoingAccountsWithProofOfOwnership](#ongoingaccountswithproofofownership)       |       ❌       |
-| [oneTimePersonaData](#onetimepersonadata)                                         |       ❌       |
-| [ongoingPersonaData](#ongoingpersonadata)                                         |       ❌       |
-| [loginWithChallenge](#loginwithchallenge)                                         |       ❌       |
-| [loginWithoutChallenge](#loginwithoutchallenge)                                   |       ❌       |
-| [usePersona](#usepersona)                                                         |       ❌       |
+| :-------------------------------------------------------------------------------- | :--------------------------: |
+| [oneTimeAccountsWithoutProofOfOwnership](#onetimeaccountswithoutproofofownership) |              ✅              |
+| [oneTimeAccountsWithProofOfOwnership](#onetimeaccountswithproofofownership)       |              ❌              |
+| [ongoingAccountsWithoutProofOfOwnership](#ongoingaccountswithoutproofofownership) |              ❌              |
+| [ongoingAccountsWithProofOfOwnership](#ongoingaccountswithproofofownership)       |              ❌              |
+| [oneTimePersonaData](#onetimepersonadata)                                         |              ❌              |
+| [ongoingPersonaData](#ongoingpersonadata)                                         |              ❌              |
+| [loginWithChallenge](#loginwithchallenge)                                         |              ❌              |
+| [loginWithoutChallenge](#loginwithoutchallenge)                                   |              ❌              |
+| [usePersona](#usepersona)                                                         |              ❌              |
 
-### About neTime VS ongoing requests
+### About oneTime VS ongoing requests
 
 There are two types of data requests: `oneTime` and `ongoing`.
 
@@ -92,14 +90,14 @@ OneTime data requests will always result in the Radix Wallet asking for the user
 
 Ongoing data requests will only result in the Radix Wallet asking for the user's permission the first time. If accepted, the Radix Wallet will automatically respond to future data requests of this type with the current data. The user's permissions for ongoing data sharing with a given dApp can be managed or revoked by the user at any time in the Radix Wallet.
 
-The user's ongoing data sharing permissions are associated with a given Persona (similar to a login) in the Radix Wallet. This means that in order to request `ongoing` data, a `personaId` must be included.
+The user's ongoing data sharing permissions are associated with a given Persona (similar to a login) in the Radix Wallet. This means that in order to request `ongoing` data, a `identityAddress` must be included.
 
-Typically the dApp should begin with a `login` request which will return the `personaId` for the user's chosen Persona, which can be used for further requests (perhaps while the user has a valid session):
+Typically the dApp should begin with a `login` request which will return the `identityAddress` for the user's chosen Persona, which can be used for further requests (perhaps while the user has a valid session):
 
 ```typescript
 const result = await walletSdk.request(
   requestBuilder(
-    requestItem.login.withoutChallenge(),
+    requestItem.login('e23e7a3e-c349-4ca7-8ce1-1d067b396cb2'),
     requestItem.ongoingAccounts.withoutProofOfOwnership()
   )
 )
@@ -110,22 +108,25 @@ if (result.isErr()) {
 
 // {
 //   login: {
-//     personaId: string
+//     persona: {
+//       label: string
+//       identityAddress: string
+//     }
 //   },
 //   ongoingAccounts: Account[]
 // }
 const value = result.value
 
-// store the personaId for future ongoing data requests
-const personaId = value.login.personaId
+// store the identityAddress for future ongoing data requests
+const identityAddress = value.login.persona.identityAddress
 ```
 
-Notice that `requestItem.usePersona(personaId)` needs to contain the stored `personaId`.
+Notice that `requestItem.usePersona(identityAddress)` needs to contain the stored `identityAddress`.
 
 ```typescript
 const result = await walletSdk.request(
   requestBuilder(
-    requestItem.usePersona(personaId),
+    requestItem.usePersona(identityAddress),
     requestItem.ongoingAccounts.withoutProofOfOwnership()
   )
 )
@@ -136,7 +137,8 @@ if (result.isErr()) {
 
 // {
 //   persona: {
-//     id: string
+//     label: string
+//     identityAddress: string
 //   },
 //   ongoingAccounts: Account[]
 // }
@@ -212,7 +214,7 @@ const value = result.value
 ```typescript
 const result = await walletSdk.request(
   requestBuilder(
-    requestItem.usePersona(personaId),
+    requestItem.usePersona(identityAddress),
     requestItem.ongoingAccounts.withoutProofOfOwnership(3)
   )
 )
@@ -232,7 +234,7 @@ const value = result.value
 ```typescript
 const result = await walletSdk.request(
   requestBuilder(
-    requestItem.usePersona(personaId),
+    requestItem.usePersona(identityAddress),
     requestItem.ongoingAccounts.withProofOfOwnership(3)
   )
 )
@@ -283,7 +285,7 @@ const value = result.value
 
 ```typescript
 const result = await walletSdk.request(
-  requestItem.usePersona(personaId),
+  requestItem.usePersona(identityAddress),
   requestBuilder(requestItem.ongoingPersonaData(['firstName', 'email']))
 )
 
@@ -293,7 +295,8 @@ if (result.isErr()) {
 
 // {
 //   persona: {
-//     id: string
+//     identityAddress: string
+//     label: string
 //   }
 //   ongoingPersonaData: PersonaDataField[];
 // }
@@ -308,25 +311,21 @@ For a pure frontend dApp without any server backend, you may simply want to requ
 
 If your dApp does have a server backend and you are keeping track of users to personalize their experience, a Persona-based login provides strong proof of user identity, and the ID returned from the wallet provides a unique index for that user.
 
-Once your dApp has a given `personaId`, it may be used for future requests for data that the user has given "ongoing" permission to share.
+Once your dApp has a given `identityAddress`, it may be used for future requests for data that the user has given "ongoing" permission to share.
 
-
-#### loginWithChallenge
+#### login
 
 This request type results in the Radix Wallet asking the user to select a Persona to login to this dApp (or suggest one already used in the past there), and providing cryptographic proof of control.
 
 This proof comes in the form of a signed "challenge" against an on-ledger Identity component. For each Persona a user creates in the Radix Wallet, the wallet automatically creates an associated on-ledger Identity (which contains none of the personal data held in the wallet). This Identity includes a public key in its metadata, and the signature on the challenge uses the corresponding private key. ROLA (Radix Off-Ledger Authentication) may be used in your dApp backend to check if the login challenge is correct against on-ledger state.
 
-The on-ledger address of this Identity will be the `personaId` used to identify that user – in future queries, or perhaps in your dApp's own user database.
+The on-ledger address of this Identity will be the `identityAddress` used to identify that user – in future queries, or perhaps in your dApp's own user database.
 
-If you are building a pure frontend dApp where the login is for pure user convenience, you may safely ignore the challenge and simply keep track of the `personaId` in the user's session for use in data requests that require it.
-
+If you are building a pure frontend dApp where the login is for pure user convenience, you may safely ignore the challenge and simply keep track of the `identityAddress` in the user's session for use in data requests that require it.
 
 ```typescript
 const result = await walletSdk.request(
-  requestBuilder(
-    requestItem.login.withChallenge('e23e7a3e-c349-4ca7-8ce1-1d067b396cb2')
-  )
+  requestBuilder(requestItem.login('e23e7a3e-c349-4ca7-8ce1-1d067b396cb2'))
 )
 
 if (result.isErr()) {
@@ -335,25 +334,25 @@ if (result.isErr()) {
 
 // {
 //   login: {
-//     personaId: string
+//     persona: {
+//       label: string
+//       identityAddress: string
+//       publicKey: string
+//     }
 //     challenge: string
-//     publicKey: string
 //     signature: string
-//     identityComponentAddress: string
 //   }
 // }
 const value = result.value
 ```
 
-
-
 #### usePersona
 
-If you have already identified the user via a login (perhaps for a given active session), you may specify a `personaId` directly without requesting a login from the wallet.
+If you have already identified the user via a login (perhaps for a given active session), you may specify a `identityAddress` directly without requesting a login from the wallet.
 
 ```typescript
 const result = await walletSdk.request(
-  requestBuilder(requestItem.usePersona(personaId))
+  requestBuilder(requestItem.usePersona(identityAddress))
 )
 
 if (result.isErr()) {
@@ -362,7 +361,8 @@ if (result.isErr()) {
 
 // {
 //   persona: {
-//     id: string
+//     identityAddress: string
+//     label: string
 //   }
 // }
 const value = result.value
