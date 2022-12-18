@@ -1,6 +1,13 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-TypeScript developer SDK to communicate with the Radix Wallet.
+This is a TypeScript developer SDK that facilitates communication with the Radix Wallet for two purposes: **requesting various forms of data from the wallet** and **sending transactions to the wallet**.
+
+**Important Note:** This is an early release for development on the Radix Betanet and the Radix Wallet developer preview. This readme describes the intended full interface for the Radix mainnet release, but many features are not yet available (and are flagged as such).
+
+The current version only supports desktop browser webapps with requests made via the Radix Wallet Connector browser extension. It is intended to later add support for mobile browser webapps using deep linking with the same essential interface.
+
+You may wish to consider using this with the [√ Connect Button](https://github.com/radixdlt/connect-button), which works with this SDK to provide additional features for your application and users.
+
 
 - [Installation](#installation)
 - [Usage](#usage)
@@ -65,7 +72,7 @@ type WalletSdkInput = {
 
 ### Wallet support
 
-| Requests                                                                          | Wallet support |
+| Requests                                                                          | Current Radix Wallet support |
 | :-------------------------------------------------------------------------------- | :------------: |
 | [oneTimeAccountsWithoutProofOfOwnership](#onetimeaccountswithoutproofofownership) |       ✅       |
 | [oneTimeAccountsWithProofOfOwnership](#onetimeaccountswithproofofownership)       |       ❌       |
@@ -77,11 +84,17 @@ type WalletSdkInput = {
 | [loginWithoutChallenge](#loginwithoutchallenge)                                   |       ❌       |
 | [usePersona](#usepersona)                                                         |       ❌       |
 
-### OneTime VS Ongoing requests
+### About neTime VS ongoing requests
 
-There are two types of data requests: `oneTime` and `ongoing`. One time data requests will always ask for the user's permission to share data with the dApp. Conversely ongoing data requests will ask for permission **once**, the wallet will then store the permission. Future data requests will automatically be sent back the dApp. The data that the user shares with dApps can be managed from the wallet and revoked at any time.
+There are two types of data requests: `oneTime` and `ongoing`.
 
-In order to request `ongoing` data a `login` request needs to be made. The login response will contain a `personaId` which future requests need to provide.
+OneTime data requests will always result in the Radix Wallet asking for the user's permission to share the data with the dApp.
+
+Ongoing data requests will only result in the Radix Wallet asking for the user's permission the first time. If accepted, the Radix Wallet will automatically respond to future data requests of this type with the current data. The user's permissions for ongoing data sharing with a given dApp can be managed or revoked by the user at any time in the Radix Wallet.
+
+The user's ongoing data sharing permissions are associated with a given Persona (similar to a login) in the Radix Wallet. This means that in order to request `ongoing` data, a `personaId` must be included.
+
+Typically the dApp should begin with a `login` request which will return the `personaId` for the user's chosen Persona, which can be used for further requests (perhaps while the user has a valid session):
 
 ```typescript
 const result = await walletSdk.request(
@@ -107,7 +120,7 @@ const value = result.value
 const personaId = value.login.personaId
 ```
 
-Notice that `requestItem.usePersona(personaId)` needs to contain the stored personaId.
+Notice that `requestItem.usePersona(personaId)` needs to contain the stored `personaId`.
 
 ```typescript
 const result = await walletSdk.request(
@@ -131,6 +144,8 @@ const value = result.value
 ```
 
 ### Get list of Accounts
+
+This request type is for one or more Radix account addresses managed by the user's Radix Wallet app. You may specify the number of accounts desired, and if you require proof of ownership of the account.
 
 **Types**
 
@@ -234,7 +249,9 @@ const value = result.value
 
 ### Get list of Persona data
 
-Get a list of data fields such as `firstName`, `email`, `shippingAddress`, etc.
+This request type is for a list of personal data fields such as `firstName`, `email`, `shippingAddress`, etc. associated with the user's selected Persona.
+
+**NOTE:** A complete list of supported data fields will be provided later when this request type becomes supported.
 
 **Types**
 
@@ -285,7 +302,25 @@ const value = result.value
 
 ### Login
 
+Sometimes your dApp may want a more personalized, consistent user experience and the Radix Wallet is able to login users with a Persona.
+
+For a pure frontend dApp without any server backend, you may simply want to request such a login from the users's wallet so that the wallet keeps track of data sharing preferences for your dApp and they don't have to re-select that data each time they connect.
+
+If your dApp does have a server backend and you are keeping track of users to personalize their experience, a Persona-based login provides strong proof of user identity, and the ID returned from the wallet provides a unique index for that user.
+
+Once your dApp has a given `personaId`, it may be used for future requests for data that the user has given "ongoing" permission to share.
+
+
 #### loginWithChallenge
+
+This request type results in the Radix Wallet asking the user to select a Persona to login to this dApp (or suggest one already used in the past there), and providing cryptographic proof of control.
+
+This proof comes in the form of a signed "challenge" against an on-ledger Identity component. For each Persona a user creates in the Radix Wallet, the wallet automatically creates an associated on-ledger Identity (which contains none of the personal data held in the wallet). This Identity includes a public key in its metadata, and the signature on the challenge uses the corresponding private key. ROLA (Radix Off-Ledger Authentication) may be used in your dApp backend to check if the login challenge is correct against on-ledger state.
+
+The on-ledger address of this Identity will be the `personaId` used to identify that user – in future queries, or perhaps in your dApp's own user database.
+
+If you are building a pure frontend dApp where the login is for pure user convenience, you may safely ignore the challenge and simply keep track of the `personaId` in the user's session for use in data requests that require it.
+
 
 ```typescript
 const result = await walletSdk.request(
@@ -310,26 +345,11 @@ if (result.isErr()) {
 const value = result.value
 ```
 
-#### loginWithoutChallenge
 
-```typescript
-const result = await walletSdk.request(
-  requestBuilder(requestItem.login.withoutChallenge())
-)
-
-if (result.isErr()) {
-  // code to handle the exception
-}
-
-// {
-//   login: {
-//     personaId: string
-//   }
-// }
-const value = result.value
-```
 
 #### usePersona
+
+If you have already identified the user via a login (perhaps for a given active session), you may specify a `personaId` directly without requesting a login from the wallet.
 
 ```typescript
 const result = await walletSdk.request(
@@ -350,9 +370,17 @@ const value = result.value
 
 ## Send transaction
 
-Submit a signed transaction to the radix network
+Your dApp can send transactions to the user's Radix Wallet for them to review, sign, and submit them to the Radix Network.
 
-### Build manifest
+Radix transactions are called "transaction manifests" and use a simply syntax to described desired behavior. See [documentation on transaction manifest commands here](https://docs-babylon.radixdlt.com/main/scrypto/transaction-manifest/intro.html).
+
+It is important to note that what your dApp sends to the Radix Wallet is actually a "transaction manifest stub". It is completed before submission by the Radix Wallet. For example, the Radix Wallet will automatically add a command to lock the necessary amount of network fees from one of the user's accounts. It may also add "assert" commands to the manifest according to user desires for expected returns.
+
+**NOTE:** Information will be provided soon on a ["comforming" transaction manifest stub format](https://docs-babylon.radixdlt.com/main/standards/comforming-transactions.html) that ensures clear presentation and handling in the Radix Wallet.
+
+### Build transaction manifest
+
+This constructs the lines of a transaction manifest stub.
 
 ```typescript
 import {
@@ -392,9 +420,11 @@ const manifest = new ManifestBuilder()
   .toString()
 ```
 
-More example can be found [here](./lib/__tests__/manifest-builder.spec.ts).
+More examples can be found [here](./lib/__tests__/manifest-builder.spec.ts).
 
 ### sendTransaction
+
+This sends the transaction manifest stub to a user's Radix Wallet, where it will be completed, presented to the user for review, signed as required, and submitted to the Radix network to be processed.
 
 ```typescript
 type SendTransactionInput = {
