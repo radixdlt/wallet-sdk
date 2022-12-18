@@ -379,7 +379,7 @@ Radix transactions are called "transaction manifests" and use a simply syntax to
 
 It is important to note that what your dApp sends to the Radix Wallet is actually a "transaction manifest stub". It is completed before submission by the Radix Wallet. For example, the Radix Wallet will automatically add a command to lock the necessary amount of network fees from one of the user's accounts. It may also add "assert" commands to the manifest according to user desires for expected returns.
 
-**NOTE:** Information will be provided soon on a [https://docs-babylon.radixdlt.com/main/standards/comforming-transactions.html]("comforming" transaction manifest stub format] that ensures clear presentation and handling in the Radix Wallet.
+**NOTE:** Information will be provided soon on a ["comforming" transaction manifest stub format](https://docs-babylon.radixdlt.com/main/standards/comforming-transactions.html) that ensures clear presentation and handling in the Radix Wallet.
 
 ### Build transaction manifest
 
