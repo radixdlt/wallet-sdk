@@ -82,8 +82,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/radixdlt/wallet-sdk.git"
-  },
-  "publishConfig": {
-    "access": "restricted"
   }
 }
