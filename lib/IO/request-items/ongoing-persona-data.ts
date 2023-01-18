@@ -15,10 +15,7 @@ export type OngoingPersonaData = {
   }
 }
 
-type RequiredKeys =
-  | { persona: any }
-  | { loginWithoutChallenge: any }
-  | { loginWithChallenge: any }
+type RequiredKeys = { usePersona: any } | { login: any }
 
 type NotAllowedKeys = { ongoingPersonaData: any }
 

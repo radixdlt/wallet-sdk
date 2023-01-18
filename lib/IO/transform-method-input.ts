@@ -20,14 +20,7 @@ const requestTypeMapper = new Map<string, string>()
     requestMethodRequestType.ongoingAccountsWithoutProofOfOwnership,
     RequestTypeSchema.ongoingAccountsRead.value
   )
-  .set(
-    requestMethodRequestType.loginWithChallenge,
-    RequestTypeSchema.loginRead.value
-  )
-  .set(
-    requestMethodRequestType.loginWithoutChallenge,
-    RequestTypeSchema.loginRead.value
-  )
+  .set(requestMethodRequestType.login, RequestTypeSchema.loginRead.value)
   .set(
     requestMethodRequestType.usePersona,
     RequestTypeSchema.usePersonaRead.value

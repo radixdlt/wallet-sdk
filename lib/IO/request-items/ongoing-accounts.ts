@@ -28,10 +28,7 @@ export type OngoingAccounts = {
   }
 }
 
-type RequiredKeys =
-  | { persona: any }
-  | { loginWithoutChallenge: any }
-  | { loginWithChallenge: any }
+type RequiredKeys = { usePersona: any } | { login: any }
 
 type NotAllowedKeys = Partial<{
   ongoingAccounts: any
