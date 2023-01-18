@@ -81,7 +81,7 @@ document.getElementById('account-address-btn')!.onclick = async () => {
 document.getElementById('persona-data-btn')!.onclick = async () => {
   clearResults()
 
-  const result = await sdk.request(requestBuilder(login()))
+  const result = await sdk.request(requestBuilder(login.withoutChallenge()))
 
   displayResults(result)
 }
@@ -100,7 +100,7 @@ document.getElementById('send-tx-btn')!.onclick = async () => {
 sdk
   .request(
     requestBuilder(
-      requestItem.login(),
+      requestItem.login.withoutChallenge(),
       requestItem.ongoingAccounts.withoutProofOfOwnership()
     )
   )

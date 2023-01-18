@@ -10,8 +10,8 @@ export const requestMethodRequestType = {
     'ongoingAccountsWithoutProofOfOwnership',
   ongoingAccountsWithProofOfOwnership: 'ongoingAccountsWithProofOfOwnership',
   usePersona: 'usePersona',
-  login: 'login',
-  // loginWithChallenge: 'loginWithChallenge',
+  loginWithoutChallenge: 'loginWithoutChallenge',
+  loginWithChallenge: 'loginWithChallenge',
   oneTimePersonaData: 'oneTimePersonaData',
   ongoingPersonaData: 'ongoingPersonaData',
 } as const
@@ -22,7 +22,7 @@ type RequestItems = {
   [requestMethodRequestType.ongoingAccountsWithoutProofOfOwnership]: OngoingAccounts['WithoutProofOfOwnership']
   // [requestMethodRequestType.ongoingAccountsWithProofOfOwnership]: OngoingAccounts['WithProofOfOwnership']
   // [requestMethodRequestType.usePersona]: UsePersona
-  [requestMethodRequestType.login]: Login['WithoutChallenge']
+  [requestMethodRequestType.loginWithoutChallenge]: Login['WithoutChallenge']
   // [requestMethodRequestType.loginWithChallenge]: Login['WithChallenge']
   // [requestMethodRequestType.oneTimePersonaData]: OneTimePersonaData
   // [requestMethodRequestType.ongoingPersonaData]: OngoingPersonaData
