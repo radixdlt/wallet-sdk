@@ -34,22 +34,13 @@ export type Login = {
 }
 
 type NotAllowedKeys = Partial<{
-  persona: any
-  loginWithoutChallenge: any
-  loginWithChallenge: any
+  usePersona: any
+  login: any
 }>
 
-export const login = {
-  withoutChallenge:
-    () =>
-    <I>(input: I extends NotAllowedKeys ? never : I) => ({
-      ...input,
-      loginWithoutChallenge: {},
-    }),
-  withChallenge:
-    (challenge: string) =>
-    <I>(input: I extends NotAllowedKeys ? never : I) => ({
-      ...input,
-      loginWithChallenge: { challenge },
-    }),
-}
+export const login =
+  (challenge?: string) =>
+  <I>(input: I extends NotAllowedKeys ? never : I) => ({
+    ...input,
+    login: { challenge },
+  })

@@ -1,5 +1,6 @@
 import WalletSdk, { requestBuilder, requestItem } from '../lib/wallet-sdk'
 import { Result } from 'neverthrow'
+import { login } from '../lib/IO/request-items/login'
 
 const sdk = WalletSdk({ dAppId: 'radixDashboard', logLevel: 'DEBUG' })
 
@@ -58,9 +59,7 @@ const accountAddressInputElement = document.getElementById(
 document.getElementById('login-btn')!.onclick = async () => {
   clearResults()
 
-  displayResults(
-    await sdk.request(requestBuilder(requestItem.login.withoutChallenge()))
-  )
+  displayResults(await sdk.request({ login: {} }))
 }
 
 document.getElementById('account-address-btn')!.onclick = async () => {
@@ -82,9 +81,7 @@ document.getElementById('account-address-btn')!.onclick = async () => {
 document.getElementById('persona-data-btn')!.onclick = async () => {
   clearResults()
 
-  const result = await sdk.request(
-    requestBuilder(requestItem.oneTimePersonaData('firstName', 'email'))
-  )
+  const result = await sdk.request(requestBuilder(login()))
 
   displayResults(result)
 }
@@ -99,3 +96,12 @@ document.getElementById('send-tx-btn')!.onclick = async () => {
 
   displayResults(result)
 }
+
+sdk
+  .request(
+    requestBuilder(
+      requestItem.login(),
+      requestItem.ongoingAccounts.withoutProofOfOwnership()
+    )
+  )
+  .map((response) => {})

@@ -91,14 +91,14 @@ describe('transformMethodInput', () => {
     it('should return correct transformed value', () => {
       ;[
         {
-          actual: requestItem.login.withChallenge('abc'),
+          actual: requestItem.login('abc'),
           expected: {
             requestType: RequestTypeSchema.loginRead.value,
             challenge: 'abc',
           },
         },
         {
-          actual: requestItem.login.withoutChallenge(),
+          actual: requestItem.login(),
           expected: {
             requestType: RequestTypeSchema.loginRead.value,
           },

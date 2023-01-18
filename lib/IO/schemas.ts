@@ -145,11 +145,11 @@ const SendTransactionResponseItemSchema = object({
 
 const RequestItemSchema = union([
   OneTimeAccountsReadRequestItemSchema,
-  // OngoingAccountsReadRequestItemSchema,
+  OngoingAccountsReadRequestItemSchema,
   // OneTimePersonaDataReadRequestItemSchema,
   // OngoingPersonaDataReadRequestItemSchema,
   // UsePersonaReadRequestItemSchema,
-  // LoginReadRequestItemSchema,
+  LoginReadRequestItemSchema,
   SendTransactionWriteRequestItemSchema,
 ])
 
