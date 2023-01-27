@@ -2,7 +2,7 @@ import WalletSdk, { requestBuilder, requestItem } from '../lib/wallet-sdk'
 import { Result } from 'neverthrow'
 import { login } from '../lib/IO/request-items/login'
 
-const sdk = WalletSdk({ dAppId: 'radixDashboard', logLevel: 'DEBUG' })
+const sdk = WalletSdk({ dAppDefinitionAddress: 'account_tdx_a_1qd5svul20u30qnq408zhj2tw5evqrunq48eg0jsjf9qsx5t8qu', logLevel: 'DEBUG' })
 
 const transactionManifest = `# Withdraw XRD from account
 CALL_METHOD ComponentAddress("account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064") "withdraw_by_amount" Decimal("5.0") ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
@@ -58,8 +58,11 @@ const accountAddressInputElement = document.getElementById(
 
 document.getElementById('login-btn')!.onclick = async () => {
   clearResults()
+  const result = await sdk.request(
+    { login: {} }
+  )
 
-  displayResults(await sdk.request({ login: {} }))
+  displayResults(result)
 }
 
 document.getElementById('account-address-btn')!.onclick = async () => {
@@ -86,6 +89,19 @@ document.getElementById('persona-data-btn')!.onclick = async () => {
   displayResults(result)
 }
 
+document.getElementById('persona-accounts-btn')!.onclick = async () => {
+  clearResults()
+
+  const result = await sdk.request(
+    requestBuilder(
+      requestItem.oneTimePersonaData('firstName', 'email'),
+      requestItem.oneTimeAccounts.withoutProofOfOwnership(5)
+    )
+  )
+
+  displayResults(result)
+}
+
 document.getElementById('send-tx-btn')!.onclick = async () => {
   clearResults()
 
@@ -99,9 +115,17 @@ document.getElementById('send-tx-btn')!.onclick = async () => {
 
 sdk
   .request(
-    requestBuilder(
-      requestItem.login.withoutChallenge(),
-      requestItem.ongoingAccounts.withoutProofOfOwnership()
-    )
+  requestBuilder(
+    requestItem.login.withoutChallenge(),
+    requestItem.ongoingAccounts.withoutProofOfOwnership()
   )
-  .map((response) => {})
+)
+
+window.radixWalletSdk = sdk
+
+declare global {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+  interface Window {
+    radixWalletSdk: typeof sdk
+  }
+}

@@ -51,18 +51,18 @@ yarn add @radixdlt/wallet-sdk
 ```typescript
 import WalletSdk from '@radixdlt/wallet-sdk'
 
-const walletSdk = WalletSdk({ dAppId: 'instabridge', networkId: 0x01 })
+const walletSdk = WalletSdk({ dAppDefinitionAddress: 'instabridge', networkId: 0x01 })
 ```
 
 ```typescript
 type WalletSdkInput = {
-  dAppId: string
+  dAppDefinitionAddress: string
   networkId?: number
   logLevel?: LogLevelDesc
 }
 ```
 
-- **requires** dAppId - Specifies the dApp that is interacting with the wallet. Used in dApp verification process on the wallet side.
+- **requires** dAppDefinitionAddress - Specifies the dApp that is interacting with the wallet. Used in dApp verification process on the wallet side.
 - **optional** networkId - Specifies which network to use, defaults to mainnet (0x01)
 - **optional** logLevel - Specifies level of log output. Used internally for debugging.
 

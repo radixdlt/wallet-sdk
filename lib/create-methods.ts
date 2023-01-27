@@ -3,19 +3,25 @@ import { SdkError } from './helpers/error'
 import { validateWalletRequest } from './helpers/validate-wallet-request'
 import { validateWalletResponse } from './helpers/validate-wallet-response'
 import { decodeWalletResponse } from './IO/decode-wallet-response'
-import { Metadata, WalletRequest, WalletSuccessResponse } from './IO/schemas'
+import {
+  Metadata,
+  WalletInteraction,
+  WalletInteractionSuccessResponse,
+} from './IO/schemas'
 import { transformMethodInput } from './IO/transform-method-input'
 import { createMessage } from './messages/create-message'
 import { CallbackFns } from './messages/events/_types'
 import { Method, requestType } from './_types'
 
-type SendWalletRequest = (
+type SendWalletInteraction = (
   callbackFns: Partial<CallbackFns>
-) => (message: WalletRequest) => ResultAsync<WalletSuccessResponse, SdkError>
+) => (
+  message: WalletInteraction
+) => ResultAsync<WalletInteractionSuccessResponse, SdkError>
 
 export const createMethods = (
   metadata: Metadata,
-  sendMessageToWallet: SendWalletRequest
+  sendMessageToWallet: SendWalletInteraction
 ) => {
   const request = <
     Input extends Method['request']['input'],
@@ -42,7 +48,7 @@ export const createMethods = (
     input: Method['sendTransaction']['input'],
     callbackFns: Partial<CallbackFns> = {}
   ) =>
-    transformMethodInput({ [requestType.sendTransaction]: input })
+    transformMethodInput({ [requestType.send]: input })
       .andThen(createMessage(metadata))
       .asyncAndThen(validateWalletRequest)
       .andThen(sendMessageToWallet(callbackFns))

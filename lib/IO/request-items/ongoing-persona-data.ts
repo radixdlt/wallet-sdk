@@ -1,13 +1,13 @@
 import {
-  OngoingPersonaDataReadRequestItem,
-  OngoingPersonaDataResponseItem,
+  OngoingPersonaDataRequestItem,
+  OngoingPersonaDataRequestResponseItem,
   PersonaDataField,
 } from '../schemas'
 
 export type OngoingPersonaData = {
   wallet: {
-    request: OngoingPersonaDataReadRequestItem
-    response: OngoingPersonaDataResponseItem
+    request: OngoingPersonaDataRequestItem
+    response: OngoingPersonaDataRequestResponseItem
   }
   method: {
     output: { ongoingPersonaData: PersonaDataField[] }

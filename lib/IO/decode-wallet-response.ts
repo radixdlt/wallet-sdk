@@ -1,47 +1,43 @@
-import { RequestTypeSchema, WalletSuccessResponse } from './schemas'
+import { RequestTypeSchema, WalletInteractionSuccessResponse } from './schemas'
 
 export const decodeWalletResponse = <R>(
-  items: WalletSuccessResponse['items']
-) =>
-  items.reduce((acc, curr) => {
-    switch (curr.requestType) {
-      case RequestTypeSchema.usePersonaRead.value: {
-        const { requestType, ...rest } = curr
-        return { ...acc, persona: rest }
+  items: WalletInteractionSuccessResponse['items']
+) => {
+  const { discriminator, ...rest } = items
+
+  return Object.entries(rest).reduce((acc, [key, value]) => {
+    switch (key) {
+      case RequestTypeSchema.auth.value: {
+        const { discriminator: authDiscriminator, ...auth } = value
+        if (authDiscriminator === 'usePersona') {
+          return { ...acc, persona: auth }
+        } else {
+          return { ...acc, login: auth }
+        }
       }
 
-      case RequestTypeSchema.loginRead.value: {
-        const { requestType, ...rest } = curr
-        return { ...acc, login: rest }
+      case RequestTypeSchema.oneTimeAccounts.value: {
+        return { ...acc, oneTimeAccounts: value.accounts }
       }
 
-      case RequestTypeSchema.oneTimeAccountsRead.value: {
-        const { requestType, ...rest } = curr
-        return { ...acc, oneTimeAccounts: rest.accounts }
+      case RequestTypeSchema.ongoingAccounts.value: {
+        return { ...acc, ongoingAccounts: value.accounts }
       }
 
-      case RequestTypeSchema.ongoingAccountsRead.value: {
-        const { requestType, ...rest } = curr
-        return { ...acc, ongoingAccounts: rest.accounts }
+      case RequestTypeSchema.oneTimePersonaData.value: {
+        return { ...acc, oneTimePersonaData: value.fields }
       }
 
-      case RequestTypeSchema.oneTimePersonaDataRead.value: {
-        const { requestType, ...rest } = curr
-        return { ...acc, oneTimePersonaData: rest.fields }
+      case RequestTypeSchema.ongoingPersonaData.value: {
+        return { ...acc, ongoingPersonaData: value.fields }
       }
 
-      case RequestTypeSchema.ongoingPersonaDataRead.value: {
-        const { requestType, ...rest } = curr
-        return { ...acc, ongoingPersonaData: rest.fields }
-      }
-
-      case RequestTypeSchema.sendTransactionWrite.value: {
-        const { requestType, ...rest } = curr
-        return { ...acc, ...rest }
-      }
+      case RequestTypeSchema.send.value:
+        return { ...acc, transactionIntentHash: value.transactionIntentHash }
 
       default:
         return acc
     }
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   }, {} as R)
+}
