@@ -14,9 +14,7 @@ export type Login = {
     method: {
       input: {}
       output: {
-        auth: {
-          identityAddress: string
-        }
+        auth: Persona
       }
     }
   }
@@ -32,7 +30,6 @@ export type Login = {
           persona: Persona
           publicKey: string
           signature: string
-          identityComponentAddress: string
         }
       }
       input: { challenge: string }
