@@ -1,28 +1,35 @@
-import { LoginReadRequestItem, LoginResponseItem } from '../schemas'
+import {
+  AuthLoginRequestItem,
+  AuthLoginWithChallengeRequestResponseItem,
+  AuthLoginWithoutChallengeRequestResponseItem,
+  Persona,
+} from '../schemas'
 
 export type Login = {
   WithoutChallenge: {
     wallet: {
-      request: LoginReadRequestItem
-      response: LoginResponseItem
+      request: AuthLoginRequestItem
+      response: AuthLoginWithoutChallengeRequestResponseItem
     }
     method: {
       input: {}
       output: {
-        login: { personaId: string }
+        auth: {
+          identityAddress: string
+        }
       }
     }
   }
   WithChallenge: {
     wallet: {
-      request: LoginReadRequestItem
-      response: LoginResponseItem
+      request: AuthLoginRequestItem
+      response: AuthLoginWithChallengeRequestResponseItem
     }
     method: {
       output: {
-        login: {
+        auth: {
           challenge: string
-          personaId: string
+          persona: Persona
           publicKey: string
           signature: string
           identityComponentAddress: string
@@ -44,12 +51,14 @@ export const login = {
     () =>
     <I>(input: I extends NotAllowedKeys ? never : I) => ({
       ...input,
-      loginWithoutChallenge: {},
+      loginWithoutChallenge: {
+        discriminator: 'login',
+      },
     }),
   withChallenge:
     (challenge: string) =>
     <I>(input: I extends NotAllowedKeys ? never : I) => ({
       ...input,
-      loginWithChallenge: { challenge },
+      loginWithChallenge: { discriminator: 'login', challenge },
     }),
 }

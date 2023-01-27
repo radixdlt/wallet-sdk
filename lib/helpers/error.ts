@@ -17,12 +17,14 @@ export const errorType = {
     'submittedTransactionHasFailedTransactionStatus',
   submittedTransactionHasRejectedTransactionStatus:
     'submittedTransactionHasRejectedTransactionStatus',
+  failedToFindAccountWithEnoughFundsToLockFee:
+    'failedToFindAccountWithEnoughFundsToLockFee',
 } as const
 
 type ErrorType = keyof typeof errorType
 
 type GenericError<T extends ErrorType> = {
-  requestId: string
+  interactionId: string
   error: T
   message?: string
 }
@@ -36,10 +38,10 @@ const defaultErrorMessage = new Map<ErrorType, string>()
 
 export const createSdkError = (
   error: ErrorType,
-  requestId: string,
+  interactionId: string,
   message?: string
 ): SdkError => ({
   error,
-  requestId,
+  interactionId,
   message: message || defaultErrorMessage.get(error) || '',
 })

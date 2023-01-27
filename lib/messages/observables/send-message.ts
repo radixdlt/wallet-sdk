@@ -16,17 +16,22 @@ import {
 import { config } from '../../config'
 import { createSdkError, errorType, SdkError } from '../../helpers/error'
 import { unwrapObservable } from '../../helpers/unwrap-observable'
-import { WalletRequest, WalletSuccessResponse } from '../../IO/schemas'
+import {
+  WalletInteraction,
+  WalletInteractionSuccessResponse,
+} from '../../IO/schemas'
 import { CallbackFns } from '../events/_types'
 import { SubjectsType } from '../subjects'
 import { messageEvents } from './message-events'
 
-export type SendMessage = ReturnType<typeof sendMessage>
+export type CreateSendMessage = ReturnType<typeof createSendMessage>
 
-export const sendMessage =
+export const createSendMessage =
   (subjects: SubjectsType) =>
   (callbackFns: Partial<CallbackFns>) =>
-  (message: WalletRequest): ResultAsync<WalletSuccessResponse, SdkError> => {
+  (
+    message: WalletInteraction
+  ): ResultAsync<WalletInteractionSuccessResponse, SdkError> => {
     const cancelRequestSubject = new Subject<void>()
 
     if (callbackFns.requestControl)
@@ -47,15 +52,15 @@ export const sendMessage =
       .asObservable()
       .pipe(
         map(() =>
-          err(createSdkError(errorType.canceledByUser, message.requestId))
+          err(createSdkError(errorType.canceledByUser, message.interactionId))
         )
       )
 
     const response$ = subjects.responseSubject.pipe(
-      filter((response) => response.requestId === message.requestId),
+      filter((response) => response.interactionId === message.interactionId),
       map(
-        (message): Result<WalletSuccessResponse, SdkError> =>
-          'items' in message ? ok(message) : err(message)
+        (response): Result<WalletInteractionSuccessResponse, SdkError> =>
+          'items' in response ? ok(response) : err(response)
       )
     )
 
@@ -64,7 +69,7 @@ export const sendMessage =
       cancelRequest$
     ).pipe(first())
 
-    const messageEvent$ = messageEvents(subjects, message.requestId).pipe(
+    const messageEvent$ = messageEvents(subjects, message.interactionId).pipe(
       tap((event) => {
         if (callbackFns.eventCallback)
           callbackFns.eventCallback(event.eventType)
@@ -77,7 +82,7 @@ export const sendMessage =
 
     const missingExtensionError$ = timer(config.extensionDetectionTime).pipe(
       map(() =>
-        err(createSdkError(errorType.missingExtension, message.requestId))
+        err(createSdkError(errorType.missingExtension, message.interactionId))
       )
     )
 

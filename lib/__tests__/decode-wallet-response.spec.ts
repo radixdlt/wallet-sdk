@@ -1,42 +1,113 @@
 import { decodeWalletResponse } from '../IO/decode-wallet-response'
-import { RequestTypeSchema, WalletSuccessResponse } from '../IO/schemas'
+import { WalletInteractionSuccessResponse } from '../IO/schemas'
 
 describe('decodeWalletResponse', () => {
   it('should output correct value', () => {
-    const walletResponse: WalletSuccessResponse['items'] = [
-      { requestType: RequestTypeSchema.loginRead.value, personaId: 'abc' },
+    ;[
       {
-        requestType: RequestTypeSchema.oneTimeAccountsRead.value,
-        accounts: [{ label: 'main account', address: 'abc', appearanceId: 0 }],
+        input: {
+          discriminator: 'authorizedRequest',
+          auth: {
+            discriminator: 'usePersona',
+            identityAddress: 'addr_xxx',
+          },
+          oneTimeAccounts: {
+            accounts: [
+              { label: 'main account', address: 'abc', appearanceId: 0 },
+            ],
+          },
+          ongoingAccounts: {
+            accounts: [
+              { label: 'main account', address: 'abc', appearanceId: 1 },
+            ],
+          },
+          oneTimePersonaData: {
+            fields: [{ field: 'email', value: 'abc' }],
+          },
+          ongoingPersonaData: {
+            fields: [{ field: 'email', value: 'abc' }],
+          },
+        },
+        expected: {
+          persona: {
+            identityAddress: 'addr_xxx',
+          },
+          oneTimeAccounts: [
+            { label: 'main account', address: 'abc', appearanceId: 0 },
+          ],
+          ongoingAccounts: [
+            { label: 'main account', address: 'abc', appearanceId: 1 },
+          ],
+          oneTimePersonaData: [{ field: 'email', value: 'abc' }],
+          ongoingPersonaData: [{ field: 'email', value: 'abc' }],
+        },
       },
       {
-        requestType: RequestTypeSchema.ongoingAccountsRead.value,
-        accounts: [{ label: 'main account', address: 'abc', appearanceId: 1 }],
+        input: {
+          discriminator: 'authorizedRequest',
+          auth: {
+            discriminator: 'loginWithChallenge',
+            persona: {
+              identityAddress: 'addr_xxx',
+              label: 'personaLabel',
+            },
+            challenge: 'challenge',
+            publicKey: 'publicKey',
+            signature: 'signature',
+          },
+        },
+        expected: {
+          login: {
+            persona: {
+              identityAddress: 'addr_xxx',
+              label: 'personaLabel',
+            },
+            challenge: 'challenge',
+            publicKey: 'publicKey',
+            signature: 'signature',
+          },
+        },
       },
       {
-        requestType: RequestTypeSchema.oneTimePersonaDataRead.value,
-        fields: [{ field: 'email', value: 'abc' }],
+        input: {
+          discriminator: 'unauthorizedRequest',
+          oneTimeAccounts: {
+            accounts: [],
+          },
+          oneTimePersonaData: {
+            fields: [
+              {
+                field: 'field',
+                value: 'value',
+              },
+            ],
+          },
+        },
+        expected: {
+          oneTimeAccounts: [],
+          oneTimePersonaData: [
+            {
+              field: 'field',
+              value: 'value',
+            },
+          ],
+        },
       },
       {
-        requestType: RequestTypeSchema.ongoingPersonaDataRead.value,
-        fields: [{ field: 'email', value: 'abc' }],
+        input: {
+          discriminator: 'transaction',
+          send: {
+            transactionIntentHash: 'txId',
+          },
+        },
+        expected: {
+          transactionIntentHash: 'txId',
+        },
       },
-      {
-        requestType: RequestTypeSchema.sendTransactionWrite.value,
-        transactionIntentHash: 'abc',
-      },
-    ]
-    expect(decodeWalletResponse(walletResponse)).toEqual({
-      login: { personaId: 'abc' },
-      oneTimeAccounts: [
-        { label: 'main account', address: 'abc', appearanceId: 0 },
-      ],
-      ongoingAccounts: [
-        { label: 'main account', address: 'abc', appearanceId: 1 },
-      ],
-      oneTimePersonaData: [{ field: 'email', value: 'abc' }],
-      ongoingPersonaData: [{ field: 'email', value: 'abc' }],
-      transactionIntentHash: 'abc',
+    ].forEach(({ input, expected }) => {
+      expect(
+        decodeWalletResponse(input as WalletInteractionSuccessResponse['items'])
+      ).toEqual(expected)
     })
   })
 })

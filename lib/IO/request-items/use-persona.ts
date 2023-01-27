@@ -1,21 +1,26 @@
-import { UsePersonaReadRequestItem, UsePersonaResponseItem } from '../schemas'
+import {
+  AuthUsePersonaRequestItem,
+  AuthUsePersonaRequestResponseItem,
+} from '../schemas'
 
 export type UsePersona = {
   wallet: {
-    request: UsePersonaReadRequestItem
-    response: UsePersonaResponseItem
+    request: AuthUsePersonaRequestItem
+    response: AuthUsePersonaRequestResponseItem
   }
   method: {
-    output: { persona: { id: string } }
-    input: { id: string }
+    input: {}
+    output: {
+      auth: { identityAddress: string }
+    }
   }
 }
 
 type NotAllowedKeys = Partial<{ login: any; usePersona: any }>
 
 export const usePersona =
-  (id: string) =>
+  (identityAddress: string) =>
   <I>(input: I extends NotAllowedKeys ? never : I) => ({
     ...input,
-    usePersona: { id },
+    usePersona: { discriminator: 'usePersona', identityAddress },
   })

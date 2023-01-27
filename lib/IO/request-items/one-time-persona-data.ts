@@ -1,15 +1,17 @@
 import {
-  OneTimePersonaDataReadRequestItem,
-  OneTimePersonaDataResponseItem,
+  OneTimePersonaDataRequestItem,
+  OneTimePersonaDataRequestResponseItem,
 } from '../schemas'
 
 export type OneTimePersonaData = {
   wallet: {
-    request: OneTimePersonaDataReadRequestItem
-    response: OneTimePersonaDataResponseItem
+    request: OneTimePersonaDataRequestItem
+    response: OneTimePersonaDataRequestResponseItem
   }
   method: {
-    output: { oneTimePersonaData: OneTimePersonaDataResponseItem['fields'] }
+    output: {
+      oneTimePersonaData: OneTimePersonaDataRequestResponseItem['fields']
+    }
     input: { fields: string[] }
   }
 }
