@@ -189,7 +189,7 @@ export type AuthUsePersonaRequestItem = z.infer<
 
 const AuthUsePersonaRequestResponseItemSchema = object({
   discriminator: literal('usePersona'),
-  identityAddress: string(),
+  persona: PersonaSchema,
 })
 
 export type AuthUsePersonaRequestResponseItem = z.infer<
@@ -205,7 +205,7 @@ export type AuthLoginRequestItem = z.infer<typeof AuthLoginRequestItemSchema>
 
 const AuthLoginWithoutChallengeRequestResponseItemSchema = object({
   discriminator: literal('loginWithoutChallenge'),
-  identityAddress: string(),
+  persona: PersonaSchema,
 })
 
 export type AuthLoginWithoutChallengeRequestResponseItem = z.infer<

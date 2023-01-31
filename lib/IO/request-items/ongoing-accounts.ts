@@ -16,8 +16,8 @@ export type OngoingAccounts = {
     }
     method: {
       input: {
-        quantity?: number
-        quantifier?: NumberOfAccountsQuantifier
+        quantity: number
+        quantifier: NumberOfAccountsQuantifier
       }
       output: { ongoingAccounts: Account[] }
     }
@@ -29,8 +29,8 @@ export type OngoingAccounts = {
     }
     method: {
       input: {
-        quantity?: number
-        quantifier?: NumberOfAccountsQuantifier
+        quantity: number
+        quantifier: NumberOfAccountsQuantifier
       }
       output: { ongoingAccounts: AccountWithProofOfOwnership[] }
     }

@@ -55,7 +55,11 @@ describe('schemas', () => {
       })
       AuthLoginRequestResponseItemSchema.parse({
         discriminator: 'loginWithoutChallenge',
-        identityAddress: 'addr_xxx',
+        persona: {
+          identityAddress:
+            'account_tdx_b_1ql5kf246qrna76pdjp7jcg7y7rznsn6qq49xpzxtmvlqeklhwj',
+          label: 'persona',
+        },
       })
     })
   })
@@ -137,7 +141,11 @@ describe('schemas', () => {
           discriminator: 'authorizedRequest',
           auth: {
             discriminator: 'usePersona',
-            identityAddress: 'personaId',
+            persona: {
+              identityAddress:
+                'account_tdx_b_1ql5kf246qrna76pdjp7jcg7y7rznsn6qq49xpzxtmvlqeklhwj',
+              label: 'persona',
+            },
           },
           ongoingPersonaData: {
             fields: [
@@ -149,6 +157,32 @@ describe('schemas', () => {
           },
         },
       })
+
+      // WalletInteractionResponseSchema.parse({
+      //   discriminator: 'success',
+      //   interactionId: '3b96efd3-fdfc-4d53-a43c-3d190cd77277',
+      //   items: {
+      //     discriminator: 'authorizedRequest',
+      //     auth: {
+      //       discriminator: 'loginWithoutChallenge',
+      //       persona: {
+      //         identityAddress:
+      //           'account_tdx_b_1ql5kf246qrna76pdjp7jcg7y7rznsn6qq49xpzxtmvlqeklhwj',
+      //         label: 'persona',
+      //       },
+      //     },
+      //     ongoingAccounts: {
+      //       accounts: [
+      //         {
+      //           address:
+      //             'account_tdx_b_1qlljmf2m0tge4qk8k2e4vkuyhw6hjwf6k02rtgs3gewsfmn8fs',
+      //           label: '234',
+      //           appearanceId: 0,
+      //         },
+      //       ],
+      //     },
+      //   },
+      // })
     })
 
     it('should parse error without message', () => {
