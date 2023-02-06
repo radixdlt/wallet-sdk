@@ -216,7 +216,6 @@ describe('sdk flow', () => {
       const result = await request
 
       if (result.isErr()) throw new Error('should not get a error response')
-
       expect((result.value as any).ongoingAccounts).toEqual([
         {
           address:
@@ -231,6 +230,10 @@ describe('sdk flow', () => {
           appearanceId: 2,
         },
       ])
+
+      expect((result.value as any).persona.identityAddress).toEqual(
+        'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y'
+      )
 
       expect(outgoingMessageSpy.getFirstValue().metadata).toEqual({
         dAppDefinitionAddress: 'radixDashboard',

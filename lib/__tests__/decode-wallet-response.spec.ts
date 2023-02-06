@@ -57,11 +57,11 @@ describe('decodeWalletResponse', () => {
           },
         },
         expected: {
-          login: {
-            persona: {
-              identityAddress: 'addr_xxx',
-              label: 'personaLabel',
-            },
+          persona: {
+            identityAddress: 'addr_xxx',
+            label: 'personaLabel',
+          },
+          signedChallenge: {
             challenge: 'challenge',
             publicKey: 'publicKey',
             signature: 'signature',

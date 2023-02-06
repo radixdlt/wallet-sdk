@@ -11,8 +11,11 @@ export const decodeWalletResponse = <R>(
         const { discriminator: authDiscriminator, ...auth } = value
         if (authDiscriminator === 'usePersona') {
           return { ...acc, persona: auth.persona }
+        } else if (authDiscriminator === 'loginWithChallenge') {
+          const { persona, ...signedChallenge } = auth
+          return { ...acc, persona, signedChallenge }
         } else {
-          return { ...acc, login: auth }
+          return { ...acc, persona: auth.persona }
         }
       }
 

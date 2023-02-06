@@ -14,7 +14,7 @@ export type Login = {
     method: {
       input: {}
       output: {
-        auth: Persona
+        persona: Persona
       }
     }
   }
@@ -25,9 +25,9 @@ export type Login = {
     }
     method: {
       output: {
-        auth: {
+        persona: Persona
+        signedChallenge: {
           challenge: string
-          persona: Persona
           publicKey: string
           signature: string
         }
