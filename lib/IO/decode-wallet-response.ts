@@ -10,7 +10,7 @@ export const decodeWalletResponse = <R>(
       case RequestTypeSchema.auth.value: {
         const { discriminator: authDiscriminator, ...auth } = value
         if (authDiscriminator === 'usePersona') {
-          return { ...acc, persona: auth }
+          return { ...acc, persona: auth.persona }
         } else {
           return { ...acc, login: auth }
         }

@@ -9,7 +9,7 @@ describe('decodeWalletResponse', () => {
           discriminator: 'authorizedRequest',
           auth: {
             discriminator: 'usePersona',
-            identityAddress: 'addr_xxx',
+            persona: { identityAddress: 'addr_xxx' },
           },
           oneTimeAccounts: {
             accounts: [
