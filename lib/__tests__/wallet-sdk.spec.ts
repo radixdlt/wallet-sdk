@@ -256,12 +256,26 @@ describe('sdk flow', () => {
         )
       )
 
+      sdk
+        .request(
+          {
+            usePersona: {
+              identityAddress:
+                'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y',
+            },
+          },
+          {
+            eventCallback: callbackSpy,
+          }
+        )
+        .map((result) => result.persona)
+
       // mock a wallet response
       delay(300).then(() => {
         sendIncomingMessage({
           discriminator: 'authorizedRequest',
           auth: {
-            discriminator: 'loginWithoutChallenge',
+            discriminator: 'usePersona',
             persona: {
               identityAddress:
                 'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y',
@@ -274,7 +288,7 @@ describe('sdk flow', () => {
       const result = await request
 
       if (result.isErr()) throw new Error('should not get a error response')
-      expect((result.value as any).login.persona.identityAddress).toEqual(
+      expect((result.value as any).persona.identityAddress).toEqual(
         'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y'
       )
 

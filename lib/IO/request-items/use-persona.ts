@@ -1,6 +1,7 @@
 import {
   AuthUsePersonaRequestItem,
   AuthUsePersonaRequestResponseItem,
+  Persona,
 } from '../schemas'
 
 export type UsePersona = {
@@ -11,7 +12,7 @@ export type UsePersona = {
   method: {
     input: { identityAddress: string }
     output: {
-      auth: { identityAddress: string }
+      persona: Persona
     }
   }
 }
