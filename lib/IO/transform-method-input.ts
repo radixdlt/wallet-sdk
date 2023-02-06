@@ -50,9 +50,20 @@ export const transformMethodInput = <I extends {}>(input: I) =>
               },
             }
 
-          case requestMethodRequestType.usePersona:
-          case requestMethodRequestType.loginWithChallenge:
           case requestMethodRequestType.loginWithoutChallenge:
+            return {
+              ...acc,
+              auth: { ...value, discriminator: 'login' },
+              discriminator: 'authorizedRequest',
+            }
+
+          case requestMethodRequestType.usePersona:
+            return {
+              ...acc,
+              auth: { ...value, discriminator: 'usePersona' },
+              discriminator: 'authorizedRequest',
+            }
+          case requestMethodRequestType.loginWithChallenge:
             return {
               ...acc,
               auth: value,

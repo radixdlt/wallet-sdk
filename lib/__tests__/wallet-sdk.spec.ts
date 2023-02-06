@@ -162,6 +162,124 @@ describe('sdk flow', () => {
 
       expect(callbackSpy).toBeCalledWith('receivedByExtension')
     })
+
+    it('should request ongoing accounts and login', async () => {
+      const callbackSpy = jest.fn()
+
+      const { request, sendIncomingMessage, outgoingMessageSpy } =
+        createRequestHelper(() =>
+          sdk.request(
+            {
+              loginWithoutChallenge: {},
+              ongoingAccountsWithoutProofOfOwnership: {
+                quantifier: 'atLeast',
+                quantity: 1,
+              },
+            },
+            {
+              eventCallback: callbackSpy,
+            }
+          )
+        )
+
+      // mock a wallet response
+      delay(300).then(() => {
+        sendIncomingMessage({
+          discriminator: 'authorizedRequest',
+          auth: {
+            discriminator: 'loginWithoutChallenge',
+            persona: {
+              identityAddress:
+                'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y',
+              label: '2nd persona',
+            },
+          },
+          ongoingAccounts: {
+            accounts: [
+              {
+                address:
+                  'account_tdx_b_1qaz0nxslmr9nssmy463rd57hl7q0xsadaal0gy7cwsuqwecaws',
+                label: 'Jakub Another Accoun',
+                appearanceId: 1,
+              },
+              {
+                address:
+                  'account_tdx_b_1q7te4nk60fy2wt7d0wh8l2dhlp5c0n75phcnrwa8uglsrf6sjr',
+                label: '3rd Account',
+                appearanceId: 2,
+              },
+            ],
+          },
+        })
+      })
+
+      const result = await request
+
+      if (result.isErr()) throw new Error('should not get a error response')
+
+      expect((result.value as any).ongoingAccounts).toEqual([
+        {
+          address:
+            'account_tdx_b_1qaz0nxslmr9nssmy463rd57hl7q0xsadaal0gy7cwsuqwecaws',
+          label: 'Jakub Another Accoun',
+          appearanceId: 1,
+        },
+        {
+          address:
+            'account_tdx_b_1q7te4nk60fy2wt7d0wh8l2dhlp5c0n75phcnrwa8uglsrf6sjr',
+          label: '3rd Account',
+          appearanceId: 2,
+        },
+      ])
+
+      expect(outgoingMessageSpy.getFirstValue().metadata).toEqual({
+        dAppDefinitionAddress: 'radixDashboard',
+        networkId: 1,
+      })
+
+      expect(callbackSpy).toBeCalledWith('receivedByExtension')
+    })
+    it('should request usePersona', async () => {
+      const callbackSpy = jest.fn()
+
+      const { request, sendIncomingMessage } = createRequestHelper(() =>
+        sdk.request(
+          {
+            usePersona: {
+              identityAddress:
+                'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y',
+            },
+          },
+          {
+            eventCallback: callbackSpy,
+          }
+        )
+      )
+
+      // mock a wallet response
+      delay(300).then(() => {
+        sendIncomingMessage({
+          discriminator: 'authorizedRequest',
+          auth: {
+            discriminator: 'loginWithoutChallenge',
+            persona: {
+              identityAddress:
+                'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y',
+              label: '2nd persona',
+            },
+          },
+        })
+      })
+
+      const result = await request
+
+      if (result.isErr()) throw new Error('should not get a error response')
+      expect((result.value as any).login.persona.identityAddress).toEqual(
+        'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y'
+      )
+
+      expect(callbackSpy).toBeCalledWith('receivedByExtension')
+    })
   })
 
   describe('send transaction method', () => {

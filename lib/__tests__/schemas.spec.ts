@@ -158,31 +158,48 @@ describe('schemas', () => {
         },
       })
 
-      // WalletInteractionResponseSchema.parse({
-      //   discriminator: 'success',
-      //   interactionId: '3b96efd3-fdfc-4d53-a43c-3d190cd77277',
-      //   items: {
-      //     discriminator: 'authorizedRequest',
-      //     auth: {
-      //       discriminator: 'loginWithoutChallenge',
-      //       persona: {
-      //         identityAddress:
-      //           'account_tdx_b_1ql5kf246qrna76pdjp7jcg7y7rznsn6qq49xpzxtmvlqeklhwj',
-      //         label: 'persona',
-      //       },
-      //     },
-      //     ongoingAccounts: {
-      //       accounts: [
-      //         {
-      //           address:
-      //             'account_tdx_b_1qlljmf2m0tge4qk8k2e4vkuyhw6hjwf6k02rtgs3gewsfmn8fs',
-      //           label: '234',
-      //           appearanceId: 0,
-      //         },
-      //       ],
-      //     },
-      //   },
-      // })
+      WalletInteractionResponseSchema.parse({
+        discriminator: 'success',
+        interactionId: '3b96efd3-fdfc-4d53-a43c-3d190cd77277',
+        items: {
+          discriminator: 'authorizedRequest',
+          auth: {
+            discriminator: 'loginWithoutChallenge',
+            persona: {
+              identityAddress:
+                'account_tdx_b_1ql5kf246qrna76pdjp7jcg7y7rznsn6qq49xpzxtmvlqeklhwj',
+              label: 'persona',
+            },
+          },
+          ongoingAccounts: {
+            accounts: [
+              {
+                address:
+                  'account_tdx_b_1qlljmf2m0tge4qk8k2e4vkuyhw6hjwf6k02rtgs3gewsfmn8fs',
+                label: '234',
+                appearanceId: 0,
+              },
+            ],
+          },
+        },
+      })
+      WalletInteractionResponseSchema.parse({
+        interactionId: 'd4c76fd0-1881-4e0b-87e5-0b6e3e58c360',
+        discriminator: 'success',
+        items: {
+          discriminator: 'unauthorizedRequest',
+          oneTimeAccounts: {
+            accounts: [
+              {
+                address:
+                  'account_tdx_b_1q7v5vaj2jxf9pm5ndzqvfd925sukk0x7xlhfghn9apxq88agsg',
+                label: '1',
+                appearanceId: 0,
+              },
+            ],
+          },
+        },
+      })
     })
 
     it('should parse error without message', () => {
