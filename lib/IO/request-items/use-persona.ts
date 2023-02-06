@@ -9,7 +9,7 @@ export type UsePersona = {
     response: AuthUsePersonaRequestResponseItem
   }
   method: {
-    input: {}
+    input: { identityAddress: string }
     output: {
       auth: { identityAddress: string }
     }

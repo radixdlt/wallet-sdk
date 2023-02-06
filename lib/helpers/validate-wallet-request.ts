@@ -14,7 +14,8 @@ export const validateWalletRequest = (
     .map(() => walletInteraction)
     .mapErr((issues) => {
       log.error(`🔵💥 invalid wallet request`)
-      log.debug(issues)
+      log.debug(JSON.stringify(walletInteraction, null, 2))
+      log.debug(JSON.stringify(issues, null, 2))
       return createSdkError(
         errorType.walletRequestValidation,
         walletInteraction.interactionId
