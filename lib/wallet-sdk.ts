@@ -53,5 +53,5 @@ export default WalletSdk
 export { ManifestBuilder } from './manifest-builder'
 export * from './scrypto-value'
 export { requestBuilder } from './request-builder'
-export { requestItem } from './IO/request-items/request-item'
+export * from './IO/request-items'
 export * from './IO/schemas'
