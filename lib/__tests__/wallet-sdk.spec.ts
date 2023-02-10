@@ -1,7 +1,7 @@
 /* eslint-disable max-params */
 /* eslint-disable array-callback-return */
 /* eslint-disable max-nested-callbacks */
-import WalletSdk, { Network, WalletSdk as WalletSdkType } from '../wallet-sdk'
+import { Network, WalletSdk } from '../wallet-sdk'
 import { subscribeSpyTo } from '@hirez_io/observer-spy'
 import log from 'loglevel'
 import { messageLifeCycleEvent } from '../messages/events/_types'
@@ -38,7 +38,7 @@ const delay = (millis: number) =>
   })
 
 describe('sdk flow', () => {
-  let sdk: WalletSdkType
+  let sdk: WalletSdk
   beforeEach(() => {
     sdk = WalletSdk({
       dAppDefinitionAddress: 'radixDashboard',
@@ -52,7 +52,7 @@ describe('sdk flow', () => {
   })
 
   const createRequestHelper = (
-    input: () => ReturnType<WalletSdkType['request']>
+    input: () => ReturnType<WalletSdk['request']>
   ) => {
     const eventDispatchSpy = jest.spyOn(globalThis, 'dispatchEvent')
     const outgoingMessageSpy = subscribeSpyTo(
