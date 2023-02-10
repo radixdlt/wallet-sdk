@@ -20,7 +20,9 @@ export const Network = {
   Hammunet: 0x22,
 } as const
 
-const WalletSdk = ({
+export type WalletSdk = ReturnType<typeof WalletSdk>
+
+export const WalletSdk = ({
   networkId = Network.Mainnet,
   dAppDefinitionAddress,
   logLevel = config.logLevel,
@@ -46,12 +48,9 @@ const WalletSdk = ({
   }
 }
 
-export type WalletSdk = ReturnType<typeof WalletSdk>
-
-export default WalletSdk
-
 export { ManifestBuilder } from './manifest-builder'
 export * from './scrypto-value'
 export { requestBuilder } from './request-builder'
 export * from './IO/request-items'
 export * from './IO/schemas'
+export * from './helpers/error'
