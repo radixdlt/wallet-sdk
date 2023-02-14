@@ -4,6 +4,7 @@ export type ComponentAddressString = `component_${string}` | `account_${string}`
 export type SystemAddressString = `system_${string}`
 
 export enum TypeId {
+  Bool = 'Bool',
   I8 = 'i8',
   I16 = 'i16',
   I32 = 'i32',
@@ -15,7 +16,6 @@ export enum TypeId {
   U64 = 'u64',
   U128 = 'u128',
   Unit = 'Unit',
-  Bool = 'Bool',
   String = 'String',
   Enum = 'Enum',
   Array = 'Array',
@@ -31,16 +31,17 @@ export enum TypeId {
 
   Expression = 'Expression',
   Blob = 'Blob',
-  NonFungibleAddress = 'NonFungibleAddress',
+  NonFungibleGlobalId = 'NonFungibleGlobalId',
 
   Hash = 'Hash',
+  Map = 'Map',
   EcdsaSecp256k1PublicKey = 'EcdsaSecp256k1PublicKey',
   EcdsaSecp256k1Signature = 'EcdsaSecp256k1Signature',
   EddsaEd25519PublicKey = 'EddsaEd25519PublicKey',
   EddsaEd25519Signature = 'EddsaEd25519Signature',
   Decimal = 'Decimal',
   PreciseDecimal = 'PreciseDecimal',
-  NonFungibleId = 'NonFungibleId',
+  NonFungibleLocalId = 'NonFungibleLocalId',
 }
 
 export class ScryptoValueError extends Error {
@@ -162,6 +163,14 @@ export const Array = <T extends TypeId>(
   return `Array<${type}>(${args.join(',')})`
 }
 
+export const Map = <T extends TypeId, E extends TypeId>(
+  keyType: T,
+  valueType: E,
+  ...args: string[]
+): `Map<${T},${E}>(${string})` => {
+  return `Map<${keyType},${valueType}>(${args.join(',')})`
+}
+
 export const PackageAddress = (
   packageAddress: PackageAddressString
 ): `PackageAddress("${string}")` => {
@@ -212,11 +221,11 @@ export const Blob = <T extends string>(blob: T): `Blob("${T}")` => {
   return `Blob("${blob}")`
 }
 
-export const NonFungibleAddress = (
+export const NonFungibleGlobalId = (
   resourceAddress: ResourceAddressString,
-  non_fungible_id: string
-): `NonFungibleAddress(${string}, ${string})` => {
-  return `NonFungibleAddress("${resourceAddress}", ${non_fungible_id})`
+  nonFungibleId: string
+): `NonFungibleGlobalId(${string}, ${string})` => {
+  return `NonFungibleGlobalId("${resourceAddress}", ${nonFungibleId})`
 }
 
 export const Hash = (hash: string): `Hash("${string}")` => {
@@ -247,6 +256,10 @@ export const EddsaEd25519Signature = (
   return `EddsaEd25519Signature("${sig}")`
 }
 
+export const Integer = (num: number): `"#${string}#"` => {
+  return `"#${num}#"`
+}
+
 export const Decimal = (num: number): `Decimal("${string}")` => {
   return `Decimal("${num}")`
 }
@@ -255,8 +268,8 @@ export const PreciseDecimal = (num: number): `PreciseDecimal("${string}")` => {
   return `PreciseDecimal("${num}")`
 }
 
-export const NonFungibleId = (id: string): `NonFungibleId(${string})` => {
-  return `NonFungibleId(${id})`
+export const NonFungibleLocalId = (id: string): `NonFungibleLocalId(${string})` => {
+  return `NonFungibleLocalId(${id})`
 }
 
 const validateArrayElements = (type: TypeId, args: string[]) => {
