@@ -1,98 +1,90 @@
 import { ok } from 'neverthrow'
 import { requestMethodRequestType } from '../methods/request'
-import { Wallet } from '../_types'
-import { RequestTypeSchema } from './schemas'
+import { NumberOfAccounts, WalletInteractionItems } from './schemas'
 
-const requestTypeMapper = new Map<string, string>()
-  .set(
-    requestMethodRequestType.oneTimeAccountsWithoutProofOfOwnership,
-    RequestTypeSchema.oneTimeAccountsRead.value
-  )
-  .set(
-    requestMethodRequestType.oneTimeAccountsWithProofOfOwnership,
-    RequestTypeSchema.oneTimeAccountsRead.value
-  )
-  .set(
-    requestMethodRequestType.ongoingAccountsWithProofOfOwnership,
-    RequestTypeSchema.ongoingAccountsRead.value
-  )
-  .set(
-    requestMethodRequestType.ongoingAccountsWithoutProofOfOwnership,
-    RequestTypeSchema.ongoingAccountsRead.value
-  )
-  .set(
-    requestMethodRequestType.loginWithChallenge,
-    RequestTypeSchema.loginRead.value
-  )
-  .set(
-    requestMethodRequestType.loginWithoutChallenge,
-    RequestTypeSchema.loginRead.value
-  )
-  .set(
-    requestMethodRequestType.usePersona,
-    RequestTypeSchema.usePersonaRead.value
-  )
-  .set(
-    requestMethodRequestType.oneTimePersonaData,
-    RequestTypeSchema.oneTimePersonaDataRead.value
-  )
-  .set(
-    requestMethodRequestType.ongoingPersonaData,
-    RequestTypeSchema.ongoingPersonaDataRead.value
-  )
-  .set('sendTransaction', RequestTypeSchema.sendTransactionWrite.value)
+export const provideDefaultNumberOfAccounts = (
+  value: Partial<NumberOfAccounts>
+): NumberOfAccounts => ({
+  quantity: value?.quantity || 1,
+  quantifier: value?.quantifier || 'atLeast',
+})
 
 export const transformMethodInput = <I extends {}>(input: I) =>
   ok(
-    Object.entries(input).reduce<Wallet['requestItem'][]>(
+    Object.entries(input).reduce<WalletInteractionItems>(
       (acc, [requestType, value]: [string, any]) => {
         switch (requestType) {
           case requestMethodRequestType.oneTimeAccountsWithoutProofOfOwnership:
-            return [
+            return {
               ...acc,
-              {
-                requestType: RequestTypeSchema.oneTimeAccountsRead.value,
-                ...value,
+              oneTimeAccounts: {
                 requiresProofOfOwnership: false,
+                numberOfAccounts: provideDefaultNumberOfAccounts(value),
               },
-            ]
+            }
+
           case requestMethodRequestType.oneTimeAccountsWithProofOfOwnership:
-            return [
+            return {
               ...acc,
-              {
-                requestType: RequestTypeSchema.oneTimeAccountsRead.value,
-                ...value,
+              oneTimeAccounts: {
                 requiresProofOfOwnership: true,
+                numberOfAccounts: provideDefaultNumberOfAccounts(value),
               },
-            ]
+            }
 
           case requestMethodRequestType.ongoingAccountsWithProofOfOwnership:
-            return [
+            return {
               ...acc,
-              {
-                requestType: RequestTypeSchema.ongoingAccountsRead.value,
-                ...value,
+              ongoingAccounts: {
                 requiresProofOfOwnership: true,
+                numberOfAccounts: provideDefaultNumberOfAccounts(value),
               },
-            ]
+            }
 
           case requestMethodRequestType.ongoingAccountsWithoutProofOfOwnership:
-            return [
+            return {
               ...acc,
-              {
-                requestType: RequestTypeSchema.ongoingAccountsRead.value,
-                ...value,
+              ongoingAccounts: {
                 requiresProofOfOwnership: false,
+                numberOfAccounts: provideDefaultNumberOfAccounts(value),
               },
-            ]
+            }
+
+          case requestMethodRequestType.loginWithoutChallenge:
+            return {
+              ...acc,
+              auth: { ...value, discriminator: 'login' },
+              discriminator: 'authorizedRequest',
+            }
+
+          case requestMethodRequestType.usePersona:
+            return {
+              ...acc,
+              auth: { ...value, discriminator: 'usePersona' },
+              discriminator: 'authorizedRequest',
+            }
+          case requestMethodRequestType.loginWithChallenge:
+            return {
+              ...acc,
+              auth: value,
+              discriminator: 'authorizedRequest',
+            }
+
+          case 'send':
+            return {
+              discriminator: 'transaction',
+              send: value,
+            }
 
           default:
-            return [
+            return {
               ...acc,
-              { requestType: requestTypeMapper.get(requestType), ...value },
-            ]
+              [requestType]: value,
+            }
         }
       },
-      []
+      {
+        discriminator: 'unauthorizedRequest',
+      }
     )
   )

@@ -1,35 +1,44 @@
+import { config } from '../../config'
 import {
   Account,
   AccountWithProofOfOwnership,
-  OngoingAccountsReadRequestItem,
-  OngoingAccountsResponseItem,
+  NumberOfAccountsQuantifier,
+  OngoingAccountsRequestItem,
+  OngoingAccountsWithoutProofOfOwnershipRequestResponseItem,
+  OngoingAccountsWithProofOfOwnershipRequestResponseItem,
 } from '../schemas'
 
 export type OngoingAccounts = {
   WithoutProofOfOwnership: {
     wallet: {
-      request: OngoingAccountsReadRequestItem
-      response: OngoingAccountsResponseItem
+      request: OngoingAccountsRequestItem
+      response: OngoingAccountsWithoutProofOfOwnershipRequestResponseItem
     }
     method: {
-      input: { numberOfAccounts?: number }
+      input: {
+        quantity: number
+        quantifier: NumberOfAccountsQuantifier
+      }
       output: { ongoingAccounts: Account[] }
     }
   }
   WithProofOfOwnership: {
     wallet: {
-      request: OngoingAccountsReadRequestItem
-      response: OngoingAccountsResponseItem
+      request: OngoingAccountsRequestItem
+      response: OngoingAccountsWithProofOfOwnershipRequestResponseItem
     }
     method: {
-      input: { numberOfAccounts?: number }
+      input: {
+        quantity: number
+        quantifier: NumberOfAccountsQuantifier
+      }
       output: { ongoingAccounts: AccountWithProofOfOwnership[] }
     }
   }
 }
 
 type RequiredKeys =
-  | { persona: any }
+  | { usePersona: any }
   | { loginWithoutChallenge: any }
   | { loginWithChallenge: any }
 
@@ -40,19 +49,27 @@ type NotAllowedKeys = Partial<{
 
 export const ongoingAccounts = {
   withoutProofOfOwnership:
-    (numberOfAccounts?: number) =>
+    (
+      quantity = config.defaultNumberOfAccountsQuantity,
+      quantifier = config.defaultNumberOfAccountsQuantifier
+    ) =>
     <I extends RequiredKeys>(input: I extends NotAllowedKeys ? never : I) => ({
       ...input,
       ongoingAccountsWithoutProofOfOwnership: {
-        numberOfAccounts,
+        quantity,
+        quantifier,
       },
     }),
   withProofOfOwnership:
-    (numberOfAccounts?: number) =>
+    (
+      quantity = config.defaultNumberOfAccountsQuantity,
+      quantifier = config.defaultNumberOfAccountsQuantifier
+    ) =>
     <I extends RequiredKeys>(input: I extends NotAllowedKeys ? never : I) => ({
       ...input,
       ongoingAccountsWithProofOfOwnership: {
-        numberOfAccounts,
+        quantity,
+        quantifier,
       },
     }),
 }

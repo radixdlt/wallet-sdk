@@ -1,17 +1,16 @@
 /* eslint-disable max-params */
 /* eslint-disable array-callback-return */
 /* eslint-disable max-nested-callbacks */
-import WalletSdk, { Network, WalletSdk as WalletSdkType } from '../wallet-sdk'
+import { Network, WalletSdk } from '../wallet-sdk'
 import { subscribeSpyTo } from '@hirez_io/observer-spy'
 import log from 'loglevel'
 import { messageLifeCycleEvent } from '../messages/events/_types'
 
 import { OneTimeAccounts } from '../IO/request-items/one-time-accounts'
-import { WalletSuccessResponse } from '../IO/schemas'
+import { WalletInteractionSuccessResponse } from '../IO/schemas'
 
 const mockAccountWalletResponse: OneTimeAccounts['WithoutProofOfOwnership']['wallet']['response'] =
   {
-    requestType: 'oneTimeAccountsRead',
     accounts: [
       {
         address: 'rdx61333732663539372d383861352d3461',
@@ -39,9 +38,12 @@ const delay = (millis: number) =>
   })
 
 describe('sdk flow', () => {
-  let sdk: WalletSdkType
+  let sdk: WalletSdk
   beforeEach(() => {
-    sdk = WalletSdk({ dAppId: 'radixDashboard', logLevel: 'debug' })
+    sdk = WalletSdk({
+      dAppDefinitionAddress: 'radixDashboard',
+      logLevel: 'debug',
+    })
   })
 
   afterEach(() => {
@@ -50,7 +52,7 @@ describe('sdk flow', () => {
   })
 
   const createRequestHelper = (
-    input: () => ReturnType<WalletSdkType['request']>
+    input: () => ReturnType<WalletSdk['request']>
   ) => {
     const eventDispatchSpy = jest.spyOn(globalThis, 'dispatchEvent')
     const outgoingMessageSpy = subscribeSpyTo(
@@ -62,34 +64,37 @@ describe('sdk flow', () => {
 
     const request = input()
 
-    let requestId: string | undefined
+    let interactionId: string | undefined
 
     delay(0).then(() => {
       expect(eventDispatchSpy).toBeCalled()
       const outgoingMessage = outgoingMessageSpy.getFirstValue()
-      requestId = outgoingMessage.requestId
-      sendReceivedEvent(outgoingMessage.requestId)
+      interactionId = outgoingMessage.interactionId
+      sendReceivedEvent(outgoingMessage.interactionId)
     })
 
-    const getRequestId = () => requestId!
+    const getinteractionId = () => interactionId!
 
     return {
       getMessageEvents: () => messageEventSpy.getValues(),
-      getRequestId,
+      getinteractionId,
       outgoingMessageSpy,
-      sendIncomingMessage: (walletResponse: WalletSuccessResponse['items']) => {
+      sendIncomingMessage: (
+        walletResponse: WalletInteractionSuccessResponse['items']
+      ) => {
         sdk.__subjects.incomingMessageSubject.next({
+          discriminator: 'success',
           items: walletResponse,
-          requestId: getRequestId(),
+          interactionId: getinteractionId(),
         })
       },
       request,
     }
   }
 
-  const sendReceivedEvent = (requestId: string) => {
+  const sendReceivedEvent = (interactionId: string) => {
     sdk.__subjects.incomingMessageSubject.next({
-      requestId,
+      interactionId,
       eventType: messageLifeCycleEvent.receivedByExtension,
     })
   }
@@ -122,8 +127,6 @@ describe('sdk flow', () => {
     })
 
     it('should request account addresses and persona data', async () => {
-      const walletResponse = [mockAccountWalletResponse]
-
       const callbackSpy = jest.fn()
 
       const { request, sendIncomingMessage, outgoingMessageSpy } =
@@ -138,7 +141,10 @@ describe('sdk flow', () => {
 
       // mock a wallet response
       delay(300).then(() => {
-        sendIncomingMessage(walletResponse)
+        sendIncomingMessage({
+          discriminator: 'unauthorizedRequest',
+          oneTimeAccounts: mockAccountWalletResponse,
+        })
       })
 
       const result = await request
@@ -146,13 +152,148 @@ describe('sdk flow', () => {
       if (result.isErr()) throw new Error('should not get a error response')
 
       expect((result.value as any).oneTimeAccounts).toEqual(
-        walletResponse[0].accounts
+        mockAccountWalletResponse.accounts
       )
 
       expect(outgoingMessageSpy.getFirstValue().metadata).toEqual({
-        dAppId: 'radixDashboard',
+        dAppDefinitionAddress: 'radixDashboard',
         networkId: 1,
       })
+
+      expect(callbackSpy).toBeCalledWith('receivedByExtension')
+    })
+
+    it('should request ongoing accounts and login', async () => {
+      const callbackSpy = jest.fn()
+
+      const { request, sendIncomingMessage, outgoingMessageSpy } =
+        createRequestHelper(() =>
+          sdk.request(
+            {
+              loginWithoutChallenge: {},
+              ongoingAccountsWithoutProofOfOwnership: {
+                quantifier: 'atLeast',
+                quantity: 1,
+              },
+            },
+            {
+              eventCallback: callbackSpy,
+            }
+          )
+        )
+
+      // mock a wallet response
+      delay(300).then(() => {
+        sendIncomingMessage({
+          discriminator: 'authorizedRequest',
+          auth: {
+            discriminator: 'loginWithoutChallenge',
+            persona: {
+              identityAddress:
+                'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y',
+              label: '2nd persona',
+            },
+          },
+          ongoingAccounts: {
+            accounts: [
+              {
+                address:
+                  'account_tdx_b_1qaz0nxslmr9nssmy463rd57hl7q0xsadaal0gy7cwsuqwecaws',
+                label: 'Jakub Another Accoun',
+                appearanceId: 1,
+              },
+              {
+                address:
+                  'account_tdx_b_1q7te4nk60fy2wt7d0wh8l2dhlp5c0n75phcnrwa8uglsrf6sjr',
+                label: '3rd Account',
+                appearanceId: 2,
+              },
+            ],
+          },
+        })
+      })
+
+      const result = await request
+
+      if (result.isErr()) throw new Error('should not get a error response')
+      expect((result.value as any).ongoingAccounts).toEqual([
+        {
+          address:
+            'account_tdx_b_1qaz0nxslmr9nssmy463rd57hl7q0xsadaal0gy7cwsuqwecaws',
+          label: 'Jakub Another Accoun',
+          appearanceId: 1,
+        },
+        {
+          address:
+            'account_tdx_b_1q7te4nk60fy2wt7d0wh8l2dhlp5c0n75phcnrwa8uglsrf6sjr',
+          label: '3rd Account',
+          appearanceId: 2,
+        },
+      ])
+
+      expect((result.value as any).persona.identityAddress).toEqual(
+        'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y'
+      )
+
+      expect(outgoingMessageSpy.getFirstValue().metadata).toEqual({
+        dAppDefinitionAddress: 'radixDashboard',
+        networkId: 1,
+      })
+
+      expect(callbackSpy).toBeCalledWith('receivedByExtension')
+    })
+    it('should request usePersona', async () => {
+      const callbackSpy = jest.fn()
+
+      const { request, sendIncomingMessage } = createRequestHelper(() =>
+        sdk.request(
+          {
+            usePersona: {
+              identityAddress:
+                'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y',
+            },
+          },
+          {
+            eventCallback: callbackSpy,
+          }
+        )
+      )
+
+      sdk
+        .request(
+          {
+            usePersona: {
+              identityAddress:
+                'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y',
+            },
+          },
+          {
+            eventCallback: callbackSpy,
+          }
+        )
+        .map((result) => result.persona)
+
+      // mock a wallet response
+      delay(300).then(() => {
+        sendIncomingMessage({
+          discriminator: 'authorizedRequest',
+          auth: {
+            discriminator: 'usePersona',
+            persona: {
+              identityAddress:
+                'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y',
+              label: '2nd persona',
+            },
+          },
+        })
+      })
+
+      const result = await request
+
+      if (result.isErr()) throw new Error('should not get a error response')
+      expect((result.value as any).persona.identityAddress).toEqual(
+        'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y'
+      )
 
       expect(callbackSpy).toBeCalledWith('receivedByExtension')
     })
@@ -193,23 +334,24 @@ describe('sdk flow', () => {
         expect(outgoingMessage.metadata.networkId).toBe(Network.Mainnet)
 
         sdk.__subjects.incomingMessageSubject.next({
-          requestId: outgoingMessage.requestId,
+          interactionId: outgoingMessage.interactionId,
           eventType: messageLifeCycleEvent.receivedByExtension,
         })
 
         sdk.__subjects.incomingMessageSubject.next({
-          requestId: outgoingMessage.requestId,
-          items: [
-            {
-              requestType: 'sendTransactionWrite',
+          discriminator: 'success',
+          interactionId: outgoingMessage.interactionId,
+          items: {
+            discriminator: 'transaction',
+            send: {
               transactionIntentHash: 'testHash',
             },
-          ],
+          },
         })
 
         expect(messageEventSpy.getValues()).toEqual([
           {
-            requestId: outgoingMessage.requestId,
+            interactionId: outgoingMessage.interactionId,
             eventType: messageLifeCycleEvent.receivedByExtension,
           },
         ])

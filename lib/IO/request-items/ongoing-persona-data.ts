@@ -1,13 +1,13 @@
 import {
-  OngoingPersonaDataReadRequestItem,
-  OngoingPersonaDataResponseItem,
+  OngoingPersonaDataRequestItem,
+  OngoingPersonaDataRequestResponseItem,
   PersonaDataField,
 } from '../schemas'
 
 export type OngoingPersonaData = {
   wallet: {
-    request: OngoingPersonaDataReadRequestItem
-    response: OngoingPersonaDataResponseItem
+    request: OngoingPersonaDataRequestItem
+    response: OngoingPersonaDataRequestResponseItem
   }
   method: {
     output: { ongoingPersonaData: PersonaDataField[] }
@@ -15,10 +15,7 @@ export type OngoingPersonaData = {
   }
 }
 
-type RequiredKeys =
-  | { persona: any }
-  | { loginWithoutChallenge: any }
-  | { loginWithChallenge: any }
+type RequiredKeys = { usePersona: any } | { login: any }
 
 type NotAllowedKeys = { ongoingPersonaData: any }
 

@@ -1,4 +1,7 @@
+import { Login } from '../IO/request-items/login'
 import { OneTimeAccounts } from '../IO/request-items/one-time-accounts'
+import { OngoingAccounts } from '../IO/request-items/ongoing-accounts'
+import { UsePersona } from '../IO/request-items/use-persona'
 
 export const requestMethodRequestType = {
   oneTimeAccountsWithoutProofOfOwnership:
@@ -17,10 +20,10 @@ export const requestMethodRequestType = {
 type RequestItems = {
   [requestMethodRequestType.oneTimeAccountsWithoutProofOfOwnership]: OneTimeAccounts['WithoutProofOfOwnership']
   // [requestMethodRequestType.oneTimeAccountsWithProofOfOwnership]: OneTimeAccounts['WithProofOfOwnership']
-  // [requestMethodRequestType.ongoingAccountsWithoutProofOfOwnership]: OngoingAccounts['WithoutProofOfOwnership']
+  [requestMethodRequestType.ongoingAccountsWithoutProofOfOwnership]: OngoingAccounts['WithoutProofOfOwnership']
   // [requestMethodRequestType.ongoingAccountsWithProofOfOwnership]: OngoingAccounts['WithProofOfOwnership']
-  // [requestMethodRequestType.usePersona]: UsePersona
-  // [requestMethodRequestType.loginWithoutChallenge]: Login['WithoutChallenge']
+  [requestMethodRequestType.usePersona]: UsePersona
+  [requestMethodRequestType.loginWithoutChallenge]: Login['WithoutChallenge']
   // [requestMethodRequestType.loginWithChallenge]: Login['WithChallenge']
   // [requestMethodRequestType.oneTimePersonaData]: OneTimePersonaData
   // [requestMethodRequestType.ongoingPersonaData]: OngoingPersonaData

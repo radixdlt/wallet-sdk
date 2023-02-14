@@ -10,7 +10,7 @@ module.exports = {
   extends: ['alloy', 'alloy/typescript'],
   overrides: [
     {
-      files: ['**/chrome-api.test.ts'],
+      files: ['**/*.spec.ts'],
       rules: {
         'max-nested-callbacks': 'off',
         'max-params': 'off',

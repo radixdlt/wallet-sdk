@@ -11,36 +11,74 @@ describe('transformMethodInput', () => {
         {
           actual: requestItem.oneTimeAccounts.withoutProofOfOwnership(),
           expected: {
-            requestType: RequestTypeSchema.oneTimeAccountsRead.value,
-            requiresProofOfOwnership: false,
+            discriminator: 'unauthorizedRequest',
+            [RequestTypeSchema.oneTimeAccounts.value]: {
+              requiresProofOfOwnership: false,
+              numberOfAccounts: {
+                quantity: 1,
+                quantifier: 'atLeast',
+              },
+            },
           },
         },
         {
           actual: requestItem.oneTimeAccounts.withoutProofOfOwnership(3),
           expected: {
-            requestType: RequestTypeSchema.oneTimeAccountsRead.value,
-            requiresProofOfOwnership: false,
-            numberOfAccounts: 3,
+            discriminator: 'unauthorizedRequest',
+            [RequestTypeSchema.oneTimeAccounts.value]: {
+              requiresProofOfOwnership: false,
+              numberOfAccounts: {
+                quantity: 3,
+                quantifier: 'atLeast',
+              },
+            },
           },
         },
         {
           actual: requestItem.oneTimeAccounts.withProofOfOwnership(),
           expected: {
-            requestType: RequestTypeSchema.oneTimeAccountsRead.value,
-            requiresProofOfOwnership: true,
+            discriminator: 'unauthorizedRequest',
+            [RequestTypeSchema.oneTimeAccounts.value]: {
+              requiresProofOfOwnership: true,
+              numberOfAccounts: {
+                quantity: 1,
+                quantifier: 'atLeast',
+              },
+            },
           },
         },
         {
           actual: requestItem.oneTimeAccounts.withProofOfOwnership(1),
           expected: {
-            requestType: RequestTypeSchema.oneTimeAccountsRead.value,
-            requiresProofOfOwnership: true,
-            numberOfAccounts: 1,
+            discriminator: 'unauthorizedRequest',
+            [RequestTypeSchema.oneTimeAccounts.value]: {
+              requiresProofOfOwnership: true,
+              numberOfAccounts: {
+                quantity: 1,
+                quantifier: 'atLeast',
+              },
+            },
+          },
+        },
+        {
+          actual: requestItem.oneTimeAccounts.withProofOfOwnership(
+            5,
+            'exactly'
+          ),
+          expected: {
+            discriminator: 'unauthorizedRequest',
+            [RequestTypeSchema.oneTimeAccounts.value]: {
+              requiresProofOfOwnership: true,
+              numberOfAccounts: {
+                quantity: 5,
+                quantifier: 'exactly',
+              },
+            },
           },
         },
       ].forEach((testItem) => {
         expect(transformMethodInput(testItem.actual({} as any))).toEqual(
-          ok([testItem.expected])
+          ok(testItem.expected)
         )
       })
     })
@@ -51,38 +89,74 @@ describe('transformMethodInput', () => {
         {
           actual: requestItem.ongoingAccounts.withoutProofOfOwnership(),
           expected: {
-            requestType: RequestTypeSchema.ongoingAccountsRead.value,
-            requiresProofOfOwnership: false,
-            numberOfAccounts: undefined,
+            discriminator: 'unauthorizedRequest',
+            [RequestTypeSchema.ongoingAccounts.value]: {
+              requiresProofOfOwnership: false,
+              numberOfAccounts: {
+                quantity: 1,
+                quantifier: 'atLeast',
+              },
+            },
           },
         },
         {
           actual: requestItem.ongoingAccounts.withoutProofOfOwnership(3),
           expected: {
-            requestType: RequestTypeSchema.ongoingAccountsRead.value,
-            requiresProofOfOwnership: false,
-            numberOfAccounts: 3,
+            discriminator: 'unauthorizedRequest',
+            [RequestTypeSchema.ongoingAccounts.value]: {
+              requiresProofOfOwnership: false,
+              numberOfAccounts: {
+                quantity: 3,
+                quantifier: 'atLeast',
+              },
+            },
           },
         },
         {
           actual: requestItem.ongoingAccounts.withProofOfOwnership(),
           expected: {
-            requestType: RequestTypeSchema.ongoingAccountsRead.value,
-            requiresProofOfOwnership: true,
-            numberOfAccounts: undefined,
+            discriminator: 'unauthorizedRequest',
+            [RequestTypeSchema.ongoingAccounts.value]: {
+              requiresProofOfOwnership: true,
+              numberOfAccounts: {
+                quantity: 1,
+                quantifier: 'atLeast',
+              },
+            },
           },
         },
         {
-          actual: requestItem.ongoingAccounts.withProofOfOwnership(1),
+          actual: requestItem.ongoingAccounts.withProofOfOwnership(5),
           expected: {
-            requestType: RequestTypeSchema.ongoingAccountsRead.value,
-            requiresProofOfOwnership: true,
-            numberOfAccounts: 1,
+            discriminator: 'unauthorizedRequest',
+            [RequestTypeSchema.ongoingAccounts.value]: {
+              requiresProofOfOwnership: true,
+              numberOfAccounts: {
+                quantity: 5,
+                quantifier: 'atLeast',
+              },
+            },
+          },
+        },
+        {
+          actual: requestItem.ongoingAccounts.withProofOfOwnership(
+            10,
+            'exactly'
+          ),
+          expected: {
+            discriminator: 'unauthorizedRequest',
+            [RequestTypeSchema.ongoingAccounts.value]: {
+              requiresProofOfOwnership: true,
+              numberOfAccounts: {
+                quantity: 10,
+                quantifier: 'exactly',
+              },
+            },
           },
         },
       ].forEach((testItem) => {
         expect(transformMethodInput(testItem.actual({} as any))).toEqual(
-          ok([testItem.expected])
+          ok(testItem.expected)
         )
       })
     })
@@ -93,19 +167,25 @@ describe('transformMethodInput', () => {
         {
           actual: requestItem.login.withChallenge('abc'),
           expected: {
-            requestType: RequestTypeSchema.loginRead.value,
-            challenge: 'abc',
+            discriminator: 'authorizedRequest',
+            auth: {
+              discriminator: 'login',
+              challenge: 'abc',
+            },
           },
         },
         {
           actual: requestItem.login.withoutChallenge(),
           expected: {
-            requestType: RequestTypeSchema.loginRead.value,
+            discriminator: 'authorizedRequest',
+            auth: {
+              discriminator: 'login',
+            },
           },
         },
       ].forEach((testItem) => {
         expect(transformMethodInput(testItem.actual({} as any))).toEqual(
-          ok([testItem.expected])
+          ok(testItem.expected)
         )
       })
     })
@@ -116,13 +196,16 @@ describe('transformMethodInput', () => {
         {
           actual: requestItem.usePersona('abc'),
           expected: {
-            requestType: RequestTypeSchema.usePersonaRead.value,
-            id: 'abc',
+            discriminator: 'authorizedRequest',
+            auth: {
+              discriminator: 'usePersona',
+              identityAddress: 'abc',
+            },
           },
         },
       ].forEach((testItem) => {
         expect(transformMethodInput(testItem.actual({} as any))).toEqual(
-          ok([testItem.expected])
+          ok(testItem.expected)
         )
       })
     })
@@ -133,13 +216,15 @@ describe('transformMethodInput', () => {
         {
           actual: requestItem.oneTimePersonaData('email'),
           expected: {
-            requestType: RequestTypeSchema.oneTimePersonaDataRead.value,
-            fields: ['email'],
+            discriminator: 'unauthorizedRequest',
+            [RequestTypeSchema.oneTimePersonaData.value]: {
+              fields: ['email'],
+            },
           },
         },
       ].forEach((testItem) => {
         expect(transformMethodInput(testItem.actual({} as any))).toEqual(
-          ok([testItem.expected])
+          ok(testItem.expected)
         )
       })
     })
@@ -150,13 +235,15 @@ describe('transformMethodInput', () => {
         {
           actual: requestItem.ongoingPersonaData('email'),
           expected: {
-            requestType: RequestTypeSchema.ongoingPersonaDataRead.value,
-            fields: ['email'],
+            discriminator: 'unauthorizedRequest',
+            [RequestTypeSchema.ongoingPersonaData.value]: {
+              fields: ['email'],
+            },
           },
         },
       ].forEach((testItem) => {
         expect(transformMethodInput(testItem.actual({} as any))).toEqual(
-          ok([testItem.expected])
+          ok(testItem.expected)
         )
       })
     })
@@ -171,16 +258,18 @@ describe('transformMethodInput', () => {
             accountAddress: 'abc',
           },
           expected: {
-            requestType: RequestTypeSchema.sendTransactionWrite.value,
-            transactionManifest: 'test',
-            version: 1,
-            accountAddress: 'abc',
+            discriminator: 'transaction',
+            send: {
+              transactionManifest: 'test',
+              version: 1,
+              accountAddress: 'abc',
+            },
           },
         },
       ].forEach((testItem) => {
-        expect(
-          transformMethodInput({ sendTransaction: testItem.actual })
-        ).toEqual(ok([testItem.expected]))
+        expect(transformMethodInput({ send: testItem.actual })).toEqual(
+          ok(testItem.expected)
+        )
       })
     })
   })

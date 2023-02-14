@@ -1,11 +1,8 @@
-import {
-  SendTransactionResponseItem,
-  SendTransactionWriteRequestItem,
-} from '../schemas'
+import { SendTransactionResponseItem, SendTransactionItem } from '../schemas'
 
 export type SendTransaction = {
   wallet: {
-    request: SendTransactionWriteRequestItem
+    request: SendTransactionItem
     response: SendTransactionResponseItem
   }
   method: {
