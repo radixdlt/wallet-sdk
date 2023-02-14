@@ -49,9 +49,12 @@ yarn add @radixdlt/wallet-sdk
 ## Getting started
 
 ```typescript
-import WalletSdk from '@radixdlt/wallet-sdk'
+import { WalletSdk } from '@radixdlt/wallet-sdk'
 
-const walletSdk = WalletSdk({ dAppDefinitionAddress: 'instabridge', networkId: 0x01 })
+const walletSdk = WalletSdk({
+  dAppDefinitionAddress: 'instabridge',
+  networkId: 0x01,
+})
 ```
 
 ```typescript
@@ -74,13 +77,13 @@ type WalletSdkInput = {
 | :-------------------------------------------------------------------------------- | :--------------------------: |
 | [oneTimeAccountsWithoutProofOfOwnership](#onetimeaccountswithoutproofofownership) |              ✅              |
 | [oneTimeAccountsWithProofOfOwnership](#onetimeaccountswithproofofownership)       |              ❌              |
-| [ongoingAccountsWithoutProofOfOwnership](#ongoingaccountswithoutproofofownership) |              ❌              |
+| [ongoingAccountsWithoutProofOfOwnership](#ongoingaccountswithoutproofofownership) |              ✅              |
 | [ongoingAccountsWithProofOfOwnership](#ongoingaccountswithproofofownership)       |              ❌              |
 | [oneTimePersonaData](#onetimepersonadata)                                         |              ❌              |
 | [ongoingPersonaData](#ongoingpersonadata)                                         |              ❌              |
 | [loginWithChallenge](#loginwithchallenge)                                         |              ❌              |
-| [loginWithoutChallenge](#loginwithoutchallenge)                                   |              ❌              |
-| [usePersona](#usepersona)                                                         |              ❌              |
+| [loginWithoutChallenge](#loginwithoutchallenge)                                   |              ✅              |
+| [usePersona](#usepersona)                                                         |              ✅              |
 
 ### About oneTime VS ongoing requests
 
@@ -97,7 +100,7 @@ Typically the dApp should begin with a `login` request which will return the `id
 ```typescript
 const result = await walletSdk.request(
   requestBuilder(
-    requestItem.login('e23e7a3e-c349-4ca7-8ce1-1d067b396cb2'),
+    requestItem.login.withoutChallenge(),
     requestItem.ongoingAccounts.withoutProofOfOwnership()
   )
 )
@@ -107,11 +110,9 @@ if (result.isErr()) {
 }
 
 // {
-//   login: {
-//     persona: {
-//       label: string
-//       identityAddress: string
-//     }
+//   persona: {
+//     label: string
+//     identityAddress: string
 //   },
 //   ongoingAccounts: Account[]
 // }
@@ -325,7 +326,9 @@ If you are building a pure frontend dApp where the login is for pure user conven
 
 ```typescript
 const result = await walletSdk.request(
-  requestBuilder(requestItem.login('e23e7a3e-c349-4ca7-8ce1-1d067b396cb2'))
+  requestBuilder(
+    requestItem.loginWithChallenge('e23e7a3e-c349-4ca7-8ce1-1d067b396cb2')
+  )
 )
 
 if (result.isErr()) {
@@ -333,14 +336,15 @@ if (result.isErr()) {
 }
 
 // {
-//   login: {
-//     persona: {
-//       label: string
-//       identityAddress: string
-//       publicKey: string
-//     }
+//   persona: {
+//     label: string
+//     identityAddress: string
+//     publicKey: string
+//   }
+//   signedChallenge: {
 //     challenge: string
 //     signature: string
+//     publicKey: string
 //   }
 // }
 const value = result.value
