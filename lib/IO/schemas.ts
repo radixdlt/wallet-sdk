@@ -21,6 +21,10 @@ export const ErrorTypeSchema = union([
   literal('submittedTransactionWasDuplicate'),
   literal('submittedTransactionHasFailedTransactionStatus'),
   literal('submittedTransactionHasRejectedTransactionStatus'),
+  literal('wrongAccountType'),
+  literal('unknownWebsite'),
+  literal('radixJsonNotFound'),
+  literal('unknownDappDefinitionAddress'),
 ])
 
 const AccountSchema = object({
