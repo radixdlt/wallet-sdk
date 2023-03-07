@@ -253,6 +253,13 @@ export type AuthRequestResponseItem = z.infer<
   typeof AuthRequestResponseItemSchema
 >
 
+export type ResetRequestItem = z.infer<typeof ResetRequestSchema>
+
+const ResetRequestSchema = object({
+  accounts: boolean(),
+  personaData: boolean(),
+})
+
 const SendTransactionRequestItemSchema = object({
   transactionManifest: string(),
   version: number(),
@@ -276,6 +283,7 @@ const WalletUnauthorizedRequestItemsSchema = object({
   discriminator: literal('unauthorizedRequest'),
   oneTimeAccounts: OneTimeAccountsRequestItemSchema.optional(),
   oneTimePersonaData: OneTimePersonaDataRequestItemSchema.optional(),
+  reset: ResetRequestSchema.optional(),
 })
 
 export type WalletUnauthorizedRequestItems = z.infer<
@@ -289,6 +297,7 @@ const WalletAuthorizedRequestItemsSchema = object({
   ongoingAccounts: OngoingAccountsRequestItemSchema.optional(),
   oneTimePersonaData: OneTimePersonaDataRequestItemSchema.optional(),
   ongoingPersonaData: OngoingPersonaDataRequestItemSchema.optional(),
+  reset: ResetRequestSchema.optional(),
 })
 
 export type WalletAuthorizedRequestItems = z.infer<

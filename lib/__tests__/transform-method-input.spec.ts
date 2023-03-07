@@ -273,4 +273,21 @@ describe('transformMethodInput', () => {
       })
     })
   })
+  describe('reset', () => {
+    it('should return correct transformed value', () => {
+      ;[
+        {
+          actual: requestItem.reset({ accounts: true }),
+          expected: {
+            reset: { accounts: true, personaData: false },
+            discriminator: 'unauthorizedRequest',
+          },
+        },
+      ].forEach((testItem) => {
+        expect(transformMethodInput(testItem.actual({} as any))).toEqual(
+          ok(testItem.expected)
+        )
+      })
+    })
+  })
 })
