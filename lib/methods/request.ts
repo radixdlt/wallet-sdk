@@ -1,6 +1,7 @@
 import { Login } from '../IO/request-items/login'
 import { OneTimeAccounts } from '../IO/request-items/one-time-accounts'
 import { OngoingAccounts } from '../IO/request-items/ongoing-accounts'
+import { Reset } from '../IO/request-items/reset'
 import { UsePersona } from '../IO/request-items/use-persona'
 
 export const requestMethodRequestType = {
@@ -15,9 +16,11 @@ export const requestMethodRequestType = {
   loginWithChallenge: 'loginWithChallenge',
   oneTimePersonaData: 'oneTimePersonaData',
   ongoingPersonaData: 'ongoingPersonaData',
+  reset: 'reset',
 } as const
 
 type RequestItems = {
+  [requestMethodRequestType.reset]: Reset
   [requestMethodRequestType.oneTimeAccountsWithoutProofOfOwnership]: OneTimeAccounts['WithoutProofOfOwnership']
   // [requestMethodRequestType.oneTimeAccountsWithProofOfOwnership]: OneTimeAccounts['WithProofOfOwnership']
   [requestMethodRequestType.ongoingAccountsWithoutProofOfOwnership]: OngoingAccounts['WithoutProofOfOwnership']
