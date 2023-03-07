@@ -4,6 +4,7 @@ import { ongoingAccounts } from './ongoing-accounts'
 import { usePersona } from './use-persona'
 import { oneTimePersonaData } from './one-time-persona-data'
 import { ongoingPersonaData } from './ongoing-persona-data'
+import { reset } from './reset'
 
 export const requestItem = {
   oneTimeAccounts,
@@ -12,4 +13,5 @@ export const requestItem = {
   ongoingPersonaData,
   login,
   usePersona,
+  reset,
 } as const

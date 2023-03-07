@@ -63,12 +63,21 @@ export const transformMethodInput = <I extends {}>(input: I) =>
               auth: { ...value, discriminator: 'usePersona' },
               discriminator: 'authorizedRequest',
             }
+
           case requestMethodRequestType.loginWithChallenge:
             return {
               ...acc,
               auth: value,
               discriminator: 'authorizedRequest',
             }
+
+          case requestMethodRequestType.reset: {
+            const { accounts = false, personaData = false } = value
+            return {
+              ...acc,
+              reset: { accounts, personaData },
+            }
+          }
 
           case 'send':
             return {
