@@ -221,11 +221,27 @@ export const Blob = <T extends string>(blob: T): `Blob("${T}")` => {
   return `Blob("${blob}")`
 }
 
-export const NonFungibleGlobalId = (
-  resourceAddress: ResourceAddressString,
-  nonFungibleId: string
-): `NonFungibleGlobalId(${string}, ${string})` => {
-  return `NonFungibleGlobalId("${resourceAddress}", ${nonFungibleId})`
+export type NonFungibleIdType =
+  | `"${string}"`
+  | `#${number}#`
+  | `[${string}]`
+  | `{${string}}`
+
+export const NonFungibleType = {
+  String: <T extends string>(id: T): `"${T}"` => `"${id}"`,
+  Integer: <T extends number | string>(id: T): `#${T}#` => `#${id}#`,
+  Byte: <T extends string>(id: T): `[${T}]` => `[${id}]`,
+  Uuid: <T extends string>(id: T): `{${T}}` => `{${id}}`,
+}
+
+export const NonFungibleGlobalId = <
+  R extends ResourceAddressString,
+  T extends NonFungibleIdType
+>(
+  resourceAddress: R,
+  nonFungibleId: T
+): `NonFungibleGlobalId("${R}:${T}")` => {
+  return `NonFungibleGlobalId("${resourceAddress}:${nonFungibleId}")`
 }
 
 export const Hash = (hash: string): `Hash("${string}")` => {
@@ -256,10 +272,6 @@ export const EddsaEd25519Signature = (
   return `EddsaEd25519Signature("${sig}")`
 }
 
-export const Integer = (num: number): `"#${string}#"` => {
-  return `"#${num}#"`
-}
-
 export const Decimal = (num: number): `Decimal("${string}")` => {
   return `Decimal("${num}")`
 }
@@ -268,8 +280,10 @@ export const PreciseDecimal = (num: number): `PreciseDecimal("${string}")` => {
   return `PreciseDecimal("${num}")`
 }
 
-export const NonFungibleLocalId = (id: string): `NonFungibleLocalId(${string})` => {
-  return `NonFungibleLocalId(${id})`
+export const NonFungibleLocalId = (
+  id: string
+): `NonFungibleLocalId("${string}")` => {
+  return `NonFungibleLocalId("${id}")`
 }
 
 const validateArrayElements = (type: TypeId, args: string[]) => {
