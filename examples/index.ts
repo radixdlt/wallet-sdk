@@ -102,7 +102,7 @@ document.getElementById('persona-accounts-btn')!.onclick = async () => {
 
   const result = await sdk.request(
     requestBuilder(
-      requestItem.oneTimePersonaData('firstName', 'email'),
+      requestItem.oneTimePersonaData('givenName'),
       requestItem.oneTimeAccounts.withoutProofOfOwnership(5)
     )
   )

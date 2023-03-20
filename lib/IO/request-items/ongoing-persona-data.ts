@@ -1,6 +1,7 @@
 import {
   OngoingPersonaDataRequestItem,
   OngoingPersonaDataRequestResponseItem,
+  PersonaData,
   PersonaDataField,
 } from '../schemas'
 
@@ -10,17 +11,20 @@ export type OngoingPersonaData = {
     response: OngoingPersonaDataRequestResponseItem
   }
   method: {
-    output: { ongoingPersonaData: PersonaDataField[] }
-    input: { fields: string[] }
+    output: { ongoingPersonaData: PersonaData[] }
+    input: { fields: PersonaDataField[] }
   }
 }
 
-type RequiredKeys = { usePersona: any } | { login: any }
+type RequiredKeys =
+  | { usePersona: any }
+  | { loginWithoutChallenge: any }
+  | { loginWithChallenge: any }
 
 type NotAllowedKeys = { ongoingPersonaData: any }
 
 export const ongoingPersonaData =
-  (...fields: string[]) =>
+  (...fields: PersonaDataField[]) =>
   <I extends RequiredKeys>(input: I extends NotAllowedKeys ? never : I) => ({
     ...input,
     ongoingPersonaData: { fields },

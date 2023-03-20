@@ -214,11 +214,11 @@ describe('transformMethodInput', () => {
     it('should return correct transformed value', () => {
       ;[
         {
-          actual: requestItem.oneTimePersonaData('email'),
+          actual: requestItem.oneTimePersonaData('emailAddress'),
           expected: {
             discriminator: 'unauthorizedRequest',
             [RequestTypeSchema.oneTimePersonaData.value]: {
-              fields: ['email'],
+              fields: ['emailAddress'],
             },
           },
         },
@@ -233,11 +233,11 @@ describe('transformMethodInput', () => {
     it('should return correct transformed value', () => {
       ;[
         {
-          actual: requestItem.ongoingPersonaData('email'),
+          actual: requestItem.ongoingPersonaData('emailAddress'),
           expected: {
             discriminator: 'unauthorizedRequest',
             [RequestTypeSchema.ongoingPersonaData.value]: {
-              fields: ['email'],
+              fields: ['emailAddress'],
             },
           },
         },
