@@ -80,8 +80,8 @@ type WalletSdkInput = {
 | [oneTimeAccountsWithProofOfOwnership](#onetimeaccountswithproofofownership)       |              ❌              |
 | [ongoingAccountsWithoutProofOfOwnership](#ongoingaccountswithoutproofofownership) |              ✅              |
 | [ongoingAccountsWithProofOfOwnership](#ongoingaccountswithproofofownership)       |              ❌              |
-| [oneTimePersonaData](#onetimepersonadata)                                         |              ❌              |
-| [ongoingPersonaData](#ongoingpersonadata)                                         |              ❌              |
+| [oneTimePersonaData](#onetimepersonadata)                                         |              ✅              |
+| [ongoingPersonaData](#ongoingpersonadata)                                         |              ✅              |
 | [loginWithChallenge](#loginwithchallenge)                                         |              ❌              |
 | [loginWithoutChallenge](#loginwithoutchallenge)                                   |              ✅              |
 | [usePersona](#usepersona)                                                         |              ✅              |
@@ -254,9 +254,14 @@ const value = result.value
 
 ### Get list of Persona data
 
-This request type is for a list of personal data fields such as `firstName`, `email`, `shippingAddress`, etc. associated with the user's selected Persona.
+This request type is for a list of personal data fields associated with the user's selected Persona.
 
-**NOTE:** A complete list of supported data fields will be provided later when this request type becomes supported.
+| Available persona data fields |
+| :---------------------------- |
+| `"givenName"`                 |
+| `"familyName"`                |
+| `"emailAddress"`              |
+| `"phoneNumber"`               |
 
 **Types**
 
@@ -271,7 +276,7 @@ type PersonaDataField = {
 
 ```typescript
 const result = await walletSdk.request(
-  requestBuilder(requestItem.oneTimePersonaData(['firstName', 'email']))
+  requestBuilder(requestItem.oneTimePersonaData(['givenName', 'emailAddress']))
 )
 
 if (result.isErr()) {
@@ -290,7 +295,7 @@ const value = result.value
 const result = await walletSdk.request(
   requestBuilder(
     requestItem.usePersona(identityAddress),
-    requestItem.ongoingPersonaData(['firstName', 'email'])
+    requestItem.ongoingPersonaData(['givenName', 'emailAddress'])
   )
 )
 
