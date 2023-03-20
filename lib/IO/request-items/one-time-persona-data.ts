@@ -1,6 +1,7 @@
 import {
   OneTimePersonaDataRequestItem,
   OneTimePersonaDataRequestResponseItem,
+  PersonaDataField,
 } from '../schemas'
 
 export type OneTimePersonaData = {
@@ -12,14 +13,14 @@ export type OneTimePersonaData = {
     output: {
       oneTimePersonaData: OneTimePersonaDataRequestResponseItem['fields']
     }
-    input: { fields: string[] }
+    input: { fields: PersonaDataField[] }
   }
 }
 
 type NotAllowedKeys = { oneTimePersonaData: any }
 
 export const oneTimePersonaData =
-  (...fields: string[]) =>
+  (...fields: PersonaDataField[]) =>
   <I>(input: I extends NotAllowedKeys ? never : I) => ({
     ...input,
     oneTimePersonaData: { fields },

@@ -27,6 +27,22 @@ export const ErrorTypeSchema = union([
   literal('unknownDappDefinitionAddress'),
 ])
 
+export const personaDataField = {
+  givenName: 'givenName',
+  familyName: 'familyName',
+  emailAddress: 'emailAddress',
+  phoneNumber: 'phoneNumber',
+} as const
+
+export const PersonaDataFieldSchema = union([
+  literal(personaDataField.emailAddress),
+  literal(personaDataField.familyName),
+  literal(personaDataField.givenName),
+  literal(personaDataField.phoneNumber),
+])
+
+export type PersonaDataField = z.infer<typeof PersonaDataFieldSchema>
+
 const AccountSchema = object({
   address: string(),
   label: string(),
@@ -52,12 +68,12 @@ const PersonaSchema = object({
 
 export type Persona = z.infer<typeof PersonaSchema>
 
-const PersonaDataFieldSchema = object({
-  field: string(),
+const PersonaDataSchema = object({
+  field: PersonaDataFieldSchema,
   value: string(),
 })
 
-export type PersonaDataField = z.infer<typeof PersonaDataFieldSchema>
+export type PersonaData = z.infer<typeof PersonaDataSchema>
 
 const NumberOfAccountsQuantifierSchema = union([
   literal('exactly'),
@@ -159,7 +175,7 @@ export type OneTimePersonaDataRequestItem = z.infer<
 >
 
 const OneTimePersonaDataRequestResponseItemSchema = object({
-  fields: PersonaDataFieldSchema.array(),
+  fields: PersonaDataSchema.array(),
 })
 
 export type OneTimePersonaDataRequestResponseItem = z.infer<
@@ -167,7 +183,7 @@ export type OneTimePersonaDataRequestResponseItem = z.infer<
 >
 
 const OngoingPersonaDataRequestItemSchema = object({
-  fields: string().array(),
+  fields: PersonaDataFieldSchema.array(),
 })
 
 export type OngoingPersonaDataRequestItem = z.infer<
@@ -175,7 +191,7 @@ export type OngoingPersonaDataRequestItem = z.infer<
 >
 
 const OngoingPersonaDataRequestResponseItemSchema = object({
-  fields: PersonaDataFieldSchema.array(),
+  fields: PersonaDataSchema.array(),
 })
 
 export type OngoingPersonaDataRequestResponseItem = z.infer<
