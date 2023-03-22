@@ -69,6 +69,22 @@ export const transformMethodInput = <I extends {}>(input: I) =>
               },
             }
 
+          case requestMethodRequestType.oneTimePersonaData:
+            return {
+              ...acc,
+              oneTimePersonaData: {
+                fields: value.fields,
+              },
+            }
+
+          case requestMethodRequestType.ongoingPersonaData:
+            return {
+              ...acc,
+              ongoingPersonaData: {
+                fields: value.fields,
+              },
+            }
+
           case requestMethodRequestType.loginWithoutChallenge:
             return {
               ...acc,

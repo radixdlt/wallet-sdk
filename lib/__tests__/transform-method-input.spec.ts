@@ -289,4 +289,43 @@ describe('transformMethodInput', () => {
       })
     })
   })
+
+  describe('personaData', () => {
+    it('should return correct transformed value', () => {
+      ;[
+        {
+          actual: {
+            reset: {
+              accounts: true,
+              personaData: false,
+            },
+            oneTimePersonaData: {
+              fields: [
+                'givenName',
+                'emailAddress',
+                'familyName',
+                'phoneNumber',
+              ],
+              oneTime: true,
+            },
+          },
+          expected: {
+            discriminator: 'unauthorizedRequest',
+            oneTimePersonaData: {
+              fields: [
+                'givenName',
+                'emailAddress',
+                'familyName',
+                'phoneNumber',
+              ],
+            },
+          },
+        },
+      ].forEach((testItem) => {
+        expect(transformMethodInput(testItem.actual)).toEqual(
+          ok(testItem.expected)
+        )
+      })
+    })
+  })
 })
