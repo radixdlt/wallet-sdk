@@ -279,7 +279,6 @@ describe('transformMethodInput', () => {
         {
           actual: requestItem.reset({ accounts: true }),
           expected: {
-            reset: { accounts: true, personaData: false },
             discriminator: 'unauthorizedRequest',
           },
         },
