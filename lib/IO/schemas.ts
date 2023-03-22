@@ -299,7 +299,6 @@ const WalletUnauthorizedRequestItemsSchema = object({
   discriminator: literal('unauthorizedRequest'),
   oneTimeAccounts: OneTimeAccountsRequestItemSchema.optional(),
   oneTimePersonaData: OneTimePersonaDataRequestItemSchema.optional(),
-  reset: ResetRequestSchema.optional(),
 })
 
 export type WalletUnauthorizedRequestItems = z.infer<
