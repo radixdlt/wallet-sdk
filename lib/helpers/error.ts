@@ -23,6 +23,7 @@ export const errorType = {
   unknownWebsite: 'unknownWebsite',
   radixJsonNotFound: 'radixJsonNotFound',
   unknownDappDefinitionAddress: 'unknownDappDefinitionAddress',
+  invalidPersona: 'invalidPersona',
 } as const
 
 type ErrorType = keyof typeof errorType

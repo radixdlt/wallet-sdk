@@ -25,6 +25,7 @@ export const ErrorTypeSchema = union([
   literal('unknownWebsite'),
   literal('radixJsonNotFound'),
   literal('unknownDappDefinitionAddress'),
+  literal('invalidPersona'),
 ])
 
 export const personaDataField = {
