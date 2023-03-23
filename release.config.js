@@ -4,8 +4,8 @@ module.exports = {
     'next',
     {
       name: 'develop',
-      channel: 'beta',
-      prerelease: 'beta',
+      channel: 'alpha',
+      prerelease: 'alpha',
     },
   ],
   plugins: [
