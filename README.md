@@ -412,7 +412,7 @@ This constructs the lines of a transaction manifest stub.
 import {
   ManifestBuilder,
   Decimal,
-  ResourceAddress,
+  Address,
   Bucket,
   Expression,
 } from '@radixdlt/wallet-sdk'
@@ -423,7 +423,7 @@ const manifest = new ManifestBuilder()
     'withdraw_by_amount',
     [
       Decimal('1'),
-      ResourceAddress(
+      Address(
         'resource_tdx_a_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqegh4k9'
       ),
     ]

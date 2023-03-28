@@ -5,25 +5,18 @@ import { ManifestBuilder } from '../manifest-builder'
 import {
   Bool,
   Bucket,
-  ComponentAddress,
+  Address,
   Decimal,
   Enum,
-  Hash,
   I128,
   I16,
   I32,
   I64,
   I8,
   NonFungibleGlobalId,
-  PackageAddress,
   PreciseDecimal,
-  ResourceAddress,
-  EcdsaSecp256k1PublicKey,
-  EcdsaSecp256k1Signature,
-  EddsaEd25519PublicKey,
-  EddsaEd25519Signature,
   String,
-  ScryptoValueError,
+  ManifestValueError,
   Tuple,
   TypeId,
   Proof,
@@ -35,10 +28,9 @@ import {
   Unit,
   Array,
   Expression,
-  SystemAddress,
   NonFungibleType,
   NonFungibleLocalId,
-} from '../scrypto-value'
+} from '../manifest-value'
 
 describe('scrypto value', () => {
   it.each([
@@ -77,11 +69,10 @@ describe('scrypto value', () => {
       Array(TypeId.Decimal, Decimal(42.42), Decimal(42.42)),
       'Array<Decimal>(Decimal("42.42"),Decimal("42.42"))',
     ],
-    [PackageAddress('package_foo'), 'PackageAddress("package_foo")'],
-    [ComponentAddress('component_foo'), 'ComponentAddress("component_foo")'],
-    [ComponentAddress('account_foo'), 'ComponentAddress("account_foo")'],
-    [ResourceAddress('resource_foo'), 'ResourceAddress("resource_foo")'],
-    [SystemAddress('system_foo'), 'SystemAddress("system_foo")'],
+    [Address('package_foo'), 'Address("package_foo")'],
+    [Address('component_foo'), 'Address("component_foo")'],
+    [Address('account_foo'), 'Address("account_foo")'],
+    [Address('resource_foo'), 'Address("resource_foo")'],
     [
       NonFungibleGlobalId('resource_foo', NonFungibleType.Integer(123)),
       'NonFungibleGlobalId("resource_foo:#123#")',
@@ -90,11 +81,6 @@ describe('scrypto value', () => {
     [Bucket(35), 'Bucket(35u32)'],
     [Proof('foo'), 'Proof("foo")'],
     [Proof(35), 'Proof(35u32)'],
-    [Hash('hashfoo'), 'Hash("hashfoo")'],
-    [EcdsaSecp256k1PublicKey('a'), 'EcdsaSecp256k1PublicKey("a")'],
-    [EcdsaSecp256k1Signature('a'), 'EcdsaSecp256k1Signature("a")'],
-    [EddsaEd25519PublicKey('a'), 'EddsaEd25519PublicKey("a")'],
-    [EddsaEd25519Signature('a'), 'EddsaEd25519Signature("a")'],
     [Decimal(1.234), 'Decimal("1.234")'],
     [PreciseDecimal(1.234), 'PreciseDecimal("1.234")'],
     [NonFungibleLocalId('id'), 'NonFungibleLocalId("id")'],
@@ -140,8 +126,8 @@ describe('scrypto value', () => {
       () => Array(TypeId.U8, U8(25), U32(25)),
       'Array<u8> expects the same type',
     ],
-  ])('should fail with ScryptoValueError', (test, expected) => {
-    expect(test).toThrowError(new ScryptoValueError(expected))
+  ])('should fail with ManifestValueError', (test, expected) => {
+    expect(test).toThrowError(new ManifestValueError(expected))
   })
 })
 
@@ -212,7 +198,7 @@ describe('manifest builder', () => {
           'withdraw_by_amount',
           [
             Decimal(5.0),
-            ResourceAddress(
+            Address(
               'resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag'
             ),
           ]
@@ -267,32 +253,32 @@ describe('manifest builder', () => {
         .build()
         .toString()
     )
-      .toBe(`TAKE_FROM_WORKTOP ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Bucket("bucket1");
-TAKE_FROM_WORKTOP_BY_AMOUNT Decimal("5") ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Bucket("bucket2");
-TAKE_FROM_WORKTOP_BY_IDS Array<NonFungibleLocalId>(NonFungibleLocalId("#123#")) ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Bucket("bucket3");
+      .toBe(`TAKE_FROM_WORKTOP Address("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Bucket("bucket1");
+TAKE_FROM_WORKTOP_BY_AMOUNT Decimal("5") Address("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Bucket("bucket2");
+TAKE_FROM_WORKTOP_BY_IDS Array<NonFungibleLocalId>(NonFungibleLocalId("#123#")) Address("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Bucket("bucket3");
 RETURN_TO_WORKTOP Bucket("bucket3");
-ASSERT_WORKTOP_CONTAINS ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
-ASSERT_WORKTOP_CONTAINS_BY_AMOUNT Decimal("5") ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
-ASSERT_WORKTOP_CONTAINS_BY_IDS Array<NonFungibleLocalId>(NonFungibleLocalId("[deadbeef]")) ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
+ASSERT_WORKTOP_CONTAINS Address("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
+ASSERT_WORKTOP_CONTAINS_BY_AMOUNT Decimal("5") Address("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
+ASSERT_WORKTOP_CONTAINS_BY_IDS Array<NonFungibleLocalId>(NonFungibleLocalId("[deadbeef]")) Address("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
 POP_FROM_AUTH_ZONE Proof("proof1");
 PUSH_TO_AUTH_ZONE Proof("proof1");
 CLEAR_AUTH_ZONE;
-CREATE_PROOF_FROM_AUTH_ZONE ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Proof("proof2");
-CREATE_PROOF_FROM_AUTH_ZONE_BY_AMOUNT Decimal("5") ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Proof("proof3");
-CREATE_PROOF_FROM_AUTH_ZONE_BY_IDS Array<NonFungibleLocalId>(NonFungibleLocalId("hello")) ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Proof("proof4");
+CREATE_PROOF_FROM_AUTH_ZONE Address("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Proof("proof2");
+CREATE_PROOF_FROM_AUTH_ZONE_BY_AMOUNT Decimal("5") Address("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Proof("proof3");
+CREATE_PROOF_FROM_AUTH_ZONE_BY_IDS Array<NonFungibleLocalId>(NonFungibleLocalId("hello")) Address("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Proof("proof4");
 CREATE_PROOF_FROM_BUCKET Bucket("bucket2") Proof("proof5");
 CLONE_PROOF Proof("proof5") Proof("proof6");
 DROP_PROOF Proof("proof6");
-CALL_FUNCTION PackageAddress("package_sim1qyqzcexvnyg60z7lnlwauh66nhzg3m8tch2j8wc0e70qkydk8r") "GumballMachine" "new" ;
-CALL_METHOD ComponentAddress("account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064") "withdraw_by_amount" Decimal("5") ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
+CALL_FUNCTION Address("package_sim1qyqzcexvnyg60z7lnlwauh66nhzg3m8tch2j8wc0e70qkydk8r") "GumballMachine" "new" ;
+CALL_METHOD Address("account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064") "withdraw_by_amount" Decimal("5") Address("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
 CALL_NATIVE_FUNCTION "ResourceManger" "create" Enum("Fungible",0u8) Array<Tuple>() Array<Tuple>() Enum("Some",Enum("Fungible",Decimal("1")));
 CALL_NATIVE_METHOD Global("component_sim1q2f9vmyrmeladvz0ejfttcztqv3genlsgpu9vue83mcs835hum") "claim_royalty" ;
 PUBLISH_PACKAGE_WITH_OWNER Blob("985792bf3aa28de2793e33983607f4c39bed3e96626cb05a99fdc75caf2d111e") Blob("985792bf3aa28de2793e33983607f4c39bed3e96626cb05a99fdc75caf2d111e") NonFungibleGlobalId("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag:#1#");
 CREATE_RESOURCE Enum("Fungible",0u8) Array<Tuple>() Array<Tuple>() Enum("Some",Enum("Fungible",Decimal("1")));
 BURN_BUCKET Bucket("bucket1");
-MINT_FUNGIBLE ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Decimal("5");
-CALL_METHOD ComponentAddress("account_sim1qwcwzxdr4s33ahvvjyvmeqeje5cepqu0ngset7xlukuq33gx97") "withdraw" ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
-CALL_METHOD ComponentAddress("account_sim1qwcwzxdr4s33ahvvjyvmeqeje5cepqu0ngset7xlukuq33gx97") "withdraw_by_amount" Decimal("5") ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
-CALL_METHOD ComponentAddress("account_sim1qwcwzxdr4s33ahvvjyvmeqeje5cepqu0ngset7xlukuq33gx97") "withdraw_by_ids" Array<NonFungibleLocalId>(NonFungibleLocalId("#123#")) ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");`)
+MINT_FUNGIBLE Address("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Decimal("5");
+CALL_METHOD Address("account_sim1qwcwzxdr4s33ahvvjyvmeqeje5cepqu0ngset7xlukuq33gx97") "withdraw" Address("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
+CALL_METHOD Address("account_sim1qwcwzxdr4s33ahvvjyvmeqeje5cepqu0ngset7xlukuq33gx97") "withdraw_by_amount" Decimal("5") Address("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
+CALL_METHOD Address("account_sim1qwcwzxdr4s33ahvvjyvmeqeje5cepqu0ngset7xlukuq33gx97") "withdraw_by_ids" Array<NonFungibleLocalId>(NonFungibleLocalId("#123#")) Address("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");`)
   })
 })
