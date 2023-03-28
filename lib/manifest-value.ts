@@ -191,19 +191,6 @@ export const Blob = <T extends string>(blob: T): `Blob("${T}")` => {
   return `Blob("${blob}")`
 }
 
-export type NonFungibleIdType =
-  | `"${string}"`
-  | `#${number}#`
-  | `[${string}]`
-  | `{${string}}`
-
-export const NonFungibleType = {
-  String: <T extends string>(id: T): `"${T}"` => `"${id}"`,
-  Integer: <T extends number | string>(id: T): `#${T}#` => `#${id}#`,
-  Byte: <T extends string>(id: T): `[${T}]` => `[${id}]`,
-  Uuid: <T extends string>(id: T): `{${T}}` => `{${id}}`,
-}
-
 export const Decimal = (num: number): `Decimal("${string}")` => {
   return `Decimal("${num}")`
 }
@@ -212,20 +199,27 @@ export const PreciseDecimal = (num: number): `PreciseDecimal("${string}")` => {
   return `PreciseDecimal("${num}")`
 }
 
-export const NonFungibleLocalId = (
-  id: string
-): `NonFungibleLocalId("${string}")` => {
-  return `NonFungibleLocalId("${id}")`
+export type NonFungibleLocalIdString =
+  | `<${string}>`
+  | `#${number}#`
+  | `[${string}]`
+  | `{${string}}`
+
+export const NonFungibleLocalId = {
+  String: <T extends string>(id: T): `NonFungibleLocalId("<${T}>")` =>
+    `NonFungibleLocalId("<${id}>")`,
+  Integer: <T extends number | string>(id: T): `NonFungibleLocalId("#${T}#")` =>
+    `NonFungibleLocalId("#${id}#")`,
+  Byte: <T extends string>(id: T): `NonFungibleLocalId("[${T}]")` =>
+    `NonFungibleLocalId("[${id}]")`,
+  Uuid: <T extends string>(id: T): `NonFungibleLocalId("{${T}}")` =>
+    `NonFungibleLocalId("{${id}}")`,
 }
 
-export const NonFungibleGlobalId = <
-  R extends AddressString,
-  T extends NonFungibleIdType
->(
-  resourceAddress: R,
-  nonFungibleId: T
-): `NonFungibleGlobalId("${R}:${T}")` => {
-  return `NonFungibleGlobalId("${resourceAddress}:${nonFungibleId}")`
+export const NonFungibleGlobalId = (
+  id: String
+): `NonFungibleGlobalId("${string}")` => {
+  return `NonFungibleGlobalId("${id}")`
 }
 
 export const Bytes = (hex: String): `Bytes("${string}")` => {
