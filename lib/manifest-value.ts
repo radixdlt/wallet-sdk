@@ -135,10 +135,16 @@ export const String = <T extends string>(str: T): `"${T}"` => {
   return `"${str}"`
 }
 
-export const Enum = (field: string, ...args: string[]): string => {
-  return args.length > 0
-    ? `Enum("${field}",${args.join(',')})`
-    : `Enum("${field}")`
+export const Enum = (field: string | number, ...args: string[]): string => {
+  if (typeof field === 'number') {
+    return args.length > 0
+      ? `Enum(${field}u8,${args.join(',')})`
+      : `Enum(${field}u8)`
+  } else {
+    return args.length > 0
+      ? `Enum("${field}",${args.join(',')})`
+      : `Enum("${field}")`
+  }
 }
 
 export const Tuple = <T extends string[]>(...args: T): `Tuple(${string})` => {

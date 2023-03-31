@@ -81,7 +81,7 @@ export class ManifestBuilder {
    * @returns
    */
   takeFromWorktopByIds(
-    nonFungibleLocalIds: [NonFungibleLocalIdString],
+    nonFungibleLocalIds: NonFungibleLocalIdString[],
     resourceAddress: AddressString,
     bucketName: string
   ): ManifestBuilder {
@@ -150,7 +150,7 @@ export class ManifestBuilder {
    * @returns
    */
   assertWorktopContainsByIds(
-    nonFungibleLocalIds: [NonFungibleLocalIdString],
+    nonFungibleLocalIds: NonFungibleLocalIdString[],
     resourceAddress: AddressString
   ): ManifestBuilder {
     var temp = nonFungibleLocalIds
@@ -250,7 +250,7 @@ export class ManifestBuilder {
    * @returns
    */
   createProofFromAuthZoneByIds(
-    nonFungibleLocalIds: [NonFungibleLocalIdString],
+    nonFungibleLocalIds: NonFungibleLocalIdString[],
     resourceAddress: AddressString,
     proofName: string
   ): ManifestBuilder {
@@ -404,7 +404,7 @@ export class ManifestBuilder {
   withdrawNonFungiblesFromAccount(
     accountAddress: AddressString,
     resourceAddress: AddressString,
-    nonFungibleLocalIds: [NonFungibleLocalIdString]
+    nonFungibleLocalIds: NonFungibleLocalIdString[]
   ): ManifestBuilder {
     var temp = nonFungibleLocalIds
       .map(function (id) {
@@ -474,7 +474,7 @@ export class ManifestBuilder {
   createProofFromAccountByIds(
     accountAddress: AddressString,
     resourceAddress: AddressString,
-    nonFungibleLocalIds: [NonFungibleLocalIdString]
+    nonFungibleLocalIds: NonFungibleLocalIdString[]
   ): ManifestBuilder {
     var temp = nonFungibleLocalIds
       .map(function (id) {
@@ -486,6 +486,18 @@ export class ManifestBuilder {
         resourceAddress
       )} Array<NonFungibleLocalId>(${temp});`
     )
+    return this
+  }
+
+  /**
+   * Add any instruction.
+   *
+   * @param name The instruction name
+   * @param args The instruction arguments
+   * @returns
+   */
+  instruction(name: string, args: string[]): ManifestBuilder {
+    this.instructions.push(`${name} ${args.join(' ')};`)
     return this
   }
 

@@ -210,6 +210,13 @@ describe('manifest builder', () => {
           'resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k',
           ['#123#']
         )
+        .instruction('SET_METADATA', [
+          Address(
+            'component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x'
+          ),
+          'key',
+          Enum(0, Enum(0, 'value')),
+        ])
         .build()
         .toString()
     )
@@ -233,7 +240,8 @@ CALL_FUNCTION Address("package_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq5
 CALL_METHOD Address("component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x") "withdraw" Address("resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k") Decimal("5");
 MINT_FUNGIBLE Address("resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k") Decimal("5");
 CALL_METHOD Address("component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x") "withdraw" Address("resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k") Decimal("5");
-CALL_METHOD Address("component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x") "withdraw_non_fungibles" Address("resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k") Array<NonFungibleLocalId>(NonFungibleLocalId("#123#"));`)
+CALL_METHOD Address("component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x") "withdraw_non_fungibles" Address("resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k") Array<NonFungibleLocalId>(NonFungibleLocalId("#123#"));
+SET_METADATA Address("component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x") "key" Enum(0u8, Enum(0u8, "value"));`)
   })
 
   // Compile the above output with `rtmc` to ensure the SDK is up to date
