@@ -138,11 +138,11 @@ export const String = <T extends string>(str: T): `"${T}"` => {
 export const Enum = (field: string | number, ...args: string[]): string => {
   if (typeof field === 'number') {
     return args.length > 0
-      ? `Enum(${field}u8,${args.join(',')})`
+      ? `Enum(${field}u8, ${args.join(', ')})`
       : `Enum(${field}u8)`
   } else {
     return args.length > 0
-      ? `Enum("${field}",${args.join(',')})`
+      ? `Enum("${field}", ${args.join(', ')})`
       : `Enum("${field}")`
   }
 }

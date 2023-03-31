@@ -52,11 +52,11 @@ describe('scrypto value', () => {
     [Enum('Foo'), 'Enum("Foo")'],
     [
       Enum('Foo', String('some string'), Bool(false)),
-      'Enum("Foo","some string",false)',
+      'Enum("Foo", "some string", false)',
     ],
-    [Enum('Some', String('foobar')), 'Enum("Some","foobar")'],
-    [Enum('Some', U128('128')), 'Enum("Some",128u128)'],
-    [Enum('Some', Decimal(219.01234)), 'Enum("Some",Decimal("219.01234"))'],
+    [Enum('Some', String('foobar')), 'Enum("Some", "foobar")'],
+    [Enum('Some', U128('128')), 'Enum("Some", 128u128)'],
+    [Enum('Some', Decimal(219.01234)), 'Enum("Some", Decimal("219.01234"))'],
     [Enum('None'), 'Enum("None")'],
     [Tuple(Decimal(42.42), String('foo')), 'Tuple(Decimal("42.42"),"foo")'],
     [Tuple(Decimal(42.42), String('foo')), 'Tuple(Decimal("42.42"),"foo")'],
@@ -214,8 +214,8 @@ describe('manifest builder', () => {
           Address(
             'component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x'
           ),
-          'key',
-          Enum(0, Enum(0, 'value')),
+          String('key'),
+          Enum(0, Enum(0, String('value'))),
         ])
         .build()
         .toString()
