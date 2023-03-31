@@ -1,6 +1,11 @@
 import { ok } from 'neverthrow'
 import { requestMethodRequestType } from '../methods/request'
-import { NumberOfAccounts, WalletInteractionItems } from './schemas'
+import {
+  NumberOfAccounts,
+  ResetRequestItem,
+  WalletInteractionItems,
+  WalletUnauthorizedRequestItems,
+} from './schemas'
 
 export const provideDefaultNumberOfAccounts = (
   value: Partial<NumberOfAccounts>
@@ -8,6 +13,20 @@ export const provideDefaultNumberOfAccounts = (
   quantity: value?.quantity || 1,
   quantifier: value?.quantifier || 'atLeast',
 })
+
+const removeResetForUnauthorizedRequest = (value: WalletInteractionItems) => {
+  if (
+    value.discriminator === 'transaction' ||
+    value.discriminator === 'authorizedRequest'
+  )
+    return value
+
+  const { reset, ...rest } = value as WalletUnauthorizedRequestItems & {
+    reset: ResetRequestItem
+  }
+
+  return rest
+}
 
 export const transformMethodInput = <I extends {}>(input: I) =>
   ok(
@@ -50,6 +69,22 @@ export const transformMethodInput = <I extends {}>(input: I) =>
               },
             }
 
+          case requestMethodRequestType.oneTimePersonaData:
+            return {
+              ...acc,
+              oneTimePersonaData: {
+                fields: value.fields,
+              },
+            }
+
+          case requestMethodRequestType.ongoingPersonaData:
+            return {
+              ...acc,
+              ongoingPersonaData: {
+                fields: value.fields,
+              },
+            }
+
           case requestMethodRequestType.loginWithoutChallenge:
             return {
               ...acc,
@@ -63,12 +98,22 @@ export const transformMethodInput = <I extends {}>(input: I) =>
               auth: { ...value, discriminator: 'usePersona' },
               discriminator: 'authorizedRequest',
             }
+
           case requestMethodRequestType.loginWithChallenge:
             return {
               ...acc,
               auth: value,
               discriminator: 'authorizedRequest',
             }
+
+          case requestMethodRequestType.reset: {
+            const { accounts = false, personaData = false } = value
+            if (!accounts && !personaData) return acc
+            return {
+              ...acc,
+              reset: { accounts, personaData },
+            }
+          }
 
           case 'send':
             return {
@@ -87,4 +132,4 @@ export const transformMethodInput = <I extends {}>(input: I) =>
         discriminator: 'unauthorizedRequest',
       }
     )
-  )
+  ).map(removeResetForUnauthorizedRequest)

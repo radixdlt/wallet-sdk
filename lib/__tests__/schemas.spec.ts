@@ -124,7 +124,7 @@ describe('schemas', () => {
           oneTimePersonaData: {
             fields: [
               {
-                field: 'test',
+                field: 'emailAddress',
                 value: 'test',
               },
             ],
@@ -150,7 +150,7 @@ describe('schemas', () => {
           ongoingPersonaData: {
             fields: [
               {
-                field: 'test',
+                field: 'emailAddress',
                 value: 'test',
               },
             ],

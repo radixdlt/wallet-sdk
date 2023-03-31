@@ -1,6 +1,7 @@
 import { WalletSdk, requestBuilder, requestItem } from '../lib/wallet-sdk'
 import { Result } from 'neverthrow'
 import { login } from '../lib/IO/request-items/login'
+import { reset } from '../lib/IO/request-items/reset'
 
 const sdk = WalletSdk({
   dAppDefinitionAddress:
@@ -8,42 +9,26 @@ const sdk = WalletSdk({
   logLevel: 'DEBUG',
 })
 
-const transactionManifest = `# Withdraw XRD from account
-CALL_METHOD ComponentAddress("account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064") "withdraw_by_amount" Decimal("5.0") ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
+const transactionManifest = `
+# Withdraw XRD from account
+CALL_METHOD Address("account_sim1qjy5fakwygc45fkyhyxxulsf5zfae0ycez0x05et9hqs7d0gtn") "withdraw" Address("resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k") Decimal("5.0");
 
 # Buy GUM with XRD
-TAKE_FROM_WORKTOP_BY_AMOUNT Decimal("2.0") ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Bucket("xrd");
-CALL_METHOD ComponentAddress("component_sim1q2f9vmyrmeladvz0ejfttcztqv3genlsgpu9vue83mcs835hum") "buy_gumball" Bucket("xrd");
-ASSERT_WORKTOP_CONTAINS_BY_AMOUNT Decimal("3.0") ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
-ASSERT_WORKTOP_CONTAINS ResourceAddress("resource_sim1qzhdk7tq68u8msj38r6v6yqa5myc64ejx3ud20zlh9gseqtux6");
+TAKE_FROM_WORKTOP_BY_AMOUNT Decimal("2.0") Address("resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k") Bucket("xrd");
+CALL_METHOD Address("component_sim1qd8djmepmq7hxqaakt9rl3hkce532px42s8eh4qmqlks9f87dn") "buy_gumball" Bucket("xrd");
+ASSERT_WORKTOP_CONTAINS_BY_AMOUNT Decimal("3.0") Address("resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k");
+ASSERT_WORKTOP_CONTAINS Address("resource_sim1q2ym536cwvvf3cy9p777t4qjczqwf79hagp3wn93srvsgvqtwe");
 
 # Create a proof from bucket, clone it and drop both
-TAKE_FROM_WORKTOP ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Bucket("some_xrd");
-CREATE_PROOF_FROM_BUCKET Bucket("some_xrd") Proof("proof1");
-CLONE_PROOF Proof("proof1") Proof("proof2");
-DROP_PROOF Proof("proof1");
-DROP_PROOF Proof("proof2");
-
-# Create a proof from account and drop it
-CALL_METHOD ComponentAddress("account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064") "create_proof_by_amount" Decimal("5.0") ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag");
-POP_FROM_AUTH_ZONE Proof("proof3");
-DROP_PROOF Proof("proof3");
+TAKE_FROM_WORKTOP Address("resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k") Bucket("some_xrd");
 
 # Return a bucket to worktop
 RETURN_TO_WORKTOP Bucket("some_xrd");
-TAKE_FROM_WORKTOP_BY_IDS Set<NonFungibleId>(NonFungibleId("0905000000"), NonFungibleId("0907000000")) ResourceAddress("resource_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqu57yag") Bucket("nfts");
+TAKE_FROM_WORKTOP_BY_IDS Array<NonFungibleLocalId>(NonFungibleLocalId("#1#")) Address("resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k") Bucket("nfts");
 
-# Create a new fungible resource
-CREATE_RESOURCE Enum("Fungible", 0u8) Map<String, String>() Map<Enum, Tuple>() Some(Enum("Fungible", Decimal("1.0")));
-
-# Cancel all buckets and move resources to account
-CALL_METHOD ComponentAddress("account_sim1q02r73u7nv47h80e30pc3q6ylsj7mgvparm3pnsm780qgsy064") "deposit_batch" Expression("ENTIRE_WORKTOP");
-
-# Drop all proofs
-DROP_ALL_PROOFS;
-
-# Complicated method that takes all of the number types
-CALL_METHOD ComponentAddress("component_sim1q2f9vmyrmeladvz0ejfttcztqv3genlsgpu9vue83mcs835hum") "complicated_method" Decimal("1") PreciseDecimal("2");`
+# Move all resources in worktop to account
+CALL_METHOD Address("account_sim1qjy5fakwygc45fkyhyxxulsf5zfae0ycez0x05et9hqs7d0gtn") "deposit_batch" Expression("ENTIRE_WORKTOP");
+`
 
 const displayResults = (result: Result<any, any>) => {
   document.getElementById('results')!.innerHTML = `<pre>${JSON.stringify(
@@ -62,7 +47,10 @@ const accountAddressInputElement = document.getElementById(
 
 document.getElementById('login-btn')!.onclick = async () => {
   clearResults()
-  const result = await sdk.request({ loginWithoutChallenge: {} })
+  const result = await sdk.request({
+    loginWithoutChallenge: {},
+    reset: { accounts: true },
+  })
 
   displayResults(result)
 }
@@ -86,7 +74,9 @@ document.getElementById('account-address-btn')!.onclick = async () => {
 document.getElementById('persona-data-btn')!.onclick = async () => {
   clearResults()
 
-  const result = await sdk.request(requestBuilder(login.withoutChallenge()))
+  const result = await sdk.request(
+    requestBuilder(login.withoutChallenge(), reset({ personaData: true }))
+  )
 
   displayResults(result)
 }
@@ -96,7 +86,7 @@ document.getElementById('persona-accounts-btn')!.onclick = async () => {
 
   const result = await sdk.request(
     requestBuilder(
-      requestItem.oneTimePersonaData('firstName', 'email'),
+      requestItem.oneTimePersonaData('givenName'),
       requestItem.oneTimeAccounts.withoutProofOfOwnership(5)
     )
   )
@@ -114,15 +104,6 @@ document.getElementById('send-tx-btn')!.onclick = async () => {
 
   displayResults(result)
 }
-
-sdk
-  .request(
-    requestBuilder(
-      requestItem.login.withoutChallenge(),
-      requestItem.ongoingAccounts.withoutProofOfOwnership()
-    )
-  )
-  .map((result) => result.persona)
 
 window.radixWalletSdk = sdk
 

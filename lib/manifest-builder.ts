@@ -1,14 +1,11 @@
 import {
   Bucket,
-  ComponentAddress,
+  Address,
   Decimal,
-  PackageAddress,
   Proof,
-  ResourceAddress,
-  ResourceAddressString,
-  PackageAddressString,
-  ComponentAddressString,
-} from './scrypto-value'
+  AddressString,
+  NonFungibleLocalIdString,
+} from './manifest-value'
 
 export class Manifest {
   instructions: string[]
@@ -43,13 +40,11 @@ export class ManifestBuilder {
    * @returns
    */
   takeFromWorktop(
-    resourceAddress: ResourceAddressString,
+    resourceAddress: AddressString,
     bucketName: string
   ): ManifestBuilder {
     this.instructions.push(
-      `TAKE_FROM_WORKTOP ${ResourceAddress(resourceAddress)} ${Bucket(
-        bucketName
-      )};`
+      `TAKE_FROM_WORKTOP ${Address(resourceAddress)} ${Bucket(bucketName)};`
     )
     this.buckets.set(bucketName, this.id_allocator++)
     return this
@@ -59,18 +54,18 @@ export class ManifestBuilder {
    * Take some amount of resource from worktop.
    *
    * @param amount The amount
-   * @param resourceAddress The resource address
+   * @param resourceAddresses The resource address
    * @param bucketName The name of the new bucket
    * @returns
    */
   takeFromWorktopByAmount(
     amount: number,
-    resourceAddress: ResourceAddressString,
+    resourceAddresses: AddressString,
     bucketName: string
   ): ManifestBuilder {
     this.instructions.push(
-      `TAKE_FROM_WORKTOP_BY_AMOUNT ${Decimal(amount)} ${ResourceAddress(
-        resourceAddress
+      `TAKE_FROM_WORKTOP_BY_AMOUNT ${Decimal(amount)} ${Address(
+        resourceAddresses
       )} ${Bucket(bucketName)};`
     )
     this.buckets.set(bucketName, this.id_allocator++)
@@ -80,18 +75,23 @@ export class ManifestBuilder {
   /**
    * Take some non-fungibles from worktop.
    *
-   * @param nonFungibleIds The non-fungible IDs
+   * @param nonFungibleLocalIds The non-fungible IDs
    * @param resourceAddress The resource address
    * @param bucketName The name of the new bucket
    * @returns
    */
   takeFromWorktopByIds(
-    nonFungibleIds: string,
-    resourceAddress: ResourceAddressString,
+    nonFungibleLocalIds: NonFungibleLocalIdString[],
+    resourceAddress: AddressString,
     bucketName: string
   ): ManifestBuilder {
+    let temp = nonFungibleLocalIds
+      .map(function (id) {
+        return 'NonFungibleLocalId("' + id + '")'
+      })
+      .join(', ')
     this.instructions.push(
-      `TAKE_FROM_WORKTOP_BY_IDS ${nonFungibleIds} ${ResourceAddress(
+      `TAKE_FROM_WORKTOP_BY_IDS Array<NonFungibleLocalId>(${temp}) ${Address(
         resourceAddress
       )} ${Bucket(bucketName)};`
     )
@@ -116,11 +116,9 @@ export class ManifestBuilder {
    * @param resourceAddress The resource address
    * @returns
    */
-  assertWorktopContains(
-    resourceAddress: ResourceAddressString
-  ): ManifestBuilder {
+  assertWorktopContains(resourceAddress: AddressString): ManifestBuilder {
     this.instructions.push(
-      `ASSERT_WORKTOP_CONTAINS ${ResourceAddress(resourceAddress)};`
+      `ASSERT_WORKTOP_CONTAINS ${Address(resourceAddress)};`
     )
     return this
   }
@@ -134,10 +132,10 @@ export class ManifestBuilder {
    */
   assertWorktopContainsByAmount(
     amount: number,
-    resourceAddress: ResourceAddressString
+    resourceAddress: AddressString
   ): ManifestBuilder {
     this.instructions.push(
-      `ASSERT_WORKTOP_CONTAINS_BY_AMOUNT ${Decimal(amount)} ${ResourceAddress(
+      `ASSERT_WORKTOP_CONTAINS_BY_AMOUNT ${Decimal(amount)} ${Address(
         resourceAddress
       )};`
     )
@@ -147,16 +145,21 @@ export class ManifestBuilder {
   /**
    * Asserts worktop contains some non-fungibles.
    *
-   * @param nonFungibleIds The non-fungible IDs
+   * @param nonFungibleLocalIds The non-fungible IDs
    * @param resourceAddress The resource address
    * @returns
    */
   assertWorktopContainsByIds(
-    nonFungibleIds: string,
-    resourceAddress: ResourceAddressString
+    nonFungibleLocalIds: NonFungibleLocalIdString[],
+    resourceAddress: AddressString
   ): ManifestBuilder {
+    let temp = nonFungibleLocalIds
+      .map(function (id) {
+        return 'NonFungibleLocalId("' + id + '")'
+      })
+      .join(', ')
     this.instructions.push(
-      `ASSERT_WORKTOP_CONTAINS_BY_IDS ${nonFungibleIds} ${ResourceAddress(
+      `ASSERT_WORKTOP_CONTAINS_BY_IDS Array<NonFungibleLocalId>(${temp}) ${Address(
         resourceAddress
       )};`
     )
@@ -204,11 +207,11 @@ export class ManifestBuilder {
    * @returns
    */
   createProofFromAuthZone(
-    resourceAddress: ResourceAddressString,
+    resourceAddress: AddressString,
     proofName: string
   ): ManifestBuilder {
     this.instructions.push(
-      `CREATE_PROOF_FROM_AUTH_ZONE ${ResourceAddress(resourceAddress)} ${Proof(
+      `CREATE_PROOF_FROM_AUTH_ZONE ${Address(resourceAddress)} ${Proof(
         proofName
       )};`
     )
@@ -226,13 +229,13 @@ export class ManifestBuilder {
    */
   createProofFromAuthZoneByAmount(
     amount: number,
-    resourceAddress: ResourceAddressString,
+    resourceAddress: AddressString,
     proofName: string
   ): ManifestBuilder {
     this.instructions.push(
-      `CREATE_PROOF_FROM_AUTH_ZONE_BY_AMOUNT ${Decimal(
-        amount
-      )} ${ResourceAddress(resourceAddress)} ${Proof(proofName)};`
+      `CREATE_PROOF_FROM_AUTH_ZONE_BY_AMOUNT ${Decimal(amount)} ${Address(
+        resourceAddress
+      )} ${Proof(proofName)};`
     )
     this.proofs.set(proofName, this.id_allocator++)
     return this
@@ -241,18 +244,23 @@ export class ManifestBuilder {
   /**
    * Creates a composite proof from the auth zone for the give non-fungibles.
    *
-   * @param nonFungibleIds The non-fungible IDs
+   * @param nonFungibleLocalIds The non-fungible IDs
    * @param resourceAddress The resource address
    * @param proofName The name of the new proof
    * @returns
    */
   createProofFromAuthZoneByIds(
-    nonFungibleIds: string,
-    resourceAddress: ResourceAddressString,
+    nonFungibleLocalIds: NonFungibleLocalIdString[],
+    resourceAddress: AddressString,
     proofName: string
   ): ManifestBuilder {
+    let temp = nonFungibleLocalIds
+      .map(function (id) {
+        return 'NonFungibleLocalId("' + id + '")'
+      })
+      .join(', ')
     this.instructions.push(
-      `CREATE_PROOF_FROM_AUTH_ZONE_BY_IDS ${nonFungibleIds} ${ResourceAddress(
+      `CREATE_PROOF_FROM_AUTH_ZONE_BY_IDS Array<NonFungibleLocalId>(${temp}) ${Address(
         resourceAddress
       )} ${Proof(proofName)};`
     )
@@ -313,13 +321,13 @@ export class ManifestBuilder {
    * @param args The arguments, which must be in manifest format, e.g. `1u8`, `"string"`, `Bucket("name")`
    */
   callFunction(
-    packageAddress: PackageAddressString,
+    packageAddress: AddressString,
     blueprintName: string,
     functionName: string,
     args: string[]
   ): ManifestBuilder {
     this.instructions.push(
-      `CALL_FUNCTION ${PackageAddress(
+      `CALL_FUNCTION ${Address(
         packageAddress
       )} "${blueprintName}" "${functionName}" ${args.join(' ')};`
     )
@@ -335,114 +343,15 @@ export class ManifestBuilder {
    * @returns
    */
   callMethod(
-    componentAddress: ComponentAddressString,
+    componentAddress: AddressString,
     methodName: string,
     args: string[]
   ): ManifestBuilder {
     this.instructions.push(
-      `CALL_METHOD ${ComponentAddress(
-        componentAddress
-      )} "${methodName}" ${args.join(' ')};`
+      `CALL_METHOD ${Address(componentAddress)} "${methodName}" ${args.join(
+        ' '
+      )};`
     )
-    return this
-  }
-
-  /**
-   * Calls a native function
-   *
-   * @param blueprintName  The blueprint name
-   * @param functionName  The function name
-   * @param args The arguments, which must be in manifest format, e.g. `1u8`, `"string"`, `Bucket("name")`
-   */
-  callNativeFunction(
-    blueprintName: string,
-    functionName: string,
-    args: string[]
-  ): ManifestBuilder {
-    this.instructions.push(
-      'CALL_NATIVE_FUNCTION "' +
-        blueprintName +
-        '" "' +
-        functionName +
-        '" ' +
-        args.join(' ') +
-        ';'
-    )
-    return this
-  }
-
-  /**
-   * Calls a method on a component.
-   *
-   * @param componentAddress  The component address
-   * @param methodName The method name
-   * @param args The arguments, which must be in manifest format, e.g. `1u8`, `"string"`, `Bucket("name")`
-   * @returns
-   */
-  callNativeMethod(
-    receiver: string,
-    methodName: string,
-    args: string[]
-  ): ManifestBuilder {
-    this.instructions.push(
-      'CALL_NATIVE_METHOD ' +
-        receiver +
-        ' "' +
-        methodName +
-        '" ' +
-        args.join(' ') +
-        ';'
-    )
-    return this
-  }
-  /**
-   * Publishes a package.
-   * @param code_hash The package wasm code hash
-   * @param abi_hash The package ABI hash
-   * @param owner_badge The owner badge
-   */
-  publishPackageWithOwner(
-    code_hash: string,
-    abi_hash: string,
-    owner_badge: string
-  ): ManifestBuilder {
-    this.instructions.push(
-      'PUBLISH_PACKAGE_WITH_OWNER Blob("' +
-        code_hash +
-        '") Blob("' +
-        abi_hash +
-        '") ' +
-        owner_badge +
-        ';'
-    )
-    return this
-  }
-
-  /**
-   * Create resource
-   * @param bucketName The name of the bucket to burn
-   * @returns
-   */
-  createResource(
-    resource_type: string,
-    metadata: string,
-    access_rules: string,
-    mint_params: string
-  ): ManifestBuilder {
-    this.instructions.push(
-      `CREATE_RESOURCE ${resource_type} ${metadata} ${access_rules} ${mint_params};`
-    )
-    return this
-  }
-
-  /**
-   * Burns a bucket
-   *
-   * @param bucketName The name of the bucket to burn
-   * @returns
-   */
-  burnBucket(bucketName: string): ManifestBuilder {
-    this.instructions.push(`BURN_BUCKET ${Bucket(bucketName)};`)
     return this
   }
 
@@ -454,53 +363,32 @@ export class ManifestBuilder {
    * @returns
    */
   mintFungible(
-    resourceAddress: ResourceAddressString,
+    resourceAddress: AddressString,
     amount: number
   ): ManifestBuilder {
     this.instructions.push(
-      `MINT_FUNGIBLE ${ResourceAddress(resourceAddress)} ${Decimal(amount)};`
+      `MINT_FUNGIBLE ${Address(resourceAddress)} ${Decimal(amount)};`
     )
     return this
   }
 
   /**
-   * Withdraws all the given resource from account.
+   * Withdraws resource from account.
    *
    * @param accountAddress The account component address
    * @param resourceAddress The resource address
+   * @param amount The amount
    * @returns
    */
   withdrawFromAccount(
-    accountAddress: ComponentAddressString,
-    resourceAddress: ResourceAddressString
+    accountAddress: AddressString,
+    resourceAddress: AddressString,
+    amount: number
   ): ManifestBuilder {
     this.instructions.push(
-      `CALL_METHOD ${ComponentAddress(
-        accountAddress
-      )} "withdraw" ${ResourceAddress(resourceAddress)};`
-    )
-    return this
-  }
-
-  /**
-   * Withdraws some amount of resource from account.
-   *
-   * @param accountAddress The account component address
-   * @param amount The amount
-   * @param resourceAddress The resource address
-   * @returns
-   */
-  withdrawFromAccountByAmount(
-    accountAddress: ComponentAddressString,
-    amount: number,
-    resourceAddress: ResourceAddressString
-  ): ManifestBuilder {
-    this.instructions.push(
-      `CALL_METHOD ${ComponentAddress(
-        accountAddress
-      )} "withdraw_by_amount" ${Decimal(amount)} ${ResourceAddress(
+      `CALL_METHOD ${Address(accountAddress)} "withdraw" ${Address(
         resourceAddress
-      )};`
+      )} ${Decimal(amount)};`
     )
     return this
   }
@@ -509,21 +397,26 @@ export class ManifestBuilder {
    * Withdraws some non-fungibles from account.
    *
    * @param accountAddress The account component address
-   * @param nonFungibleIds The non-fungible IDs
-   * @param resourceAddress The resource address
+   * @param nonFungibleLocalIds The non-fungible IDs
+   * @param address The resource address
    * @returns
    */
-  withdrawFromAccountByIds(
-    accountAddress: ComponentAddressString,
-    nonFungibleIds: string,
-    resourceAddress: ResourceAddressString
+  withdrawNonFungiblesFromAccount(
+    accountAddress: AddressString,
+    resourceAddress: AddressString,
+    nonFungibleLocalIds: NonFungibleLocalIdString[]
   ): ManifestBuilder {
+    let temp = nonFungibleLocalIds
+      .map(function (id) {
+        return 'NonFungibleLocalId("' + id + '")'
+      })
+      .join(', ')
     this.instructions.push(
-      `CALL_METHOD ${ComponentAddress(
+      `CALL_METHOD ${Address(
         accountAddress
-      )} "withdraw_by_ids" ${nonFungibleIds} ${ResourceAddress(
+      )} "withdraw_non_fungibles" ${Address(
         resourceAddress
-      )};`
+      )} Array<NonFungibleLocalId>(${temp});`
     )
     return this
   }
@@ -536,13 +429,13 @@ export class ManifestBuilder {
    * @returns
    */
   createProofFromAccount(
-    accountAddress: ComponentAddressString,
-    resourceAddress: ResourceAddressString
+    accountAddress: AddressString,
+    resourceAddress: AddressString
   ): ManifestBuilder {
     this.instructions.push(
-      `CALL_METHOD ${ComponentAddress(
-        accountAddress
-      )} "create_proof" ${ResourceAddress(resourceAddress)};`
+      `CALL_METHOD ${Address(accountAddress)} "create_proof" ${Address(
+        resourceAddress
+      )};`
     )
     return this
   }
@@ -551,20 +444,20 @@ export class ManifestBuilder {
    * Creates proof of some amount of resource from account.
    *
    * @param accountAddress The account component address
-   * @param amount The amount
    * @param resourceAddress The resource address
+   * @param amount The amount
    * @returns
    */
   createProofFromAccountByAmount(
-    accountAddress: ComponentAddressString,
-    amount: number,
-    resourceAddress: ResourceAddressString
+    accountAddress: AddressString,
+    resourceAddress: AddressString,
+    amount: number
   ): ManifestBuilder {
     this.instructions.push(
-      `CALL_METHOD ${ComponentAddress(
+      `CALL_METHOD ${Address(
         accountAddress
-      )} "create_proof_by_amount" ${Decimal(amount)} ${ResourceAddress(
-        resourceAddress
+      )} "create_proof_by_amount" ${Address(resourceAddress)} ${Decimal(
+        amount
       )};`
     )
     return this
@@ -574,22 +467,37 @@ export class ManifestBuilder {
    * Creates proof of some non-fungibles from account.
    *
    * @param accountAddress The account component address
-   * @param nonFungibleIds The non-fungible IDs
+   * @param nonFungibleLocalIds The non-fungible IDs
    * @param resourceAddress The resource address
    * @returns
    */
   createProofFromAccountByIds(
-    accountAddress: ComponentAddressString,
-    nonFungibleIds: string,
-    resourceAddress: ResourceAddressString
+    accountAddress: AddressString,
+    resourceAddress: AddressString,
+    nonFungibleLocalIds: NonFungibleLocalIdString[]
   ): ManifestBuilder {
+    let temp = nonFungibleLocalIds
+      .map(function (id) {
+        return 'NonFungibleLocalId("' + id + '")'
+      })
+      .join(', ')
     this.instructions.push(
-      `CALL_METHOD ${ComponentAddress(
-        accountAddress
-      )} "create_proof_by_ids" ${nonFungibleIds} ${ResourceAddress(
+      `CALL_METHOD ${Address(accountAddress)} "create_proof_by_ids" ${Address(
         resourceAddress
-      )};`
+      )} Array<NonFungibleLocalId>(${temp});`
     )
+    return this
+  }
+
+  /**
+   * Add any instruction.
+   *
+   * @param name The instruction name
+   * @param args The instruction arguments
+   * @returns
+   */
+  instruction(name: string, args: string[]): ManifestBuilder {
+    this.instructions.push(`${name} ${args.join(' ')};`)
     return this
   }
 
