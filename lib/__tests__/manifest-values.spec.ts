@@ -144,7 +144,7 @@ describe('manifest builder', () => {
           'bucket2'
         )
         .takeFromWorktopByIds(
-          Array(TypeId.NonFungibleLocalId, NonFungibleLocalId.Integer('123')),
+          ['#123#'],
           'resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k',
           'bucket3'
         )
@@ -157,7 +157,7 @@ describe('manifest builder', () => {
           'resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k'
         )
         .assertWorktopContainsByIds(
-          Array(TypeId.NonFungibleLocalId, NonFungibleLocalId.Byte('deadbeef')),
+          ['[deadbeef]'],
           'resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k'
         )
         .popFromAuthZone('proof1')
@@ -173,7 +173,7 @@ describe('manifest builder', () => {
           'proof3'
         )
         .createProofFromAuthZoneByIds(
-          Array(TypeId.NonFungibleLocalId, NonFungibleLocalId.String('hello')),
+          ['<hello>'],
           'resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k',
           'proof4'
         )
@@ -188,12 +188,12 @@ describe('manifest builder', () => {
         )
         .callMethod(
           'component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x',
-          'withdraw_by_amount',
+          'withdraw',
           [
-            Decimal(5.0),
             Address(
               'resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k'
             ),
+            Decimal(5.0),
           ]
         )
         .mintFungible(
@@ -202,17 +202,13 @@ describe('manifest builder', () => {
         )
         .withdrawFromAccount(
           'component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x',
-          'resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k'
+          'resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k',
+          5
         )
-        .withdrawFromAccountByAmount(
+        .withdrawNonFungiblesFromAccount(
           'component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x',
-          5,
-          'resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k'
-        )
-        .withdrawFromAccountByIds(
-          'component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x',
-          Array(TypeId.NonFungibleLocalId, NonFungibleLocalId.Integer(123)),
-          'resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k'
+          'resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k',
+          ['#123#']
         )
         .build()
         .toString()
@@ -234,11 +230,10 @@ CREATE_PROOF_FROM_BUCKET Bucket("bucket2") Proof("proof5");
 CLONE_PROOF Proof("proof5") Proof("proof6");
 DROP_PROOF Proof("proof6");
 CALL_FUNCTION Address("package_sim1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq57ks9j") "GumballMachine" "new" ;
-CALL_METHOD Address("component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x") "withdraw_by_amount" Decimal("5") Address("resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k");
+CALL_METHOD Address("component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x") "withdraw" Address("resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k") Decimal("5");
 MINT_FUNGIBLE Address("resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k") Decimal("5");
-CALL_METHOD Address("component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x") "withdraw" Address("resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k");
-CALL_METHOD Address("component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x") "withdraw_by_amount" Decimal("5") Address("resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k");
-CALL_METHOD Address("component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x") "withdraw_by_ids" Array<NonFungibleLocalId>(NonFungibleLocalId("#123#")) Address("resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k");`)
+CALL_METHOD Address("component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x") "withdraw" Address("resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k") Decimal("5");
+CALL_METHOD Address("component_sim1q0kryz5scup945usk39qjc2yjh6l5zsyuh8t7v5pk0tshjs68x") "withdraw_non_fungibles" Address("resource_sim1qyqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs6d89k") Array<NonFungibleLocalId>(NonFungibleLocalId("#123#"));`)
   })
 
   // Compile the above output with `rtmc` to ensure the SDK is up to date
