@@ -373,7 +373,7 @@ export class ManifestBuilder {
   }
 
   /**
-   * Withdraws all the given resource from account.
+   * Withdraws resource from account.
    *
    * @param accountAddress The account component address
    * @param resourceAddress The resource address
