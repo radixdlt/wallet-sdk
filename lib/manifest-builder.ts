@@ -85,9 +85,9 @@ export class ManifestBuilder {
     resourceAddress: AddressString,
     bucketName: string
   ): ManifestBuilder {
-    var temp = nonFungibleLocalIds
+    let temp = nonFungibleLocalIds
       .map(function (id) {
-        'NonFungibleLocalId("' + id + '")'
+        return 'NonFungibleLocalId("' + id + '")'
       })
       .join(', ')
     this.instructions.push(
@@ -153,9 +153,9 @@ export class ManifestBuilder {
     nonFungibleLocalIds: NonFungibleLocalIdString[],
     resourceAddress: AddressString
   ): ManifestBuilder {
-    var temp = nonFungibleLocalIds
+    let temp = nonFungibleLocalIds
       .map(function (id) {
-        'NonFungibleLocalId("' + id + '")'
+        return 'NonFungibleLocalId("' + id + '")'
       })
       .join(', ')
     this.instructions.push(
@@ -254,9 +254,9 @@ export class ManifestBuilder {
     resourceAddress: AddressString,
     proofName: string
   ): ManifestBuilder {
-    var temp = nonFungibleLocalIds
+    let temp = nonFungibleLocalIds
       .map(function (id) {
-        'NonFungibleLocalId("' + id + '")'
+        return 'NonFungibleLocalId("' + id + '")'
       })
       .join(', ')
     this.instructions.push(
@@ -388,7 +388,7 @@ export class ManifestBuilder {
     this.instructions.push(
       `CALL_METHOD ${Address(accountAddress)} "withdraw" ${Address(
         resourceAddress
-      )} ${Decimal(amount)} ;`
+      )} ${Decimal(amount)};`
     )
     return this
   }
@@ -406,9 +406,9 @@ export class ManifestBuilder {
     resourceAddress: AddressString,
     nonFungibleLocalIds: NonFungibleLocalIdString[]
   ): ManifestBuilder {
-    var temp = nonFungibleLocalIds
+    let temp = nonFungibleLocalIds
       .map(function (id) {
-        'NonFungibleLocalId("' + id + '")'
+        return 'NonFungibleLocalId("' + id + '")'
       })
       .join(', ')
     this.instructions.push(
@@ -416,7 +416,7 @@ export class ManifestBuilder {
         accountAddress
       )} "withdraw_non_fungibles" ${Address(
         resourceAddress
-      )} Array<NonFungibleLocalId>(${temp})};`
+      )} Array<NonFungibleLocalId>(${temp});`
     )
     return this
   }
@@ -476,9 +476,9 @@ export class ManifestBuilder {
     resourceAddress: AddressString,
     nonFungibleLocalIds: NonFungibleLocalIdString[]
   ): ManifestBuilder {
-    var temp = nonFungibleLocalIds
+    let temp = nonFungibleLocalIds
       .map(function (id) {
-        'NonFungibleLocalId("' + id + '")'
+        return 'NonFungibleLocalId("' + id + '")'
       })
       .join(', ')
     this.instructions.push(
