@@ -22,6 +22,7 @@ You may wish to consider using this with the [√ Connect Button](https://github
     - [Get list of Persona data](#get-list-of-persona-data)
       - [oneTimePersonaData](#onetimepersonadata)
       - [ongoingPersonaData](#ongoingpersonadata)
+    - [Reset](#reset)
     - [Login](#login)
       - [login](#login-1)
       - [usePersona](#usepersona)
@@ -79,11 +80,12 @@ type WalletSdkInput = {
 | [oneTimeAccountsWithProofOfOwnership](#onetimeaccountswithproofofownership)       |              ❌              |
 | [ongoingAccountsWithoutProofOfOwnership](#ongoingaccountswithoutproofofownership) |              ✅              |
 | [ongoingAccountsWithProofOfOwnership](#ongoingaccountswithproofofownership)       |              ❌              |
-| [oneTimePersonaData](#onetimepersonadata)                                         |              ❌              |
-| [ongoingPersonaData](#ongoingpersonadata)                                         |              ❌              |
+| [oneTimePersonaData](#onetimepersonadata)                                         |              ✅              |
+| [ongoingPersonaData](#ongoingpersonadata)                                         |              ✅              |
 | [loginWithChallenge](#loginwithchallenge)                                         |              ❌              |
 | [loginWithoutChallenge](#loginwithoutchallenge)                                   |              ✅              |
 | [usePersona](#usepersona)                                                         |              ✅              |
+| [reset](#reset)                                                                   |              ✅              |
 
 ### About oneTime VS ongoing requests
 
@@ -252,9 +254,14 @@ const value = result.value
 
 ### Get list of Persona data
 
-This request type is for a list of personal data fields such as `firstName`, `email`, `shippingAddress`, etc. associated with the user's selected Persona.
+This request type is for a list of personal data fields associated with the user's selected Persona.
 
-**NOTE:** A complete list of supported data fields will be provided later when this request type becomes supported.
+| Available persona data fields |
+| :---------------------------- |
+| `"givenName"`                 |
+| `"familyName"`                |
+| `"emailAddress"`              |
+| `"phoneNumber"`               |
 
 **Types**
 
@@ -269,7 +276,7 @@ type PersonaDataField = {
 
 ```typescript
 const result = await walletSdk.request(
-  requestBuilder(requestItem.oneTimePersonaData(['firstName', 'email']))
+  requestBuilder(requestItem.oneTimePersonaData(['givenName', 'emailAddress']))
 )
 
 if (result.isErr()) {
@@ -286,8 +293,10 @@ const value = result.value
 
 ```typescript
 const result = await walletSdk.request(
-  requestItem.usePersona(identityAddress),
-  requestBuilder(requestItem.ongoingPersonaData(['firstName', 'email']))
+  requestBuilder(
+    requestItem.usePersona(identityAddress),
+    requestItem.ongoingPersonaData(['givenName', 'emailAddress'])
+  )
 )
 
 if (result.isErr()) {
@@ -302,6 +311,19 @@ if (result.isErr()) {
 //   ongoingPersonaData: PersonaDataField[];
 // }
 const value = result.value
+```
+
+### Reset
+
+You can send a reset request to ask the user to provide new values for ongoing accounts and/or persona data.
+
+```typescript
+const result = await walletSdk.request(
+  requestBuilder(
+    requestItem.usePersona(identityAddress),
+    requestItem.reset({ account: true, personaData: true })
+  )
+)
 ```
 
 ### Login
@@ -390,7 +412,7 @@ This constructs the lines of a transaction manifest stub.
 import {
   ManifestBuilder,
   Decimal,
-  ResourceAddress,
+  Address,
   Bucket,
   Expression,
 } from '@radixdlt/wallet-sdk'
@@ -401,7 +423,7 @@ const manifest = new ManifestBuilder()
     'withdraw_by_amount',
     [
       Decimal('1'),
-      ResourceAddress(
+      Address(
         'resource_tdx_a_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqegh4k9'
       ),
     ]

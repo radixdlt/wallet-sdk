@@ -1,9 +1,8 @@
-export type PackageAddressString = `package_${string}`
-export type ResourceAddressString = `resource_${string}`
-export type ComponentAddressString = `component_${string}` | `account_${string}`
-export type SystemAddressString = `system_${string}`
+// TODO: define the exact list of HRP prefixes post RCNet
+export type AddressString = `${string}`
 
 export enum TypeId {
+  Bool = 'Bool',
   I8 = 'i8',
   I16 = 'i16',
   I32 = 'i32',
@@ -15,35 +14,27 @@ export enum TypeId {
   U64 = 'u64',
   U128 = 'u128',
   Unit = 'Unit',
-  Bool = 'Bool',
   String = 'String',
   Enum = 'Enum',
   Array = 'Array',
   Tuple = 'Tuple',
+  Map = 'Map',
 
-  PackageAddress = 'PackageAddress',
-  ComponentAddress = 'ComponentAddress',
-  ResourceAddress = 'ResourceAddress',
-  SystemAddress = 'SystemAddress',
-
+  Address = 'Address',
   Bucket = 'Bucket',
   Proof = 'Proof',
-
   Expression = 'Expression',
   Blob = 'Blob',
-  NonFungibleAddress = 'NonFungibleAddress',
-
-  Hash = 'Hash',
-  EcdsaSecp256k1PublicKey = 'EcdsaSecp256k1PublicKey',
-  EcdsaSecp256k1Signature = 'EcdsaSecp256k1Signature',
-  EddsaEd25519PublicKey = 'EddsaEd25519PublicKey',
-  EddsaEd25519Signature = 'EddsaEd25519Signature',
   Decimal = 'Decimal',
   PreciseDecimal = 'PreciseDecimal',
-  NonFungibleId = 'NonFungibleId',
+  NonFungibleLocalId = 'NonFungibleLocalId',
+
+  // Not in value model, but supported by manifest compiler
+  NonFungibleGlobalId = 'NonFungibleGlobalId',
+  Bytes = 'Bytes',
 }
 
-export class ScryptoValueError extends Error {
+export class ManifestValueError extends Error {
   constructor(errorMessage: string) {
     super(errorMessage)
   }
@@ -59,21 +50,21 @@ export const Bool = (bool: boolean): `${boolean}` => {
 
 export const I8 = <T extends number>(num: T): `${T}i8` => {
   if (num < -128 || num > 127) {
-    throw new ScryptoValueError('Number range exceeded i8')
+    throw new ManifestValueError('Number range exceeded i8')
   }
   return `${num}i8`
 }
 
 export const I16 = <T extends number>(num: T): `${T}i16` => {
   if (num < -32768 || num > 32767) {
-    throw new ScryptoValueError('Number range exceeded i16')
+    throw new ManifestValueError('Number range exceeded i16')
   }
   return `${num}i16`
 }
 
 export const I32 = <T extends number>(num: T): `${T}i32` => {
   if (num < -2147483648 || num > 2147483647) {
-    throw new ScryptoValueError('Number range exceeded i32')
+    throw new ManifestValueError('Number range exceeded i32')
   }
   return `${num}i32`
 }
@@ -84,7 +75,7 @@ export const I64 = <T extends string>(num: T): `${T}i64` => {
     bigNum < BigInt('-9223372036854775808') ||
     bigNum > BigInt('9223372036854775807')
   ) {
-    throw new ScryptoValueError('Number range exceeded i64')
+    throw new ManifestValueError('Number range exceeded i64')
   }
   return `${num}i64`
 }
@@ -95,28 +86,28 @@ export const I128 = <T extends string>(num: T): `${T}i128` => {
     bigNum < BigInt('-170141183460469231731687303715884105728') ||
     bigNum > BigInt('170141183460469231731687303715884105727')
   ) {
-    throw new ScryptoValueError('Number range exceeded i128')
+    throw new ManifestValueError('Number range exceeded i128')
   }
   return `${num}i128`
 }
 
 export const U8 = <T extends number>(num: T): `${T}u8` => {
   if (num < 0 || num > 255) {
-    throw new ScryptoValueError('Number range exceeded u8')
+    throw new ManifestValueError('Number range exceeded u8')
   }
   return `${num}u8`
 }
 
 export const U16 = <T extends number>(num: T): `${T}u16` => {
   if (num < 0 || num > 65535) {
-    throw new ScryptoValueError('Number range exceeded u16')
+    throw new ManifestValueError('Number range exceeded u16')
   }
   return `${num}u16`
 }
 
 export const U32 = <T extends number>(num: T): `${T}u32` => {
   if (num < 0 || num > 4294967295) {
-    throw new ScryptoValueError('Number range exceeded u32')
+    throw new ManifestValueError('Number range exceeded u32')
   }
   return `${num}u32`
 }
@@ -124,7 +115,7 @@ export const U32 = <T extends number>(num: T): `${T}u32` => {
 export const U64 = <T extends string>(num: T): `${T}u64` => {
   const bigNum = BigInt(num)
   if (bigNum < 0 || bigNum > BigInt('18446744073709551615')) {
-    throw new ScryptoValueError('Number range exceeded u64')
+    throw new ManifestValueError('Number range exceeded u64')
   }
   return `${num}u64`
 }
@@ -135,7 +126,7 @@ export const U128 = <T extends string>(num: T): `${T}u128` => {
     bigNum < 0 ||
     bigNum > BigInt('340282366920938463463374607431768211455')
   ) {
-    throw new ScryptoValueError('Number range exceeded u128')
+    throw new ManifestValueError('Number range exceeded u128')
   }
   return `${num}u128`
 }
@@ -144,10 +135,16 @@ export const String = <T extends string>(str: T): `"${T}"` => {
   return `"${str}"`
 }
 
-export const Enum = (field: string, ...args: string[]): string => {
-  return args.length > 0
-    ? `Enum("${field}",${args.join(',')})`
-    : `Enum("${field}")`
+export const Enum = (field: string | number, ...args: string[]): string => {
+  if (typeof field === 'number') {
+    return args.length > 0
+      ? `Enum(${field}u8, ${args.join(', ')})`
+      : `Enum(${field}u8)`
+  } else {
+    return args.length > 0
+      ? `Enum("${field}", ${args.join(', ')})`
+      : `Enum("${field}")`
+  }
 }
 
 export const Tuple = <T extends string[]>(...args: T): `Tuple(${string})` => {
@@ -162,28 +159,16 @@ export const Array = <T extends TypeId>(
   return `Array<${type}>(${args.join(',')})`
 }
 
-export const PackageAddress = (
-  packageAddress: PackageAddressString
-): `PackageAddress("${string}")` => {
-  return `PackageAddress("${packageAddress}")`
+export const Map = <T extends TypeId, E extends TypeId>(
+  keyType: T,
+  valueType: E,
+  ...args: string[]
+): `Map<${T},${E}>(${string})` => {
+  return `Map<${keyType},${valueType}>(${args.join(',')})`
 }
 
-export const ComponentAddress = (
-  componentAddress: ComponentAddressString
-): `ComponentAddress("${string}")` => {
-  return `ComponentAddress("${componentAddress}")`
-}
-
-export const ResourceAddress = (
-  resourceAddress: ResourceAddressString
-): `ResourceAddress("${string}")` => {
-  return `ResourceAddress("${resourceAddress}")`
-}
-
-export const SystemAddress = (
-  systemAddress: SystemAddressString
-): `SystemAddress("${string}")` => {
-  return `SystemAddress("${systemAddress}")`
+export const Address = (address: AddressString): `Address("${string}")` => {
+  return `Address("${address}")`
 }
 
 export const Bucket = (bucketId: string | number): `Bucket(${string})` => {
@@ -212,41 +197,6 @@ export const Blob = <T extends string>(blob: T): `Blob("${T}")` => {
   return `Blob("${blob}")`
 }
 
-export const NonFungibleAddress = (
-  resourceAddress: ResourceAddressString,
-  non_fungible_id: string
-): `NonFungibleAddress(${string}, ${string})` => {
-  return `NonFungibleAddress("${resourceAddress}", ${non_fungible_id})`
-}
-
-export const Hash = (hash: string): `Hash("${string}")` => {
-  return `Hash("${hash}")`
-}
-
-export const EcdsaSecp256k1PublicKey = (
-  pk: string
-): `EcdsaSecp256k1PublicKey("${string}")` => {
-  return `EcdsaSecp256k1PublicKey("${pk}")`
-}
-
-export const EcdsaSecp256k1Signature = (
-  sig: string
-): `EcdsaSecp256k1Signature("${string}")` => {
-  return `EcdsaSecp256k1Signature("${sig}")`
-}
-
-export const EddsaEd25519PublicKey = (
-  pk: string
-): `EddsaEd25519PublicKey("${string}")` => {
-  return `EddsaEd25519PublicKey("${pk}")`
-}
-
-export const EddsaEd25519Signature = (
-  sig: string
-): `EddsaEd25519Signature("${string}")` => {
-  return `EddsaEd25519Signature("${sig}")`
-}
-
 export const Decimal = (num: number): `Decimal("${string}")` => {
   return `Decimal("${num}")`
 }
@@ -255,22 +205,45 @@ export const PreciseDecimal = (num: number): `PreciseDecimal("${string}")` => {
   return `PreciseDecimal("${num}")`
 }
 
-export const NonFungibleId = (id: string): `NonFungibleId(${string})` => {
-  return `NonFungibleId(${id})`
+export type NonFungibleLocalIdString =
+  | `<${string}>`
+  | `#${number}#`
+  | `[${string}]`
+  | `{${string}}`
+
+export const NonFungibleLocalId = {
+  String: <T extends string>(id: T): `NonFungibleLocalId("<${T}>")` =>
+    `NonFungibleLocalId("<${id}>")`,
+  Integer: <T extends number | string>(id: T): `NonFungibleLocalId("#${T}#")` =>
+    `NonFungibleLocalId("#${id}#")`,
+  Byte: <T extends string>(id: T): `NonFungibleLocalId("[${T}]")` =>
+    `NonFungibleLocalId("[${id}]")`,
+  Uuid: <T extends string>(id: T): `NonFungibleLocalId("{${T}}")` =>
+    `NonFungibleLocalId("{${id}}")`,
+}
+
+export const NonFungibleGlobalId = (
+  id: String
+): `NonFungibleGlobalId("${string}")` => {
+  return `NonFungibleGlobalId("${id}")`
+}
+
+export const Bytes = (hex: String): `Bytes("${string}")` => {
+  return `Bytes("${hex}")`
 }
 
 const validateArrayElements = (type: TypeId, args: string[]) => {
   if (type === TypeId.String) {
     if (args.some((a) => !a.startsWith('"') && !a.endsWith('"'))) {
-      throw new ScryptoValueError(`Array<${type}> expects the same type`)
+      throw new ManifestValueError(`Array<${type}> expects the same type`)
     }
   } else if (type === TypeId.Unit) {
     if (args.some((a) => a !== '()')) {
-      throw new ScryptoValueError(`Array<${type}> expects the same type`)
+      throw new ManifestValueError(`Array<${type}> expects the same type`)
     }
   } else {
     if (args.some((a) => !a.includes(type))) {
-      throw new ScryptoValueError(`Array<${type}> expects the same type`)
+      throw new ManifestValueError(`Array<${type}> expects the same type`)
     }
   }
 }

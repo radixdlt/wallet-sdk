@@ -19,6 +19,11 @@ export const errorType = {
     'submittedTransactionHasRejectedTransactionStatus',
   failedToFindAccountWithEnoughFundsToLockFee:
     'failedToFindAccountWithEnoughFundsToLockFee',
+  wrongAccountType: 'wrongAccountType',
+  unknownWebsite: 'unknownWebsite',
+  radixJsonNotFound: 'radixJsonNotFound',
+  unknownDappDefinitionAddress: 'unknownDappDefinitionAddress',
+  invalidPersona: 'invalidPersona',
 } as const
 
 type ErrorType = keyof typeof errorType

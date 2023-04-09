@@ -214,11 +214,11 @@ describe('transformMethodInput', () => {
     it('should return correct transformed value', () => {
       ;[
         {
-          actual: requestItem.oneTimePersonaData('email'),
+          actual: requestItem.oneTimePersonaData('emailAddress'),
           expected: {
             discriminator: 'unauthorizedRequest',
             [RequestTypeSchema.oneTimePersonaData.value]: {
-              fields: ['email'],
+              fields: ['emailAddress'],
             },
           },
         },
@@ -233,11 +233,11 @@ describe('transformMethodInput', () => {
     it('should return correct transformed value', () => {
       ;[
         {
-          actual: requestItem.ongoingPersonaData('email'),
+          actual: requestItem.ongoingPersonaData('emailAddress'),
           expected: {
             discriminator: 'unauthorizedRequest',
             [RequestTypeSchema.ongoingPersonaData.value]: {
-              fields: ['email'],
+              fields: ['emailAddress'],
             },
           },
         },
@@ -268,6 +268,61 @@ describe('transformMethodInput', () => {
         },
       ].forEach((testItem) => {
         expect(transformMethodInput({ send: testItem.actual })).toEqual(
+          ok(testItem.expected)
+        )
+      })
+    })
+  })
+  describe('reset', () => {
+    it('should return correct transformed value', () => {
+      ;[
+        {
+          actual: requestItem.reset({ accounts: true }),
+          expected: {
+            discriminator: 'unauthorizedRequest',
+          },
+        },
+      ].forEach((testItem) => {
+        expect(transformMethodInput(testItem.actual({} as any))).toEqual(
+          ok(testItem.expected)
+        )
+      })
+    })
+  })
+
+  describe('personaData', () => {
+    it('should return correct transformed value', () => {
+      ;[
+        {
+          actual: {
+            reset: {
+              accounts: true,
+              personaData: false,
+            },
+            oneTimePersonaData: {
+              fields: [
+                'givenName',
+                'emailAddress',
+                'familyName',
+                'phoneNumber',
+              ],
+              oneTime: true,
+            },
+          },
+          expected: {
+            discriminator: 'unauthorizedRequest',
+            oneTimePersonaData: {
+              fields: [
+                'givenName',
+                'emailAddress',
+                'familyName',
+                'phoneNumber',
+              ],
+            },
+          },
+        },
+      ].forEach((testItem) => {
+        expect(transformMethodInput(testItem.actual)).toEqual(
           ok(testItem.expected)
         )
       })

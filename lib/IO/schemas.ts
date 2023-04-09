@@ -21,7 +21,28 @@ export const ErrorTypeSchema = union([
   literal('submittedTransactionWasDuplicate'),
   literal('submittedTransactionHasFailedTransactionStatus'),
   literal('submittedTransactionHasRejectedTransactionStatus'),
+  literal('wrongAccountType'),
+  literal('unknownWebsite'),
+  literal('radixJsonNotFound'),
+  literal('unknownDappDefinitionAddress'),
+  literal('invalidPersona'),
 ])
+
+export const personaDataField = {
+  givenName: 'givenName',
+  familyName: 'familyName',
+  emailAddress: 'emailAddress',
+  phoneNumber: 'phoneNumber',
+} as const
+
+export const PersonaDataFieldSchema = union([
+  literal(personaDataField.emailAddress),
+  literal(personaDataField.familyName),
+  literal(personaDataField.givenName),
+  literal(personaDataField.phoneNumber),
+])
+
+export type PersonaDataField = z.infer<typeof PersonaDataFieldSchema>
 
 const AccountSchema = object({
   address: string(),
@@ -48,12 +69,12 @@ const PersonaSchema = object({
 
 export type Persona = z.infer<typeof PersonaSchema>
 
-const PersonaDataFieldSchema = object({
-  field: string(),
+const PersonaDataSchema = object({
+  field: PersonaDataFieldSchema,
   value: string(),
 })
 
-export type PersonaDataField = z.infer<typeof PersonaDataFieldSchema>
+export type PersonaData = z.infer<typeof PersonaDataSchema>
 
 const NumberOfAccountsQuantifierSchema = union([
   literal('exactly'),
@@ -155,7 +176,7 @@ export type OneTimePersonaDataRequestItem = z.infer<
 >
 
 const OneTimePersonaDataRequestResponseItemSchema = object({
-  fields: PersonaDataFieldSchema.array(),
+  fields: PersonaDataSchema.array(),
 })
 
 export type OneTimePersonaDataRequestResponseItem = z.infer<
@@ -163,7 +184,7 @@ export type OneTimePersonaDataRequestResponseItem = z.infer<
 >
 
 const OngoingPersonaDataRequestItemSchema = object({
-  fields: string().array(),
+  fields: PersonaDataFieldSchema.array(),
 })
 
 export type OngoingPersonaDataRequestItem = z.infer<
@@ -171,7 +192,7 @@ export type OngoingPersonaDataRequestItem = z.infer<
 >
 
 const OngoingPersonaDataRequestResponseItemSchema = object({
-  fields: PersonaDataFieldSchema.array(),
+  fields: PersonaDataSchema.array(),
 })
 
 export type OngoingPersonaDataRequestResponseItem = z.infer<
@@ -249,6 +270,13 @@ export type AuthRequestResponseItem = z.infer<
   typeof AuthRequestResponseItemSchema
 >
 
+export type ResetRequestItem = z.infer<typeof ResetRequestSchema>
+
+const ResetRequestSchema = object({
+  accounts: boolean(),
+  personaData: boolean(),
+})
+
 const SendTransactionRequestItemSchema = object({
   transactionManifest: string(),
   version: number(),
@@ -285,6 +313,7 @@ const WalletAuthorizedRequestItemsSchema = object({
   ongoingAccounts: OngoingAccountsRequestItemSchema.optional(),
   oneTimePersonaData: OneTimePersonaDataRequestItemSchema.optional(),
   ongoingPersonaData: OngoingPersonaDataRequestItemSchema.optional(),
+  reset: ResetRequestSchema.optional(),
 })
 
 export type WalletAuthorizedRequestItems = z.infer<
