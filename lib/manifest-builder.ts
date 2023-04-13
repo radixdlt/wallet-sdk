@@ -39,10 +39,7 @@ export class ManifestBuilder {
    * @param bucketName The name of the new bucket
    * @returns
    */
-  takeFromWorktop(
-    resourceAddress: AddressString,
-    bucketName: string
-  ): ManifestBuilder {
+  takeFromWorktop(resourceAddress: AddressString, bucketName: string): this {
     this.instructions.push(
       `TAKE_FROM_WORKTOP ${Address(resourceAddress)} ${Bucket(bucketName)};`
     )
@@ -62,7 +59,7 @@ export class ManifestBuilder {
     amount: number,
     resourceAddresses: AddressString,
     bucketName: string
-  ): ManifestBuilder {
+  ): this {
     this.instructions.push(
       `TAKE_FROM_WORKTOP_BY_AMOUNT ${Decimal(amount)} ${Address(
         resourceAddresses
@@ -84,7 +81,7 @@ export class ManifestBuilder {
     nonFungibleLocalIds: NonFungibleLocalIdString[],
     resourceAddress: AddressString,
     bucketName: string
-  ): ManifestBuilder {
+  ): this {
     let temp = nonFungibleLocalIds
       .map(function (id) {
         return 'NonFungibleLocalId("' + id + '")'
@@ -116,7 +113,7 @@ export class ManifestBuilder {
    * @param resourceAddress The resource address
    * @returns
    */
-  assertWorktopContains(resourceAddress: AddressString): ManifestBuilder {
+  assertWorktopContains(resourceAddress: AddressString): this {
     this.instructions.push(
       `ASSERT_WORKTOP_CONTAINS ${Address(resourceAddress)};`
     )
@@ -133,7 +130,7 @@ export class ManifestBuilder {
   assertWorktopContainsByAmount(
     amount: number,
     resourceAddress: AddressString
-  ): ManifestBuilder {
+  ): this {
     this.instructions.push(
       `ASSERT_WORKTOP_CONTAINS_BY_AMOUNT ${Decimal(amount)} ${Address(
         resourceAddress
@@ -152,7 +149,7 @@ export class ManifestBuilder {
   assertWorktopContainsByIds(
     nonFungibleLocalIds: NonFungibleLocalIdString[],
     resourceAddress: AddressString
-  ): ManifestBuilder {
+  ): this {
     let temp = nonFungibleLocalIds
       .map(function (id) {
         return 'NonFungibleLocalId("' + id + '")'
@@ -172,7 +169,7 @@ export class ManifestBuilder {
    * @param proofName The name of the new proof
    * @returns
    */
-  popFromAuthZone(proofName: string): ManifestBuilder {
+  popFromAuthZone(proofName: string): this {
     this.instructions.push(`POP_FROM_AUTH_ZONE ${Proof(proofName)};`)
     this.proofs.set(proofName, this.id_allocator++)
     return this
@@ -184,7 +181,7 @@ export class ManifestBuilder {
    * @param proofName The proof name
    * @returns
    */
-  pushToAuthZone(proofName: string): ManifestBuilder {
+  pushToAuthZone(proofName: string): this {
     this.instructions.push(`PUSH_TO_AUTH_ZONE ${Proof(proofName)};`)
     return this
   }
@@ -194,7 +191,7 @@ export class ManifestBuilder {
    *
    * @returns
    */
-  clearAuthZone(): ManifestBuilder {
+  clearAuthZone(): this {
     this.instructions.push('CLEAR_AUTH_ZONE;')
     return this
   }
@@ -209,7 +206,7 @@ export class ManifestBuilder {
   createProofFromAuthZone(
     resourceAddress: AddressString,
     proofName: string
-  ): ManifestBuilder {
+  ): this {
     this.instructions.push(
       `CREATE_PROOF_FROM_AUTH_ZONE ${Address(resourceAddress)} ${Proof(
         proofName
@@ -231,7 +228,7 @@ export class ManifestBuilder {
     amount: number,
     resourceAddress: AddressString,
     proofName: string
-  ): ManifestBuilder {
+  ): this {
     this.instructions.push(
       `CREATE_PROOF_FROM_AUTH_ZONE_BY_AMOUNT ${Decimal(amount)} ${Address(
         resourceAddress
@@ -253,7 +250,7 @@ export class ManifestBuilder {
     nonFungibleLocalIds: NonFungibleLocalIdString[],
     resourceAddress: AddressString,
     proofName: string
-  ): ManifestBuilder {
+  ): this {
     let temp = nonFungibleLocalIds
       .map(function (id) {
         return 'NonFungibleLocalId("' + id + '")'
@@ -275,10 +272,7 @@ export class ManifestBuilder {
    * @param proofName The name of the new proof
    * @returns
    */
-  createProofFromBucket(
-    bucketName: string,
-    proofName: string
-  ): ManifestBuilder {
+  createProofFromBucket(bucketName: string, proofName: string): this {
     this.instructions.push(
       `CREATE_PROOF_FROM_BUCKET ${Bucket(bucketName)} ${Proof(proofName)};`
     )
@@ -293,7 +287,7 @@ export class ManifestBuilder {
    * @param cloneName The clone proof name
    * @returns
    */
-  cloneProof(proofName: string, cloneName: string): ManifestBuilder {
+  cloneProof(proofName: string, cloneName: string): this {
     this.instructions.push(
       `CLONE_PROOF ${Proof(proofName)} ${Proof(cloneName)};`
     )
@@ -307,7 +301,7 @@ export class ManifestBuilder {
    * @param proofName The proof name
    * @returns
    */
-  dropProof(proofName: string): ManifestBuilder {
+  dropProof(proofName: string): this {
     this.instructions.push(`DROP_PROOF ${Proof(proofName)};`)
     return this
   }
@@ -325,7 +319,7 @@ export class ManifestBuilder {
     blueprintName: string,
     functionName: string,
     args: string[]
-  ): ManifestBuilder {
+  ): this {
     this.instructions.push(
       `CALL_FUNCTION ${Address(
         packageAddress
@@ -346,7 +340,7 @@ export class ManifestBuilder {
     componentAddress: AddressString,
     methodName: string,
     args: string[]
-  ): ManifestBuilder {
+  ): this {
     this.instructions.push(
       `CALL_METHOD ${Address(componentAddress)} "${methodName}" ${args.join(
         ' '
@@ -362,10 +356,7 @@ export class ManifestBuilder {
    * @param amount The amount to mint
    * @returns
    */
-  mintFungible(
-    resourceAddress: AddressString,
-    amount: number
-  ): ManifestBuilder {
+  mintFungible(resourceAddress: AddressString, amount: number): this {
     this.instructions.push(
       `MINT_FUNGIBLE ${Address(resourceAddress)} ${Decimal(amount)};`
     )
@@ -384,7 +375,7 @@ export class ManifestBuilder {
     accountAddress: AddressString,
     resourceAddress: AddressString,
     amount: number
-  ): ManifestBuilder {
+  ): this {
     this.instructions.push(
       `CALL_METHOD ${Address(accountAddress)} "withdraw" ${Address(
         resourceAddress
@@ -405,7 +396,7 @@ export class ManifestBuilder {
     accountAddress: AddressString,
     resourceAddress: AddressString,
     nonFungibleLocalIds: NonFungibleLocalIdString[]
-  ): ManifestBuilder {
+  ): this {
     let temp = nonFungibleLocalIds
       .map(function (id) {
         return 'NonFungibleLocalId("' + id + '")'
@@ -431,7 +422,7 @@ export class ManifestBuilder {
   createProofFromAccount(
     accountAddress: AddressString,
     resourceAddress: AddressString
-  ): ManifestBuilder {
+  ): this {
     this.instructions.push(
       `CALL_METHOD ${Address(accountAddress)} "create_proof" ${Address(
         resourceAddress
@@ -452,7 +443,7 @@ export class ManifestBuilder {
     accountAddress: AddressString,
     resourceAddress: AddressString,
     amount: number
-  ): ManifestBuilder {
+  ): this {
     this.instructions.push(
       `CALL_METHOD ${Address(
         accountAddress
@@ -475,7 +466,7 @@ export class ManifestBuilder {
     accountAddress: AddressString,
     resourceAddress: AddressString,
     nonFungibleLocalIds: NonFungibleLocalIdString[]
-  ): ManifestBuilder {
+  ): this {
     let temp = nonFungibleLocalIds
       .map(function (id) {
         return 'NonFungibleLocalId("' + id + '")'
@@ -496,7 +487,7 @@ export class ManifestBuilder {
    * @param args The instruction arguments
    * @returns
    */
-  instruction(name: string, args: string[]): ManifestBuilder {
+  instruction(name: string, args: string[]): this {
     this.instructions.push(`${name} ${args.join(' ')};`)
     return this
   }
