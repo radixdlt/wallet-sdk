@@ -337,7 +337,7 @@ export type WalletTransactionItems = z.infer<
 >
 
 const WalletCancelRequestItemsSchema = object({
-  discriminator: literal('cancel'),
+  discriminator: literal('cancelRequest'),
 })
 
 const WalletInteractionItemsSchema = union([

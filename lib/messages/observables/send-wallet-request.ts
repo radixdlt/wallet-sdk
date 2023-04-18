@@ -1,15 +1,16 @@
 import { Subjects } from '../subjects'
-import { tap, share, map } from 'rxjs'
+import { tap } from 'rxjs'
 import { eventType } from '../events/_types'
+import { AppLogger } from '../../wallet-sdk'
 
-export const sendWalletRequest = (subjects: Subjects) =>
+export const sendWalletRequest = (subjects: Subjects, logger?: AppLogger) =>
   subjects.outgoingMessageSubject.pipe(
-    map((payload) => ({
-      event: eventType.outgoingMessage,
-      payload,
-    })),
     tap((payload) => {
-      subjects.dispatchEventSubject.next(payload)
-    }),
-    share()
+      logger?.debug(`🔵⬆️ walletRequest`, payload)
+      window.dispatchEvent(
+        new CustomEvent(eventType.outgoingMessage, {
+          detail: payload,
+        })
+      )
+    })
   )

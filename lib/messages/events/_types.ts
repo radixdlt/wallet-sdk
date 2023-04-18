@@ -1,3 +1,6 @@
+import { ResultAsync } from 'neverthrow'
+import { WalletInteraction } from '../../IO/schemas'
+
 export const eventType = {
   outgoingMessage: 'radix#chromeExtension#send',
   incomingMessage: 'radix#chromeExtension#receive',
@@ -17,5 +20,8 @@ export type MessageLifeCycleEvent = keyof typeof messageLifeCycleEvent
 
 export type CallbackFns = {
   eventCallback: (messageEvent: MessageLifeCycleEvent) => void
-  requestControl: (api: { cancelRequest: () => void }) => void
+  requestControl: (api: {
+    cancelRequest: () => ResultAsync<undefined, undefined>
+    getRequest: () => WalletInteraction
+  }) => void
 }
