@@ -8,6 +8,9 @@ export type IncomingMessageEvent = typeof eventType['incomingMessage']
 
 export const messageLifeCycleEvent = {
   receivedByExtension: 'receivedByExtension',
+  receivedByWallet: 'receivedByWallet',
+  requestCancelSuccess: 'requestCancelSuccess',
+  requestCancelFail: 'requestCancelFail',
 } as const
 
 export type MessageLifeCycleEvent = keyof typeof messageLifeCycleEvent

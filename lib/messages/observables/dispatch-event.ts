@@ -1,11 +1,11 @@
-import { SubjectsType } from '../subjects'
 import { tap } from 'rxjs'
-import log from 'loglevel'
+import { AppLogger } from '../../helpers/logger'
+import { Subjects } from '../subjects'
 
-export const dispatchEvent = (subjects: SubjectsType) =>
+export const dispatchEvent = (subjects: Subjects, logger?: AppLogger) =>
   subjects.dispatchEventSubject.pipe(
     tap(({ event, payload }) => {
-      log.debug(`🔵⬆️ wallet request\n${JSON.stringify(payload, null, 2)}`)
+      logger?.debug(`🔵⬆️ walletRequest`, payload)
       window.dispatchEvent(
         new CustomEvent(event, {
           detail: payload,

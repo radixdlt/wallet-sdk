@@ -62,13 +62,13 @@ const walletSdk = WalletSdk({
 type WalletSdkInput = {
   dAppDefinitionAddress: string
   networkId?: number
-  logLevel?: LogLevelDesc
+  logger?: AppLogger
 }
 ```
 
 - **requires** dAppDefinitionAddress - Specifies the dApp that is interacting with the wallet. Used in dApp verification process on the wallet side.
 - **optional** networkId - Specifies which network to use, defaults to mainnet (0x01)
-- **optional** logLevel - Specifies level of log output. Used internally for debugging.
+- **optional** logger - Used internally for debugging.
 
 ## Get Wallet Data
 

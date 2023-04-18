@@ -1,7 +1,7 @@
 import { filter } from 'rxjs'
-import { SubjectsType } from '../subjects'
+import { Subjects } from '../subjects'
 
-export const messageEvents = (subjects: SubjectsType, interactionId: string) =>
+export const messageEvents = (subjects: Subjects, interactionId: string) =>
   subjects.messageLifeCycleEventSubject.pipe(
     filter((message) => message.interactionId === interactionId)
   )

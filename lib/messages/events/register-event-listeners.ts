@@ -1,8 +1,8 @@
-import { SubjectsType } from '../subjects'
+import { Subjects } from '../subjects'
 import { IncomingMessage } from '../_types'
 import { eventType } from './_types'
 
-export const registerEventListeners = (subjects: SubjectsType) => {
+export const registerEventListeners = (subjects: Subjects) => {
   const handleIncomingMessage = (event: Event) => {
     const message = (
       event as CustomEvent<

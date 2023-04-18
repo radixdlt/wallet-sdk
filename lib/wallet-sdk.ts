@@ -1,13 +1,13 @@
 import { MessageClient } from './messages/message-client'
-import log, { LogLevelDesc } from 'loglevel'
 import { createSendMessage } from './messages/observables/send-message'
 import { createMethods } from './create-methods'
-import { config } from './config'
+import { AppLogger } from './helpers/logger'
+import { Subjects } from './messages/subjects'
 
 type WalletSdkInput = {
   networkId?: number
   dAppDefinitionAddress: string
-  logLevel?: LogLevelDesc
+  logger?: AppLogger
 }
 
 export const Network = {
@@ -25,20 +25,19 @@ export type WalletSdk = ReturnType<typeof WalletSdk>
 export const WalletSdk = ({
   networkId = Network.Mainnet,
   dAppDefinitionAddress,
-  logLevel = config.logLevel,
+  logger,
 }: WalletSdkInput) => {
-  log.setLevel(logLevel)
-  log.debug(`🔵 wallet sdk instantiated`)
-  const messageClient = MessageClient()
+  logger?.debug(`🔵 walletSdkInstantiated`)
+  const messageClient = MessageClient(Subjects(), logger)
 
   const destroy = () => {
-    log.debug(`🔵🧹 destroying wallet sdk instance`)
+    logger?.debug(`🔵🧹 destroyingWalletSdkInstance`)
     messageClient.destroy()
   }
 
   const methods = createMethods(
     { networkId, dAppDefinitionAddress },
-    createSendMessage(messageClient.subjects)
+    createSendMessage(messageClient.subjects, logger)
   )
 
   return {
@@ -54,3 +53,4 @@ export { requestBuilder } from './request-builder'
 export * from './IO/request-items'
 export * from './IO/schemas'
 export * from './helpers/error'
+export * from './helpers/logger'
