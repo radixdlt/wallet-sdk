@@ -1,8 +1,8 @@
-import { SubjectsType } from '../subjects'
+import { Subjects } from '../subjects'
 import { tap, share, map } from 'rxjs'
 import { eventType } from '../events/_types'
 
-export const walletRequest = (subjects: SubjectsType) =>
+export const sendWalletRequest = (subjects: Subjects) =>
   subjects.outgoingMessageSubject.pipe(
     map((payload) => ({
       event: eventType.outgoingMessage,

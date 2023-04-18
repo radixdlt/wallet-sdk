@@ -7,7 +7,7 @@ import {
 } from '../IO/schemas'
 import { IncomingMessage, MessageDispatch } from './_types'
 
-export type SubjectsType = ReturnType<typeof Subjects>
+export type Subjects = ReturnType<typeof Subjects>
 
 export const Subjects = () => ({
   outgoingMessageSubject: new Subject<WalletInteraction>(),

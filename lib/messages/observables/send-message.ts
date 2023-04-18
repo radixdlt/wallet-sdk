@@ -1,4 +1,3 @@
-import log from 'loglevel'
 import { Err, err, ok, Result, ResultAsync } from 'neverthrow'
 import {
   filter,
@@ -21,13 +20,14 @@ import {
   WalletInteractionSuccessResponse,
 } from '../../IO/schemas'
 import { CallbackFns } from '../events/_types'
-import { SubjectsType } from '../subjects'
+import { Subjects } from '../subjects'
 import { messageEvents } from './message-events'
+import { AppLogger } from '../../helpers/logger'
 
 export type CreateSendMessage = ReturnType<typeof createSendMessage>
 
 export const createSendMessage =
-  (subjects: SubjectsType) =>
+  (subjects: Subjects, logger?: AppLogger) =>
   (callbackFns: Partial<CallbackFns>) =>
   (
     message: WalletInteraction
@@ -37,13 +37,7 @@ export const createSendMessage =
     if (callbackFns.requestControl)
       callbackFns.requestControl({
         cancelRequest: () => {
-          log.debug(
-            `🔵⬆️❌ wallet request canceled\n${JSON.stringify(
-              message,
-              null,
-              2
-            )}`
-          )
+          logger?.debug(`🔵⬆️❌ walletRequestCanceled`, message)
           return cancelRequestSubject.next()
         },
       })
