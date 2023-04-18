@@ -1,15 +1,16 @@
-import { SubjectsType } from './subjects'
+import { Subjects } from './subjects'
 import { Subscription } from 'rxjs'
-import { walletRequest } from './observables/wallet-request'
-import { walletResponse } from './observables/wallet-response'
+import { sendWalletRequest } from './observables/send-wallet-request'
+import { handleWalletResponse } from './observables/handle-wallet-response'
 import { dispatchEvent } from './observables/dispatch-event'
+import { AppLogger } from '../helpers/logger'
 
-export const Subscriptions = (subjects: SubjectsType) => {
+export const Subscriptions = (subjects: Subjects, logger?: AppLogger) => {
   const subscription = new Subscription()
 
-  subscription.add(dispatchEvent(subjects).subscribe())
-  subscription.add(walletRequest(subjects).subscribe())
-  subscription.add(walletResponse(subjects).subscribe())
+  subscription.add(dispatchEvent(subjects, logger).subscribe())
+  subscription.add(sendWalletRequest(subjects).subscribe())
+  subscription.add(handleWalletResponse(subjects, logger).subscribe())
 
   return subscription
 }

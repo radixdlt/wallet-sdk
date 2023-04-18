@@ -3,11 +3,11 @@
 /* eslint-disable max-nested-callbacks */
 import { Network, WalletSdk } from '../wallet-sdk'
 import { subscribeSpyTo } from '@hirez_io/observer-spy'
-import log from 'loglevel'
 import { messageLifeCycleEvent } from '../messages/events/_types'
 
 import { OneTimeAccounts } from '../IO/request-items/one-time-accounts'
 import { WalletInteractionSuccessResponse } from '../IO/schemas'
+import { createLogger } from '../helpers/logger'
 
 const mockAccountWalletResponse: OneTimeAccounts['WithoutProofOfOwnership']['wallet']['response'] =
   {
@@ -39,15 +39,17 @@ const delay = (millis: number) =>
 
 describe('sdk flow', () => {
   let sdk: WalletSdk
+  let logger = createLogger(1)
   beforeEach(() => {
+    logger.settings.minLevel = 1
     sdk = WalletSdk({
       dAppDefinitionAddress: 'radixDashboard',
-      logLevel: 'debug',
+      logger,
     })
   })
 
   afterEach(() => {
-    log.setLevel('silent')
+    logger.settings.minLevel = 4
     sdk.destroy()
   })
 

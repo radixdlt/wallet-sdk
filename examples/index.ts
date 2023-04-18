@@ -2,11 +2,12 @@ import { WalletSdk, requestBuilder, requestItem } from '../lib/wallet-sdk'
 import { Result } from 'neverthrow'
 import { login } from '../lib/IO/request-items/login'
 import { reset } from '../lib/IO/request-items/reset'
+import { createLogger } from '../lib/helpers/logger'
 
 const sdk = WalletSdk({
   dAppDefinitionAddress:
     'account_tdx_a_1qd5svul20u30qnq408zhj2tw5evqrunq48eg0jsjf9qsx5t8qu',
-  logLevel: 'DEBUG',
+  logger: createLogger(1),
 })
 
 const transactionManifest = `
