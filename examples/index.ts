@@ -8,6 +8,7 @@ const sdk = WalletSdk({
   dAppDefinitionAddress:
     'account_tdx_a_1qd5svul20u30qnq408zhj2tw5evqrunq48eg0jsjf9qsx5t8qu',
   logger: createLogger(1),
+  networkId: 12,
 })
 
 const transactionManifest = `
@@ -66,7 +67,13 @@ document.getElementById('account-address-btn')!.onclick = async () => {
           ? parseInt(accountAddressInputElement.value, 10)
           : undefined
       )
-    )
+    ),
+    {
+      eventCallback: (event) => console.log(event),
+      requestControl: ({ getRequest }) => {
+        console.log(getRequest().interactionId)
+      },
+    }
   )
 
   displayResults(result)

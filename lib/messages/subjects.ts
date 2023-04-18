@@ -5,7 +5,7 @@ import {
   WalletInteractionResponse,
   WalletInteractionSuccessResponse,
 } from '../IO/schemas'
-import { IncomingMessage, MessageDispatch } from './_types'
+import { IncomingMessage } from './_types'
 
 export type Subjects = ReturnType<typeof Subjects>
 
@@ -16,5 +16,4 @@ export const Subjects = () => ({
   >(),
   responseSubject: new Subject<WalletInteractionSuccessResponse | SdkError>(),
   messageLifeCycleEventSubject: new Subject<IncomingMessage['event']>(),
-  dispatchEventSubject: new Subject<MessageDispatch>(),
 })

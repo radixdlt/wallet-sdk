@@ -105,7 +105,7 @@ describe('sdk flow', () => {
     it('should cancel request', async () => {
       let cancel: (() => void) | undefined
 
-      const { request } = createRequestHelper(() =>
+      const { request, outgoingMessageSpy } = createRequestHelper(() =>
         sdk.request(
           { oneTimeAccountsWithoutProofOfOwnership: {} },
           {
@@ -117,8 +117,15 @@ describe('sdk flow', () => {
       )
 
       // trigger a request cancelation
-      delay(300).then(() => {
-        cancel!()
+      await delay(1)
+
+      cancel!()
+
+      await delay(1)
+
+      sdk.__subjects.incomingMessageSubject.next({
+        interactionId: outgoingMessageSpy.getFirstValue().interactionId,
+        eventType: messageLifeCycleEvent.requestCancelSuccess,
       })
 
       const result = await request

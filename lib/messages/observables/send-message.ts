@@ -2,9 +2,9 @@ import { Err, err, ok, Result, ResultAsync } from 'neverthrow'
 import {
   filter,
   first,
+  firstValueFrom,
   map,
   merge,
-  Observable,
   of,
   share,
   Subject,
@@ -21,7 +21,6 @@ import {
 } from '../../IO/schemas'
 import { CallbackFns } from '../events/_types'
 import { Subjects } from '../subjects'
-import { messageEvents } from './message-events'
 import { AppLogger } from '../../helpers/logger'
 
 export type CreateSendMessage = ReturnType<typeof createSendMessage>
@@ -32,25 +31,9 @@ export const createSendMessage =
   (
     message: WalletInteraction
   ): ResultAsync<WalletInteractionSuccessResponse, SdkError> => {
-    const cancelRequestSubject = new Subject<void>()
+    const cancelRequestSubject = new Subject<Err<never, SdkError>>()
 
-    if (callbackFns.requestControl)
-      callbackFns.requestControl({
-        cancelRequest: () => {
-          logger?.debug(`🔵⬆️❌ walletRequestCanceled`, message)
-          return cancelRequestSubject.next()
-        },
-      })
-
-    const cancelRequest$ = cancelRequestSubject
-      .asObservable()
-      .pipe(
-        map(() =>
-          err(createSdkError(errorType.canceledByUser, message.interactionId))
-        )
-      )
-
-    const response$ = subjects.responseSubject.pipe(
+    const walletResponse$ = subjects.responseSubject.pipe(
       filter((response) => response.interactionId === message.interactionId),
       map(
         (response): Result<WalletInteractionSuccessResponse, SdkError> =>
@@ -58,21 +41,57 @@ export const createSendMessage =
       )
     )
 
-    const walletResponseOrCancelRequestError$ = merge(
-      response$,
-      cancelRequest$
+    const cancelResponse$ = subjects.messageLifeCycleEventSubject.pipe(
+      filter(
+        ({ interactionId, eventType }) =>
+          message.interactionId === interactionId &&
+          ['requestCancelSuccess', 'requestCancelFail'].includes(eventType)
+      ),
+      map((message) => {
+        const error = createSdkError(
+          errorType.canceledByUser,
+          message.interactionId
+        )
+        logger?.debug(`🔵⬆️❌ walletRequestCanceled`, error)
+        cancelRequestSubject.next(err(error))
+        return message
+      })
+    )
+
+    const sendCancelRequest = () => {
+      subjects.outgoingMessageSubject.next({
+        interactionId: message.interactionId,
+        items: { discriminator: 'cancelRequest' },
+        metadata: message.metadata,
+      })
+
+      return ResultAsync.fromSafePromise(
+        firstValueFrom(merge(walletResponse$, cancelResponse$))
+      )
+    }
+
+    if (callbackFns.requestControl)
+      callbackFns.requestControl({
+        cancelRequest: () => sendCancelRequest().map(() => undefined),
+        getRequest: () => message,
+      })
+
+    const walletResponseOrCancelRequest$ = merge(
+      walletResponse$,
+      cancelRequestSubject
     ).pipe(first())
 
-    const messageEvent$ = messageEvents(subjects, message.interactionId).pipe(
+    const messageLifeCycleEvent$ = subjects.messageLifeCycleEventSubject.pipe(
+      filter(({ interactionId }) => message.interactionId === interactionId),
       tap((event) => {
         if (callbackFns.eventCallback)
           callbackFns.eventCallback(event.eventType)
       }),
-      takeUntil(response$),
+      takeUntil(walletResponse$),
       share()
     )
 
-    const messageEventSubscription = messageEvent$.subscribe()
+    const messageEventSubscription = messageLifeCycleEvent$.subscribe()
 
     const missingExtensionError$ = timer(config.extensionDetectionTime).pipe(
       map(() =>
@@ -80,30 +99,30 @@ export const createSendMessage =
       )
     )
 
-    const extensionDetection$ = merge(
+    const extensionMissingError$ = merge(
       missingExtensionError$,
-      messageEvent$
+      messageLifeCycleEvent$
     ).pipe(
       first(),
       filter((value): value is Err<never, SdkError> => !('eventType' in value))
     )
 
-    const sendMessage$ = of(true).pipe(
-      tap(() => {
+    const sendWalletRequest$ = of(message).pipe(
+      tap((message) => {
         subjects.outgoingMessageSubject.next(message)
       }),
-      filter(() => false)
-    ) as Observable<never>
-
-    const walletResponse$ = merge(
-      walletResponseOrCancelRequestError$,
-      extensionDetection$,
-      sendMessage$
-    ).pipe(
-      tap(() => {
-        messageEventSubscription.unsubscribe()
-      })
+      filter((_): _ is never => false)
     )
 
-    return unwrapObservable(walletResponse$)
+    return unwrapObservable(
+      merge(
+        walletResponseOrCancelRequest$,
+        extensionMissingError$,
+        sendWalletRequest$
+      ).pipe(
+        tap(() => {
+          messageEventSubscription.unsubscribe()
+        })
+      )
+    )
   }
