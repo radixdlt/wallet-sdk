@@ -10,8 +10,8 @@ import {
 export const provideDefaultNumberOfAccounts = (
   value: Partial<NumberOfAccounts>
 ): NumberOfAccounts => ({
-  quantity: value?.quantity || 1,
-  quantifier: value?.quantifier || 'atLeast',
+  quantity: value?.quantity ?? 1,
+  quantifier: value?.quantifier ?? 'atLeast',
 })
 
 const removeResetForUnauthorizedRequest = (value: WalletInteractionItems) => {
