@@ -34,11 +34,11 @@ describe('schemas', () => {
   describe('Auth', () => {
     it('AuthRequestItemSchema', () => {
       AuthRequestItemSchema.parse({
-        discriminator: 'login',
-        challenge: 'asd',
+        discriminator: 'loginWithoutChallenge',
       })
       AuthRequestItemSchema.parse({
-        discriminator: 'login',
+        discriminator: 'loginWithChallenge',
+        challenge: 'challenge',
       })
     })
 
@@ -49,9 +49,8 @@ describe('schemas', () => {
           identityAddress: 'addr_xx',
           label: 'personaLabel',
         },
+        proof: { publicKey: 'key', signature: 'signature', curve: '12' },
         challenge: 'challenge',
-        publicKey: 'key',
-        signature: 'signature',
       })
       AuthLoginRequestResponseItemSchema.parse({
         discriminator: 'loginWithoutChallenge',

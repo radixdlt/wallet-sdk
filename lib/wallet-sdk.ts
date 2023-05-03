@@ -37,7 +37,8 @@ export const WalletSdk = ({
 
   const methods = createMethods(
     { networkId, dAppDefinitionAddress },
-    createSendMessage(messageClient.subjects, logger)
+    createSendMessage(messageClient.subjects, logger),
+    logger
   )
 
   return {

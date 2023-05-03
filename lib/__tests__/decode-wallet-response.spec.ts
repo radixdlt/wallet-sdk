@@ -52,8 +52,11 @@ describe('decodeWalletResponse', () => {
               label: 'personaLabel',
             },
             challenge: 'challenge',
-            publicKey: 'publicKey',
-            signature: 'signature',
+            proof: {
+              publicKey: 'publicKey',
+              signature: 'signature',
+              curve: '123',
+            },
           },
         },
         expected: {
@@ -61,10 +64,11 @@ describe('decodeWalletResponse', () => {
             identityAddress: 'addr_xxx',
             label: 'personaLabel',
           },
-          signedChallenge: {
-            challenge: 'challenge',
+          challenge: 'challenge',
+          proof: {
             publicKey: 'publicKey',
             signature: 'signature',
+            curve: '123',
           },
         },
       },

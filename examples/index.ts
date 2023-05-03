@@ -50,8 +50,7 @@ const accountAddressInputElement = document.getElementById(
 document.getElementById('login-btn')!.onclick = async () => {
   clearResults()
   const result = await sdk.request({
-    loginWithoutChallenge: {},
-    reset: { accounts: true },
+    loginWithChallenge: { challenge: 'test' },
   })
 
   displayResults(result)
