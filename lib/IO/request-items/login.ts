@@ -1,5 +1,6 @@
 import {
-  AuthLoginRequestItem,
+  AuthLoginWithChallengeRequestItem,
+  AuthLoginWithoutChallengeRequestItem,
   AuthLoginWithChallengeRequestResponseItem,
   AuthLoginWithoutChallengeRequestResponseItem,
   Persona,
@@ -8,7 +9,7 @@ import {
 export type Login = {
   WithoutChallenge: {
     wallet: {
-      request: AuthLoginRequestItem
+      request: AuthLoginWithoutChallengeRequestItem
       response: AuthLoginWithoutChallengeRequestResponseItem
     }
     method: {
@@ -20,14 +21,15 @@ export type Login = {
   }
   WithChallenge: {
     wallet: {
-      request: AuthLoginRequestItem
+      request: AuthLoginWithChallengeRequestItem
       response: AuthLoginWithChallengeRequestResponseItem
     }
     method: {
       output: {
         persona: Persona
-        signedChallenge: {
-          challenge: string
+        challenge: string
+        proof: {
+          curve: string
           publicKey: string
           signature: string
         }
@@ -49,13 +51,13 @@ export const login = {
     <I>(input: I extends NotAllowedKeys ? never : I) => ({
       ...input,
       loginWithoutChallenge: {
-        discriminator: 'login',
+        discriminator: 'loginWithoutChallenge',
       },
     }),
   withChallenge:
     (challenge: string) =>
     <I>(input: I extends NotAllowedKeys ? never : I) => ({
       ...input,
-      loginWithChallenge: { discriminator: 'login', challenge },
+      loginWithChallenge: { discriminator: 'loginWithChallenge', challenge },
     }),
 }

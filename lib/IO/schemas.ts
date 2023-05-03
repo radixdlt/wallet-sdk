@@ -217,12 +217,21 @@ export type AuthUsePersonaRequestResponseItem = z.infer<
   typeof AuthUsePersonaRequestResponseItemSchema
 >
 
-const AuthLoginRequestItemSchema = object({
-  discriminator: literal('login'),
-  challenge: string().optional(),
+const AuthLoginWithChallengeRequestItemSchema = object({
+  discriminator: literal('loginWithChallenge'),
+  challenge: string(),
 })
 
-export type AuthLoginRequestItem = z.infer<typeof AuthLoginRequestItemSchema>
+const AuthLoginWithoutChallengeRequestItemSchema = object({
+  discriminator: literal('loginWithoutChallenge'),
+})
+
+export type AuthLoginWithChallengeRequestItem = z.infer<
+  typeof AuthLoginWithChallengeRequestItemSchema
+>
+export type AuthLoginWithoutChallengeRequestItem = z.infer<
+  typeof AuthLoginWithoutChallengeRequestItemSchema
+>
 
 const AuthLoginWithoutChallengeRequestResponseItemSchema = object({
   discriminator: literal('loginWithoutChallenge'),
@@ -233,12 +242,17 @@ export type AuthLoginWithoutChallengeRequestResponseItem = z.infer<
   typeof AuthLoginWithoutChallengeRequestResponseItemSchema
 >
 
+const ProofSchema = object({
+  publicKey: string(),
+  signature: string(),
+  curve: string(),
+})
+
 const AuthLoginWithChallengeRequestResponseItemSchema = object({
   discriminator: literal('loginWithChallenge'),
   persona: PersonaSchema,
   challenge: string(),
-  publicKey: string(),
-  signature: string(),
+  proof: ProofSchema,
 })
 
 export type AuthLoginWithChallengeRequestResponseItem = z.infer<
@@ -256,7 +270,8 @@ export type AuthLoginRequestResponseItem = z.infer<
 
 export const AuthRequestItemSchema = union([
   AuthUsePersonaRequestItemSchema,
-  AuthLoginRequestItemSchema,
+  AuthLoginWithChallengeRequestItemSchema,
+  AuthLoginWithoutChallengeRequestItemSchema,
 ])
 
 export type AuthRequestItem = z.infer<typeof AuthRequestItemSchema>

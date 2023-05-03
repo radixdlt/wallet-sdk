@@ -12,6 +12,7 @@ import { transformMethodInput } from './IO/transform-method-input'
 import { createMessage } from './messages/create-message'
 import { CallbackFns } from './messages/events/_types'
 import { Method, requestType } from './_types'
+import { AppLogger } from './wallet-sdk'
 
 type SendWalletInteraction = (
   callbackFns: Partial<CallbackFns>
@@ -21,7 +22,8 @@ type SendWalletInteraction = (
 
 export const createMethods = (
   metadata: Metadata,
-  sendMessageToWallet: SendWalletInteraction
+  sendMessageToWallet: SendWalletInteraction,
+  logger?: AppLogger
 ) => {
   const request = <
     Input extends Method['request']['input'],
@@ -38,7 +40,7 @@ export const createMethods = (
   ) =>
     transformMethodInput(input)
       .andThen(createMessage(metadata))
-      .asyncAndThen(validateWalletRequest)
+      .asyncAndThen((message) => validateWalletRequest(message, logger))
       .andThen(sendMessageToWallet(callbackFns))
       .andThen(validateWalletResponse)
       .map((response) => response.items)

@@ -88,21 +88,23 @@ export const transformMethodInput = <I extends {}>(input: I) =>
           case requestMethodRequestType.loginWithoutChallenge:
             return {
               ...acc,
-              auth: { ...value, discriminator: 'login' },
+              auth: { discriminator: 'loginWithoutChallenge' },
               discriminator: 'authorizedRequest',
             }
+
+          case requestMethodRequestType.loginWithChallenge: {
+            const { challenge } = value
+            return {
+              ...acc,
+              auth: { challenge, discriminator: 'loginWithChallenge' },
+              discriminator: 'authorizedRequest',
+            }
+          }
 
           case requestMethodRequestType.usePersona:
             return {
               ...acc,
               auth: { ...value, discriminator: 'usePersona' },
-              discriminator: 'authorizedRequest',
-            }
-
-          case requestMethodRequestType.loginWithChallenge:
-            return {
-              ...acc,
-              auth: value,
               discriminator: 'authorizedRequest',
             }
 

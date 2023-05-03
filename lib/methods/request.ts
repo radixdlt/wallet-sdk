@@ -29,7 +29,7 @@ type RequestItems = {
   // [requestMethodRequestType.ongoingAccountsWithProofOfOwnership]: OngoingAccounts['WithProofOfOwnership']
   [requestMethodRequestType.usePersona]: UsePersona
   [requestMethodRequestType.loginWithoutChallenge]: Login['WithoutChallenge']
-  // [requestMethodRequestType.loginWithChallenge]: Login['WithChallenge']
+  [requestMethodRequestType.loginWithChallenge]: Login['WithChallenge']
   [requestMethodRequestType.oneTimePersonaData]: OneTimePersonaData
   [requestMethodRequestType.ongoingPersonaData]: OngoingPersonaData
 }

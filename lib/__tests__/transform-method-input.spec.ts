@@ -169,7 +169,7 @@ describe('transformMethodInput', () => {
           expected: {
             discriminator: 'authorizedRequest',
             auth: {
-              discriminator: 'login',
+              discriminator: 'loginWithChallenge',
               challenge: 'abc',
             },
           },
@@ -179,7 +179,7 @@ describe('transformMethodInput', () => {
           expected: {
             discriminator: 'authorizedRequest',
             auth: {
-              discriminator: 'login',
+              discriminator: 'loginWithoutChallenge',
             },
           },
         },

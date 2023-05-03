@@ -9,11 +9,9 @@ export const decodeWalletResponse = <R>(
     switch (key) {
       case RequestTypeSchema.auth.value: {
         const { discriminator: authDiscriminator, ...auth } = value
-        if (authDiscriminator === 'usePersona') {
-          return { ...acc, persona: auth.persona }
-        } else if (authDiscriminator === 'loginWithChallenge') {
-          const { persona, ...signedChallenge } = auth
-          return { ...acc, persona, signedChallenge }
+        if (authDiscriminator === 'loginWithChallenge') {
+          const { persona, proof, challenge } = auth
+          return { ...acc, persona, challenge, proof }
         } else {
           return { ...acc, persona: auth.persona }
         }
