@@ -13,7 +13,7 @@ describe('transformMethodInput', () => {
           expected: {
             discriminator: 'unauthorizedRequest',
             [RequestTypeSchema.oneTimeAccounts.value]: {
-              requiresProofOfOwnership: false,
+              discriminator: 'oneTimeAccountsWithoutProofOfOwnership',
               numberOfAccounts: {
                 quantity: 1,
                 quantifier: 'atLeast',
@@ -26,7 +26,7 @@ describe('transformMethodInput', () => {
           expected: {
             discriminator: 'unauthorizedRequest',
             [RequestTypeSchema.oneTimeAccounts.value]: {
-              requiresProofOfOwnership: false,
+              discriminator: 'oneTimeAccountsWithoutProofOfOwnership',
               numberOfAccounts: {
                 quantity: 3,
                 quantifier: 'atLeast',
@@ -35,11 +35,12 @@ describe('transformMethodInput', () => {
           },
         },
         {
-          actual: requestItem.oneTimeAccounts.withProofOfOwnership(),
+          actual: requestItem.oneTimeAccounts.withProofOfOwnership('test'),
           expected: {
             discriminator: 'unauthorizedRequest',
             [RequestTypeSchema.oneTimeAccounts.value]: {
-              requiresProofOfOwnership: true,
+              discriminator: 'oneTimeAccountsWithProofOfOwnership',
+              challenge: 'test',
               numberOfAccounts: {
                 quantity: 1,
                 quantifier: 'atLeast',
@@ -48,11 +49,12 @@ describe('transformMethodInput', () => {
           },
         },
         {
-          actual: requestItem.oneTimeAccounts.withProofOfOwnership(1),
+          actual: requestItem.oneTimeAccounts.withProofOfOwnership('test', 1),
           expected: {
             discriminator: 'unauthorizedRequest',
             [RequestTypeSchema.oneTimeAccounts.value]: {
-              requiresProofOfOwnership: true,
+              discriminator: 'oneTimeAccountsWithProofOfOwnership',
+              challenge: 'test',
               numberOfAccounts: {
                 quantity: 1,
                 quantifier: 'atLeast',
@@ -62,13 +64,15 @@ describe('transformMethodInput', () => {
         },
         {
           actual: requestItem.oneTimeAccounts.withProofOfOwnership(
+            'test',
             5,
             'exactly'
           ),
           expected: {
             discriminator: 'unauthorizedRequest',
             [RequestTypeSchema.oneTimeAccounts.value]: {
-              requiresProofOfOwnership: true,
+              discriminator: 'oneTimeAccountsWithProofOfOwnership',
+              challenge: 'test',
               numberOfAccounts: {
                 quantity: 5,
                 quantifier: 'exactly',
@@ -91,7 +95,7 @@ describe('transformMethodInput', () => {
           expected: {
             discriminator: 'unauthorizedRequest',
             [RequestTypeSchema.ongoingAccounts.value]: {
-              requiresProofOfOwnership: false,
+              discriminator: 'ongoingAccountsWithoutProofOfOwnership',
               numberOfAccounts: {
                 quantity: 1,
                 quantifier: 'atLeast',
@@ -104,7 +108,7 @@ describe('transformMethodInput', () => {
           expected: {
             discriminator: 'unauthorizedRequest',
             [RequestTypeSchema.ongoingAccounts.value]: {
-              requiresProofOfOwnership: false,
+              discriminator: 'ongoingAccountsWithoutProofOfOwnership',
               numberOfAccounts: {
                 quantity: 3,
                 quantifier: 'atLeast',
@@ -113,11 +117,12 @@ describe('transformMethodInput', () => {
           },
         },
         {
-          actual: requestItem.ongoingAccounts.withProofOfOwnership(),
+          actual: requestItem.ongoingAccounts.withProofOfOwnership('test'),
           expected: {
             discriminator: 'unauthorizedRequest',
             [RequestTypeSchema.ongoingAccounts.value]: {
-              requiresProofOfOwnership: true,
+              discriminator: 'ongoingAccountsWithProofOfOwnership',
+              challenge: 'test',
               numberOfAccounts: {
                 quantity: 1,
                 quantifier: 'atLeast',
@@ -126,11 +131,12 @@ describe('transformMethodInput', () => {
           },
         },
         {
-          actual: requestItem.ongoingAccounts.withProofOfOwnership(5),
+          actual: requestItem.ongoingAccounts.withProofOfOwnership('test', 5),
           expected: {
             discriminator: 'unauthorizedRequest',
             [RequestTypeSchema.ongoingAccounts.value]: {
-              requiresProofOfOwnership: true,
+              discriminator: 'ongoingAccountsWithProofOfOwnership',
+              challenge: 'test',
               numberOfAccounts: {
                 quantity: 5,
                 quantifier: 'atLeast',
@@ -140,13 +146,15 @@ describe('transformMethodInput', () => {
         },
         {
           actual: requestItem.ongoingAccounts.withProofOfOwnership(
+            'test',
             10,
             'exactly'
           ),
           expected: {
             discriminator: 'unauthorizedRequest',
             [RequestTypeSchema.ongoingAccounts.value]: {
-              requiresProofOfOwnership: true,
+              discriminator: 'ongoingAccountsWithProofOfOwnership',
+              challenge: 'test',
               numberOfAccounts: {
                 quantity: 10,
                 quantifier: 'exactly',

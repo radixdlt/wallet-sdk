@@ -42,6 +42,14 @@ export const PersonaDataFieldSchema = union([
   literal(personaDataField.phoneNumber),
 ])
 
+const ProofSchema = object({
+  publicKey: string(),
+  signature: string(),
+  curve: string(),
+})
+
+export type Proof = z.infer<typeof ProofSchema>
+
 export type PersonaDataField = z.infer<typeof PersonaDataFieldSchema>
 
 const AccountSchema = object({
@@ -55,7 +63,7 @@ export type Account = z.infer<typeof AccountSchema>
 const AccountWithProofOfOwnershipSchema = object({
   account: AccountSchema,
   challenge: string(),
-  signature: string(),
+  proof: ProofSchema,
 })
 
 export type AccountWithProofOfOwnership = z.infer<
@@ -99,16 +107,27 @@ const MetadataSchema = object({
 
 export type Metadata = z.infer<typeof MetadataSchema>
 
-const OneTimeAccountsRequestItemSchema = object({
-  requiresProofOfOwnership: boolean(),
+const OneTimeAccountsWithoutProofOfOwnershipRequestItemSchema = object({
+  discriminator: literal('oneTimeAccountsWithoutProofOfOwnership'),
   numberOfAccounts: NumberOfAccountsSchema,
 })
 
-export type OneTimeAccountsRequestItem = z.infer<
-  typeof OneTimeAccountsRequestItemSchema
+export type OneTimeAccountsWithoutProofOfOwnershipRequestItem = z.infer<
+  typeof OneTimeAccountsWithoutProofOfOwnershipRequestItemSchema
+>
+
+const OneTimeAccountsWithProofOfOwnershipRequestItemSchema = object({
+  discriminator: literal('oneTimeAccountsWithProofOfOwnership'),
+  numberOfAccounts: NumberOfAccountsSchema,
+  challenge: string(),
+})
+
+export type OneTimeAccountsWithProofOfOwnershipRequestItem = z.infer<
+  typeof OneTimeAccountsWithProofOfOwnershipRequestItemSchema
 >
 
 const OneTimeAccountsWithProofOfOwnershipRequestResponseItemSchema = object({
+  discriminator: literal('oneTimeAccountsWithProofOfOwnership'),
   accounts: AccountWithProofOfOwnershipSchema.array(),
 })
 
@@ -117,6 +136,7 @@ export type OneTimeAccountsWithProofOfOwnershipRequestResponseItem = z.infer<
 >
 
 const OneTimeAccountsWithoutProofOfOwnershipRequestResponseItemSchema = object({
+  discriminator: literal('oneTimeAccountsWithoutProofOfOwnership'),
   accounts: AccountSchema.array(),
 })
 
@@ -133,16 +153,27 @@ export type OneTimeAccountsRequestResponseItem = z.infer<
   typeof OneTimeAccountsRequestResponseItemSchema
 >
 
-const OngoingAccountsRequestItemSchema = object({
-  requiresProofOfOwnership: boolean(),
+const OngoingAccountsWithProofOfOwnershipRequestItemSchema = object({
+  discriminator: literal('ongoingAccountsWithProofOfOwnership'),
+  numberOfAccounts: NumberOfAccountsSchema,
+  challenge: string(),
+})
+
+export type OngoingAccountsWithProofOfOwnershipRequestItem = z.infer<
+  typeof OngoingAccountsWithProofOfOwnershipRequestItemSchema
+>
+
+const OngoingAccountsWithoutProofOfOwnershipRequestItemSchema = object({
+  discriminator: literal('ongoingAccountsWithoutProofOfOwnership'),
   numberOfAccounts: NumberOfAccountsSchema,
 })
 
-export type OngoingAccountsRequestItem = z.infer<
-  typeof OngoingAccountsRequestItemSchema
+export type OngoingAccountsWithoutProofOfOwnershipRequestItem = z.infer<
+  typeof OngoingAccountsWithoutProofOfOwnershipRequestItemSchema
 >
 
 const OngoingAccountsWithProofOfOwnershipRequestResponseItemSchema = object({
+  discriminator: literal('ongoingAccountsWithProofOfOwnership'),
   accounts: AccountWithProofOfOwnershipSchema.array(),
 })
 
@@ -151,6 +182,7 @@ export type OngoingAccountsWithProofOfOwnershipRequestResponseItem = z.infer<
 >
 
 const OngoingAccountsWithoutProofOfOwnershipRequestResponseItemSchema = object({
+  discriminator: literal('ongoingAccountsWithoutProofOfOwnership'),
   accounts: AccountSchema.array(),
 })
 
@@ -242,12 +274,6 @@ export type AuthLoginWithoutChallengeRequestResponseItem = z.infer<
   typeof AuthLoginWithoutChallengeRequestResponseItemSchema
 >
 
-const ProofSchema = object({
-  publicKey: string(),
-  signature: string(),
-  curve: string(),
-})
-
 const AuthLoginWithChallengeRequestResponseItemSchema = object({
   discriminator: literal('loginWithChallenge'),
   persona: PersonaSchema,
@@ -313,7 +339,10 @@ export type SendTransactionResponseItem = z.infer<
 
 const WalletUnauthorizedRequestItemsSchema = object({
   discriminator: literal('unauthorizedRequest'),
-  oneTimeAccounts: OneTimeAccountsRequestItemSchema.optional(),
+  oneTimeAccounts: union([
+    OneTimeAccountsWithProofOfOwnershipRequestItemSchema,
+    OneTimeAccountsWithoutProofOfOwnershipRequestItemSchema,
+  ]).optional(),
   oneTimePersonaData: OneTimePersonaDataRequestItemSchema.optional(),
 })
 
@@ -324,8 +353,14 @@ export type WalletUnauthorizedRequestItems = z.infer<
 const WalletAuthorizedRequestItemsSchema = object({
   discriminator: literal('authorizedRequest'),
   auth: AuthRequestItemSchema,
-  oneTimeAccounts: OneTimeAccountsRequestItemSchema.optional(),
-  ongoingAccounts: OngoingAccountsRequestItemSchema.optional(),
+  oneTimeAccounts: union([
+    OneTimeAccountsWithProofOfOwnershipRequestItemSchema,
+    OneTimeAccountsWithoutProofOfOwnershipRequestItemSchema,
+  ]).optional(),
+  ongoingAccounts: union([
+    OngoingAccountsWithProofOfOwnershipRequestItemSchema,
+    OngoingAccountsWithoutProofOfOwnershipRequestItemSchema,
+  ]).optional(),
   oneTimePersonaData: OneTimePersonaDataRequestItemSchema.optional(),
   ongoingPersonaData: OngoingPersonaDataRequestItemSchema.optional(),
   reset: ResetRequestSchema.optional(),

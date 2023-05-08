@@ -3,7 +3,8 @@ import {
   Account,
   AccountWithProofOfOwnership,
   NumberOfAccountsQuantifier,
-  OngoingAccountsRequestItem,
+  OngoingAccountsWithProofOfOwnershipRequestItem,
+  OngoingAccountsWithoutProofOfOwnershipRequestItem,
   OngoingAccountsWithoutProofOfOwnershipRequestResponseItem,
   OngoingAccountsWithProofOfOwnershipRequestResponseItem,
 } from '../schemas'
@@ -11,7 +12,7 @@ import {
 export type OngoingAccounts = {
   WithoutProofOfOwnership: {
     wallet: {
-      request: OngoingAccountsRequestItem
+      request: OngoingAccountsWithoutProofOfOwnershipRequestItem
       response: OngoingAccountsWithoutProofOfOwnershipRequestResponseItem
     }
     method: {
@@ -24,7 +25,7 @@ export type OngoingAccounts = {
   }
   WithProofOfOwnership: {
     wallet: {
-      request: OngoingAccountsRequestItem
+      request: OngoingAccountsWithProofOfOwnershipRequestItem
       response: OngoingAccountsWithProofOfOwnershipRequestResponseItem
     }
     method: {
@@ -56,20 +57,24 @@ export const ongoingAccounts = {
     <I extends RequiredKeys>(input: I extends NotAllowedKeys ? never : I) => ({
       ...input,
       ongoingAccountsWithoutProofOfOwnership: {
+        discriminator: 'ongoingAccountsWithoutProofOfOwnership',
         quantity,
         quantifier,
       },
     }),
   withProofOfOwnership:
     (
+      challenge: string,
       quantity = config.defaultNumberOfAccountsQuantity,
       quantifier = config.defaultNumberOfAccountsQuantifier
     ) =>
     <I extends RequiredKeys>(input: I extends NotAllowedKeys ? never : I) => ({
       ...input,
       ongoingAccountsWithProofOfOwnership: {
+        discriminator: 'ongoingAccountsWithProofOfOwnership',
         quantity,
         quantifier,
+        challenge,
       },
     }),
 }

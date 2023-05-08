@@ -11,6 +11,7 @@ import { createLogger } from '../helpers/logger'
 
 const mockAccountWalletResponse: OneTimeAccounts['WithoutProofOfOwnership']['wallet']['response'] =
   {
+    discriminator: 'oneTimeAccountsWithoutProofOfOwnership',
     accounts: [
       {
         address: 'rdx61333732663539372d383861352d3461',
@@ -204,6 +205,7 @@ describe('sdk flow', () => {
             },
           },
           ongoingAccounts: {
+            discriminator: 'ongoingAccountsWithoutProofOfOwnership',
             accounts: [
               {
                 address:
