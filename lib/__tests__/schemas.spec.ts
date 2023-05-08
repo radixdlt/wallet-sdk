@@ -11,6 +11,7 @@ import {
 describe('schemas', () => {
   it('OneTimeAccountsResponseItemSchema', () => {
     OneTimeAccountsRequestResponseItemSchema.parse({
+      discriminator: 'oneTimeAccountsWithoutProofOfOwnership',
       accounts: [
         {
           address: 'rdx61333732663539372d383861352d3461',
@@ -73,14 +74,14 @@ describe('schemas', () => {
             identityAddress: 'randomAddress1',
           },
           oneTimeAccounts: {
-            requiresProofOfOwnership: false,
+            discriminator: 'oneTimeAccountsWithoutProofOfOwnership',
             numberOfAccounts: {
               quantity: 1,
               quantifier: 'exactly',
             },
           },
           ongoingAccounts: {
-            requiresProofOfOwnership: true,
+            discriminator: 'ongoingAccountsWithoutProofOfOwnership',
             numberOfAccounts: {
               quantity: 5,
               quantifier: 'atLeast',
@@ -118,6 +119,7 @@ describe('schemas', () => {
         items: {
           discriminator: 'unauthorizedRequest',
           oneTimeAccounts: {
+            discriminator: 'oneTimeAccountsWithoutProofOfOwnership',
             accounts: [],
           },
           oneTimePersonaData: {
@@ -171,6 +173,7 @@ describe('schemas', () => {
             },
           },
           ongoingAccounts: {
+            discriminator: 'ongoingAccountsWithoutProofOfOwnership',
             accounts: [
               {
                 address:
@@ -188,6 +191,7 @@ describe('schemas', () => {
         items: {
           discriminator: 'unauthorizedRequest',
           oneTimeAccounts: {
+            discriminator: 'oneTimeAccountsWithoutProofOfOwnership',
             accounts: [
               {
                 address:

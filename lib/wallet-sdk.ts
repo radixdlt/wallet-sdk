@@ -49,7 +49,7 @@ export const WalletSdk = ({
 }
 
 export { ManifestBuilder } from './manifest-builder'
-export * from './manifest-value'
+export * as ManifestValue from './manifest-value'
 export { requestBuilder } from './request-builder'
 export * from './IO/request-items'
 export * from './IO/schemas'

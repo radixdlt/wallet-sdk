@@ -2,6 +2,10 @@ import { ok } from 'neverthrow'
 import { requestMethodRequestType } from '../methods/request'
 import {
   NumberOfAccounts,
+  OneTimeAccountsWithProofOfOwnershipRequestItem,
+  OneTimeAccountsWithoutProofOfOwnershipRequestItem,
+  OngoingAccountsWithProofOfOwnershipRequestItem,
+  OngoingAccountsWithoutProofOfOwnershipRequestItem,
   ResetRequestItem,
   WalletInteractionItems,
   WalletUnauthorizedRequestItems,
@@ -33,41 +37,55 @@ export const transformMethodInput = <I extends {}>(input: I) =>
     Object.entries(input).reduce<WalletInteractionItems>(
       (acc, [requestType, value]: [string, any]) => {
         switch (requestType) {
-          case requestMethodRequestType.oneTimeAccountsWithoutProofOfOwnership:
+          case requestMethodRequestType.oneTimeAccountsWithoutProofOfOwnership: {
+            const oneTimeAccounts: OneTimeAccountsWithoutProofOfOwnershipRequestItem =
+              {
+                discriminator: 'oneTimeAccountsWithoutProofOfOwnership',
+                numberOfAccounts: provideDefaultNumberOfAccounts(value),
+              }
             return {
               ...acc,
-              oneTimeAccounts: {
-                requiresProofOfOwnership: false,
-                numberOfAccounts: provideDefaultNumberOfAccounts(value),
-              },
+              oneTimeAccounts,
             }
+          }
 
-          case requestMethodRequestType.oneTimeAccountsWithProofOfOwnership:
+          case requestMethodRequestType.oneTimeAccountsWithProofOfOwnership: {
+            const oneTimeAccounts: OneTimeAccountsWithProofOfOwnershipRequestItem =
+              {
+                discriminator: 'oneTimeAccountsWithProofOfOwnership',
+                numberOfAccounts: provideDefaultNumberOfAccounts(value),
+                challenge: value.challenge,
+              }
             return {
               ...acc,
-              oneTimeAccounts: {
-                requiresProofOfOwnership: true,
-                numberOfAccounts: provideDefaultNumberOfAccounts(value),
-              },
+              oneTimeAccounts,
             }
+          }
 
-          case requestMethodRequestType.ongoingAccountsWithProofOfOwnership:
+          case requestMethodRequestType.ongoingAccountsWithProofOfOwnership: {
+            const ongoingAccounts: OngoingAccountsWithProofOfOwnershipRequestItem =
+              {
+                discriminator: 'ongoingAccountsWithProofOfOwnership',
+                numberOfAccounts: provideDefaultNumberOfAccounts(value),
+                challenge: value.challenge,
+              }
             return {
               ...acc,
-              ongoingAccounts: {
-                requiresProofOfOwnership: true,
-                numberOfAccounts: provideDefaultNumberOfAccounts(value),
-              },
+              ongoingAccounts,
             }
+          }
 
-          case requestMethodRequestType.ongoingAccountsWithoutProofOfOwnership:
+          case requestMethodRequestType.ongoingAccountsWithoutProofOfOwnership: {
+            const ongoingAccounts: OngoingAccountsWithoutProofOfOwnershipRequestItem =
+              {
+                discriminator: 'ongoingAccountsWithoutProofOfOwnership',
+                numberOfAccounts: provideDefaultNumberOfAccounts(value),
+              }
             return {
               ...acc,
-              ongoingAccounts: {
-                requiresProofOfOwnership: false,
-                numberOfAccounts: provideDefaultNumberOfAccounts(value),
-              },
+              ongoingAccounts,
             }
+          }
 
           case requestMethodRequestType.oneTimePersonaData:
             return {

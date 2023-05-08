@@ -24,9 +24,9 @@ export const requestMethodRequestType = {
 type RequestItems = {
   [requestMethodRequestType.reset]: Reset
   [requestMethodRequestType.oneTimeAccountsWithoutProofOfOwnership]: OneTimeAccounts['WithoutProofOfOwnership']
-  // [requestMethodRequestType.oneTimeAccountsWithProofOfOwnership]: OneTimeAccounts['WithProofOfOwnership']
+  [requestMethodRequestType.oneTimeAccountsWithProofOfOwnership]: OneTimeAccounts['WithProofOfOwnership']
   [requestMethodRequestType.ongoingAccountsWithoutProofOfOwnership]: OngoingAccounts['WithoutProofOfOwnership']
-  // [requestMethodRequestType.ongoingAccountsWithProofOfOwnership]: OngoingAccounts['WithProofOfOwnership']
+  [requestMethodRequestType.ongoingAccountsWithProofOfOwnership]: OngoingAccounts['WithProofOfOwnership']
   [requestMethodRequestType.usePersona]: UsePersona
   [requestMethodRequestType.loginWithoutChallenge]: Login['WithoutChallenge']
   [requestMethodRequestType.loginWithChallenge]: Login['WithChallenge']
