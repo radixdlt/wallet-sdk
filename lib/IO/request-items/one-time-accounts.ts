@@ -34,6 +34,7 @@ export type OneTimeAccounts = {
       input: {
         quantity?: number
         quantifier?: NumberOfAccountsQuantifier
+        challenge: string
       }
       output: {
         oneTimeAccounts: AccountWithProofOfOwnership[]
