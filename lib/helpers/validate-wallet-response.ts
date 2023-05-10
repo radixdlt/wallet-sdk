@@ -1,25 +1,21 @@
-import { ZodError } from 'zod'
-import { ResultAsync } from 'neverthrow'
+import { ResultAsync, err, ok } from 'neverthrow'
 import {
-  WalletInteractionResponseSchema,
+  WalletInteractionResponse,
   WalletInteractionSuccessResponse,
-} from '../IO/schemas'
-import { createSdkError, errorType, SdkError } from './error'
-import { AppLogger } from './logger'
+} from '../IO/v1/schemas'
+import { ZodError } from 'zod'
+import { SdkError, createSdkError } from './error'
 
 export const validateWalletResponse = (
-  walletResponse: WalletInteractionSuccessResponse,
-  logger?: AppLogger
+  walletResponse: unknown
 ): ResultAsync<WalletInteractionSuccessResponse, SdkError> =>
   ResultAsync.fromPromise(
-    WalletInteractionResponseSchema.parseAsync(walletResponse),
+    WalletInteractionResponse.parseAsync(walletResponse),
     (error) => (error as any).issues as ZodError[]
   )
-    .map(() => walletResponse)
-    .mapErr(() => {
-      logger?.error(`🔵💥 invalid wallet response`)
-      return createSdkError(
-        errorType.walletRequestValidation,
-        walletResponse.interactionId
-      )
-    })
+    .andThen((response) =>
+      response.discriminator === 'success'
+        ? ok(response)
+        : err(response as SdkError)
+    )
+    .mapErr(() => createSdkError('walletResponseValidation', ''))

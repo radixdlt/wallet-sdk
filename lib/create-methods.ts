@@ -1,62 +1,52 @@
-import { ResultAsync } from 'neverthrow'
-import { SdkError } from './helpers/error'
-import { validateWalletRequest } from './helpers/validate-wallet-request'
-import { validateWalletResponse } from './helpers/validate-wallet-response'
-import { decodeWalletResponse } from './IO/decode-wallet-response'
-import {
-  Metadata,
-  WalletInteraction,
-  WalletInteractionSuccessResponse,
-} from './IO/schemas'
-import { transformMethodInput } from './IO/transform-method-input'
-import { createMessage } from './messages/create-message'
-import { CallbackFns } from './messages/events/_types'
-import { Method, requestType } from './_types'
 import { AppLogger } from './wallet-sdk'
+import {
+  CallbackFns,
+  Metadata,
+  SendTransactionItem,
+  WalletRequestItems,
+  WalletRequestResponseItems,
+  WalletTransactionResponseItems,
+} from './IO/v1/schemas'
+import { createWalletInteractionFactory } from './IO/v1/create-wallet-interaction-factory'
+import { ConnectorExtensionClient } from './connector-extension/connector-extension-client'
+import { validateWalletResponse } from './helpers/validate-wallet-response'
 
-type SendWalletInteraction = (
-  callbackFns: Partial<CallbackFns>
-) => (
-  message: WalletInteraction
-) => ResultAsync<WalletInteractionSuccessResponse, SdkError>
-
+export type CreateMethodsInput = Metadata & Partial<{ logger: AppLogger }>
+export type CreateMethods = ReturnType<typeof createMethods>
 export const createMethods = (
-  metadata: Metadata,
-  sendMessageToWallet: SendWalletInteraction,
-  logger?: AppLogger
+  input: CreateMethodsInput,
+  connectorExtensionClient: ConnectorExtensionClient
 ) => {
-  const request = <
-    Input extends Method['request']['input'],
-    Output extends keyof Input extends keyof Method['request']['output']
-      ? {
-          [Key in keyof Input]: (x: Method['request']['output'][Key]) => void
-        }[keyof Input] extends (x: infer T) => void
-        ? T
-        : never
-      : never
-  >(
-    input: Input,
+  const logger = input.logger
+  const createWalletInteraction = createWalletInteractionFactory(logger)
+
+  const request = (
+    items: WalletRequestItems,
     callbackFns: Partial<CallbackFns> = {}
   ) =>
-    transformMethodInput(input)
-      .andThen(createMessage(metadata))
-      .asyncAndThen((message) => validateWalletRequest(message, logger))
-      .andThen(sendMessageToWallet(callbackFns))
+    createWalletInteraction(input, items)
+      .andThen((walletInteraction) =>
+        connectorExtensionClient.send(walletInteraction, callbackFns)
+      )
       .andThen(validateWalletResponse)
-      .map((response) => response.items)
-      .map(decodeWalletResponse<Output>)
+      .map((response) => response.items as WalletRequestResponseItems)
 
   const sendTransaction = (
-    input: Method['sendTransaction']['input'],
+    items: SendTransactionItem,
     callbackFns: Partial<CallbackFns> = {}
   ) =>
-    transformMethodInput({ [requestType.send]: input })
-      .andThen(createMessage(metadata))
-      .asyncAndThen(validateWalletRequest)
-      .andThen(sendMessageToWallet(callbackFns))
+    createWalletInteraction(input, {
+      discriminator: 'transaction',
+      items,
+    })
+      .andThen((walletInteraction) =>
+        connectorExtensionClient.send(walletInteraction, callbackFns)
+      )
       .andThen(validateWalletResponse)
-      .map((response) => response.items)
-      .map(decodeWalletResponse<Method['sendTransaction']['output']>)
+      .map(
+        (response): WalletTransactionResponseItems['send'] =>
+          (response as any).items.send
+      )
 
   return {
     request,
