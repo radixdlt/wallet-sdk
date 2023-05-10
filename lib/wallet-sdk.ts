@@ -1,57 +1,44 @@
-import { MessageClient } from './messages/message-client'
-import { createSendMessage } from './messages/observables/send-message'
 import { createMethods } from './create-methods'
 import { AppLogger } from './helpers/logger'
-import { Subjects } from './messages/subjects'
+import { Metadata } from './IO/v1/schemas'
+import { ConnectorExtensionClient } from './connector-extension/connector-extension-client'
 
-type WalletSdkInput = {
-  networkId?: number
-  dAppDefinitionAddress: string
-  logger?: AppLogger
-}
-
-export const Network = {
-  Mainnet: 0x01,
-  Stokenet: 0x02,
-  Adapanet: 0x0a,
-  Nebunet: 0x0b,
-  Gilganet: 0x20,
-  Enkinet: 0x21,
-  Hammunet: 0x22,
-} as const
-
+export type WalletSdkInput = Metadata &
+  Partial<{
+    logger: AppLogger
+    providers: Partial<{ connectorExtensionClient: ConnectorExtensionClient }>
+  }>
 export type WalletSdk = ReturnType<typeof WalletSdk>
 
-export const WalletSdk = ({
-  networkId = Network.Mainnet,
-  dAppDefinitionAddress,
-  logger,
-}: WalletSdkInput) => {
-  logger?.debug(`🔵 walletSdkInstantiated`)
-  const messageClient = MessageClient(Subjects(), logger)
+export const WalletSdk = (input: WalletSdkInput) => {
+  Metadata.parse({
+    version: input.version,
+    dAppDefinitionAddress: input.dAppDefinitionAddress,
+    networkId: input.networkId,
+  })
 
-  const destroy = () => {
-    logger?.debug(`🔵🧹 destroyingWalletSdkInstance`)
-    messageClient.destroy()
-  }
+  input.logger?.debug(`🔵 walletSdkInstantiated`, {
+    version: input.version,
+    networkId: input.networkId,
+    dAppDefinitionAddress: input.dAppDefinitionAddress,
+  })
 
-  const methods = createMethods(
-    { networkId, dAppDefinitionAddress },
-    createSendMessage(messageClient.subjects, logger),
-    logger
-  )
+  const logger = input.logger
+  const messageClient =
+    input.providers?.connectorExtensionClient ??
+    ConnectorExtensionClient({ logger })
 
   return {
-    ...methods,
-    destroy,
-    __subjects: messageClient.subjects,
+    ...createMethods(input, messageClient),
+    destroy: () => {
+      logger?.debug(`🔵🧹 walletSdkInstantiatedDestroyed`)
+      messageClient.destroy()
+    },
   }
 }
 
 export { ManifestBuilder } from './manifest-builder'
 export * as ManifestValue from './manifest-value'
-export { requestBuilder } from './request-builder'
-export * from './IO/request-items'
-export * from './IO/schemas'
+export * from './IO/v1/schemas'
 export * from './helpers/error'
 export * from './helpers/logger'
