@@ -126,7 +126,7 @@ export type AuthLoginWithChallengeRequestItem = z.infer<
 >
 export const AuthLoginWithChallengeRequestItem = object({
   discriminator: literal('loginWithChallenge'),
-  string: string(),
+  challenge: string(),
 })
 
 export const AuthLoginRequestItem = union([
