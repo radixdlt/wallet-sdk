@@ -143,7 +143,7 @@ export type WalletAuthorizedRequestItems = z.infer<
 >
 export const WalletAuthorizedRequestItems = object({
   discriminator: literal('authorizedRequest'),
-  login: AuthRequestItem,
+  auth: AuthRequestItem,
   reset: ResetRequestItem.optional(),
   oneTimeAccounts: AccountsRequestItem.optional(),
   ongoingAccounts: AccountsRequestItem.optional(),
@@ -263,7 +263,7 @@ export type WalletAuthorizedRequestResponseItems = z.infer<
 >
 export const WalletAuthorizedRequestResponseItems = object({
   discriminator: literal('authorizedRequest'),
-  login: AuthRequestResponseItem,
+  auth: AuthRequestResponseItem,
   oneTimeAccounts: AccountsRequestResponseItem.optional(),
   oneTimePersonaData: PersonaDataRequestResponseItem.optional(),
   ongoingAccounts: AccountsRequestResponseItem.optional(),

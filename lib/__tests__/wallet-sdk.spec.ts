@@ -211,7 +211,7 @@ describe('sdk flow', () => {
           sdk.request(
             {
               discriminator: 'authorizedRequest',
-              login: {
+              auth: {
                 discriminator: 'loginWithoutChallenge',
               },
               ongoingAccounts: {
@@ -231,7 +231,7 @@ describe('sdk flow', () => {
       delay(300).then(() => {
         sendIncomingMessage({
           discriminator: 'authorizedRequest',
-          login: {
+          auth: {
             discriminator: 'loginWithoutChallenge',
             persona: {
               identityAddress:
@@ -278,7 +278,7 @@ describe('sdk flow', () => {
         ],
       })
 
-      expect((result.value as any).login.persona.identityAddress).toEqual(
+      expect((result.value as any).auth.persona.identityAddress).toEqual(
         'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y'
       )
 
@@ -298,7 +298,7 @@ describe('sdk flow', () => {
         sdk.request(
           {
             discriminator: 'authorizedRequest',
-            login: {
+            auth: {
               discriminator: 'usePersona',
               identityAddress:
                 'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y',
@@ -314,7 +314,7 @@ describe('sdk flow', () => {
       delay(300).then(() => {
         sendIncomingMessage({
           discriminator: 'authorizedRequest',
-          login: {
+          auth: {
             discriminator: 'loginWithoutChallenge',
             persona: {
               identityAddress:
@@ -328,7 +328,7 @@ describe('sdk flow', () => {
       const result = await request
 
       if (result.isErr()) throw new Error('should not get a error response')
-      expect((result.value as any).login.persona.identityAddress).toEqual(
+      expect((result.value as any).auth.persona.identityAddress).toEqual(
         'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y'
       )
 
