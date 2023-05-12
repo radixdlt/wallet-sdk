@@ -85,12 +85,6 @@ export const ResetRequestItem = object({
   personaData: boolean(),
 })
 
-export type LoginRequestItem = z.infer<typeof LoginRequestItem>
-export const LoginRequestItem = object({
-  challenge: string().optional(),
-  identityAddress: string().optional(),
-})
-
 export type LoginRequestResponseItem = z.infer<typeof LoginRequestResponseItem>
 export const LoginRequestResponseItem = object({
   persona: Persona,
@@ -112,12 +106,44 @@ export const WalletUnauthorizedRequestItems = object({
   oneTimePersonaData: PersonaDataRequestItem.optional(),
 })
 
+export type AuthUsePersonaRequestItem = z.infer<
+  typeof AuthUsePersonaRequestItem
+>
+export const AuthUsePersonaRequestItem = object({
+  discriminator: literal('usePersona'),
+  identityAddress: string(),
+})
+
+export type AuthLoginWithoutChallengeRequestItem = z.infer<
+  typeof AuthLoginWithoutChallengeRequestItem
+>
+export const AuthLoginWithoutChallengeRequestItem = object({
+  discriminator: literal('loginWithoutChallenge'),
+})
+
+export type AuthLoginWithChallengeRequestItem = z.infer<
+  typeof AuthLoginWithChallengeRequestItem
+>
+export const AuthLoginWithChallengeRequestItem = object({
+  discriminator: literal('loginWithChallenge'),
+  string: string(),
+})
+
+export const AuthLoginRequestItem = union([
+  AuthLoginWithoutChallengeRequestItem,
+  AuthLoginWithChallengeRequestItem,
+])
+export const AuthRequestItem = union([
+  AuthUsePersonaRequestItem,
+  AuthLoginRequestItem,
+])
+
 export type WalletAuthorizedRequestItems = z.infer<
   typeof WalletAuthorizedRequestItems
 >
 export const WalletAuthorizedRequestItems = object({
   discriminator: literal('authorizedRequest'),
-  login: LoginRequestItem,
+  login: AuthRequestItem,
   reset: ResetRequestItem.optional(),
   oneTimeAccounts: AccountsRequestItem.optional(),
   ongoingAccounts: AccountsRequestItem.optional(),
@@ -195,12 +221,49 @@ const WalletUnauthorizedRequestResponseItems = object({
   oneTimePersonaData: PersonaDataRequestResponseItem.optional(),
 })
 
+export type AuthLoginWithoutChallengeRequestResponseItem = z.infer<
+  typeof AuthLoginWithoutChallengeRequestResponseItem
+>
+export const AuthLoginWithoutChallengeRequestResponseItem = object({
+  discriminator: literal('loginWithoutChallenge'),
+  persona: Persona,
+})
+
+export type AuthLoginWithChallengeRequestResponseItem = z.infer<
+  typeof AuthLoginWithChallengeRequestResponseItem
+>
+export const AuthLoginWithChallengeRequestResponseItem = object({
+  discriminator: literal('loginWithChallenge'),
+  persona: Persona,
+  challenge: string(),
+  proof: Proof,
+})
+
+export const AuthLoginRequestResponseItem = union([
+  AuthLoginWithoutChallengeRequestResponseItem,
+  AuthLoginWithChallengeRequestResponseItem,
+])
+
+export type AuthUsePersonaRequestResponseItem = z.infer<
+  typeof AuthUsePersonaRequestResponseItem
+>
+const AuthUsePersonaRequestResponseItem = object({
+  discriminator: literal('usePersona'),
+  persona: Persona,
+})
+
+export type AuthRequestResponseItem = z.infer<typeof AuthRequestResponseItem>
+export const AuthRequestResponseItem = union([
+  AuthUsePersonaRequestResponseItem,
+  AuthLoginRequestResponseItem,
+])
+
 export type WalletAuthorizedRequestResponseItems = z.infer<
   typeof WalletAuthorizedRequestResponseItems
 >
 export const WalletAuthorizedRequestResponseItems = object({
   discriminator: literal('authorizedRequest'),
-  login: LoginRequestResponseItem,
+  login: AuthRequestResponseItem,
   oneTimeAccounts: AccountsRequestResponseItem.optional(),
   oneTimePersonaData: PersonaDataRequestResponseItem.optional(),
   ongoingAccounts: AccountsRequestResponseItem.optional(),

@@ -211,7 +211,9 @@ describe('sdk flow', () => {
           sdk.request(
             {
               discriminator: 'authorizedRequest',
-              login: {},
+              login: {
+                discriminator: 'loginWithoutChallenge',
+              },
               ongoingAccounts: {
                 numberOfAccounts: {
                   quantifier: 'atLeast',
@@ -230,6 +232,7 @@ describe('sdk flow', () => {
         sendIncomingMessage({
           discriminator: 'authorizedRequest',
           login: {
+            discriminator: 'loginWithoutChallenge',
             persona: {
               identityAddress:
                 'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y',
@@ -296,6 +299,7 @@ describe('sdk flow', () => {
           {
             discriminator: 'authorizedRequest',
             login: {
+              discriminator: 'usePersona',
               identityAddress:
                 'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y',
             },
@@ -311,6 +315,7 @@ describe('sdk flow', () => {
         sendIncomingMessage({
           discriminator: 'authorizedRequest',
           login: {
+            discriminator: 'loginWithoutChallenge',
             persona: {
               identityAddress:
                 'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y',
