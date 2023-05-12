@@ -37,7 +37,7 @@ export const createMethods = (
   ) =>
     createWalletInteraction(input, {
       discriminator: 'transaction',
-      items,
+      send: items,
     })
       .andThen((walletInteraction) =>
         connectorExtensionClient.send(walletInteraction, callbackFns)

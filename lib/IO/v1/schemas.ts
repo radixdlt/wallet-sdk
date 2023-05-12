@@ -168,7 +168,7 @@ export const SendTransactionItem = object({
 export type WalletTransactionItems = z.infer<typeof WalletTransactionItems>
 export const WalletTransactionItems = object({
   discriminator: literal('transaction'),
-  items: SendTransactionItem,
+  send: SendTransactionItem,
 })
 
 export type SendTransactionResponseItem = z.infer<
