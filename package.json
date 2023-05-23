@@ -76,7 +76,7 @@
     "lodash.flow": "^3.5.0",
     "loglevel": "^1.8.1",
     "neverthrow": "^6.0.0",
-    "rxjs": "^7.6.0",
+    "rxjs": "^7.8.1",
     "zod": "^3.19.1"
   },
   "repository": {
