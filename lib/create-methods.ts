@@ -6,8 +6,8 @@ import {
   WalletRequestItems,
   WalletRequestResponseItems,
   WalletTransactionResponseItems,
-} from './IO/v1/schemas'
-import { createWalletInteractionFactory } from './IO/v1/create-wallet-interaction-factory'
+} from './IO/v2/schemas'
+import { createWalletInteractionFactory } from './IO/v2/create-wallet-interaction-factory'
 import { ConnectorExtensionClient } from './connector-extension/connector-extension-client'
 import { validateWalletResponse } from './helpers/validate-wallet-response'
 

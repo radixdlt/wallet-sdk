@@ -6,7 +6,7 @@ import {
   WalletInteraction,
   WalletInteractionSuccessResponse,
   eventType,
-} from '../IO/v1/schemas'
+} from '../IO/v2/schemas'
 import { Err, Result, ResultAsync, err, ok } from 'neverthrow'
 import { SdkError, createSdkError } from '../wallet-sdk'
 import {

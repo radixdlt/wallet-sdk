@@ -27,7 +27,7 @@ describe('sdk flow', () => {
     sdk = WalletSdk({
       dAppDefinitionAddress: 'radixDashboard',
       logger,
-      version: 1,
+      version: 2,
       networkId: 12,
       providers: { connectorExtensionClient },
     })
@@ -197,7 +197,7 @@ describe('sdk flow', () => {
       expect(outgoingMessageSpy.getFirstValue().metadata).toEqual({
         dAppDefinitionAddress: 'radixDashboard',
         networkId: 12,
-        version: 1,
+        version: 2,
       })
 
       expect(callbackSpy).toBeCalledWith('receivedByExtension')
@@ -285,7 +285,7 @@ describe('sdk flow', () => {
       expect(outgoingMessageSpy.getFirstValue().metadata).toEqual({
         dAppDefinitionAddress: 'radixDashboard',
         networkId: 12,
-        version: 1,
+        version: 2,
       })
 
       expect(callbackSpy).toBeCalledWith('receivedByExtension')
@@ -350,7 +350,7 @@ describe('sdk flow', () => {
         .sendTransaction(
           {
             transactionManifest: `test transaction manifest`,
-            version: 1,
+            version: 2,
           },
           { eventCallback: callbackSpy }
         )

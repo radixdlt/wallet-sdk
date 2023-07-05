@@ -3,7 +3,7 @@ import {
   MessageLifeCycleEvent,
   WalletInteraction,
   WalletInteractionResponse,
-} from '../IO/v1/schemas'
+} from '../IO/v2/schemas'
 
 export type Subjects = ReturnType<typeof Subjects>
 
