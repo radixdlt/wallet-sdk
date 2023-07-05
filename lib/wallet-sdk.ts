@@ -1,9 +1,9 @@
 import { createMethods } from './create-methods'
 import { AppLogger } from './helpers/logger'
-import { Metadata } from './IO/v1/schemas'
+import { Metadata as MetadataV2 } from './IO/v2/schemas'
 import { ConnectorExtensionClient } from './connector-extension/connector-extension-client'
 
-export type WalletSdkInput = Metadata &
+export type WalletSdkInput = MetadataV2 &
   Partial<{
     logger: AppLogger
     providers: Partial<{ connectorExtensionClient: ConnectorExtensionClient }>
@@ -11,7 +11,7 @@ export type WalletSdkInput = Metadata &
 export type WalletSdk = ReturnType<typeof WalletSdk>
 
 export const WalletSdk = (input: WalletSdkInput) => {
-  Metadata.parse({
+  MetadataV2.parse({
     version: input.version,
     dAppDefinitionAddress: input.dAppDefinitionAddress,
     networkId: input.networkId,
