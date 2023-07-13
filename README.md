@@ -48,7 +48,6 @@ yarn add @radixdlt/wallet-sdk
 import { WalletSdk } from '@radixdlt/wallet-sdk'
 
 const walletSdk = WalletSdk({
-  version: 1,
   networkId: 12,
   dAppDefinitionAddress:
     'account_tdx_c_1p8j5r3umpgdwpedqssn0mwnwj9tv7ae7wfzjd9srwh5q9stufq',
@@ -57,7 +56,6 @@ const walletSdk = WalletSdk({
 
 ```typescript
 type Metadata = {
-  version: number
   networkId: number
   dAppDefinitionAddress: string
 }
@@ -68,7 +66,6 @@ type Metadata = {
 | Mainnet  |  1  |
 | RCNet-V1 | 12  |
 
-- **requires** version - API version of the wallet communication protocol.
 - **requires** networkId - Specifies which network to use
 - **requires** dAppDefinitionAddress - Specifies the dApp that is interacting with the wallet. Used in dApp verification process on the wallet side.
 
@@ -113,7 +110,7 @@ This request type is for getting one or more Radix accounts managed by the user'
 ### Request
 
 ```typescript
-type NumberOfAccounts = {
+type NumberOfValues = {
   quantifier: 'exactly' | 'atLeast'
   quantity: number
 }
@@ -122,7 +119,7 @@ type NumberOfAccounts = {
 ```typescript
 type AccountsRequestItem = {
   challenge?: Challenge
-  numberOfAccounts: NumberOfAccounts
+  numberOfAccounts: NumberOfValues
 }
 ```
 
@@ -272,31 +269,24 @@ This request type is for a list of personal data fields associated with the user
 ### Request
 
 ```typescript
-type PersonaDataField =
-  | 'givenName'
-  | 'familyName'
-  | 'emailAddress'
-  | 'phoneNumber'
-```
-
-```typescript
 type PersonaDataRequestItem = {
-  fields: PersonaDataField[]
+  isRequestingName?: boolean()
+  numberOfRequestedEmailAddresses?: NumberOfValues
+  numberOfRequestedPhoneNumbers?: NumberOfValues
 }
 ```
 
 ### Response
 
 ```typescript
-type PersonaData = {
-  field: PersonaDataField
-  value: string
-}
-```
-
-```typescript
 type PersonaDataRequestResponseItem = {
-  fields: PersonaData[]
+  name?: {
+    variant: 'eastern' | 'western'
+    family: string
+    given: string
+  }
+  emailAddresses?: NumberOfValues
+  phoneNumbers?: NumberOfValues
 }
 ```
 
@@ -309,7 +299,9 @@ const result = await sdk.request({
   discriminator: 'authorizedRequest',
   auth: { discriminator: 'loginWithoutChallenge' },
   ongoingPersonaData: {
-    fields: ['givenName'],
+    isRequestingName: true,
+    numberOfRequestedEmailAddresses: { quantifier: 'atLeast', quantity: 1 },
+    numberOfRequestedPhoneNumbers: { quantifier: 'exactly', quantity: 1 },
   },
 })
 
@@ -324,9 +316,16 @@ if (result.isErr()) {
 //     persona: Persona
 //   },
 //   ongoingPersonaData: {
-//     fields: PersonaData[]
+//     name: {
+//       variant: 'western',
+//       given: 'John',
+//       family: 'Conner'
+//     },
+//     emailAddresses: ['jc@resistance.ai'],
+//     phoneNumbers: ['123123123']
 //   }
 // }
+
 const value = result.value
 ```
 
@@ -340,7 +339,7 @@ const value = result.value
 const result = await sdk.request({
   discriminator: 'unauthorizedRequest',
   oneTimePersonaData: {
-    fields: ['givenName'],
+    isRequestingName: true,
   },
 })
 
@@ -351,9 +350,14 @@ if (result.isErr()) {
 // {
 //   discriminator: "unauthorizedRequest",
 //   oneTimePersonaData: {
-//     fields: PersonaData[]
+//     name: {
+//       variant: 'eastern',
+//       given: 'Jet',
+//       family: 'Li'
+//     }
 //   }
 // }
+
 const value = result.value
 ```
 
