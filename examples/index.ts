@@ -34,7 +34,7 @@ document.getElementById('login-btn')!.onclick = async () => {
   })
   if (result.isErr()) return
   result.value.discriminator === 'authorizedRequest' &&
-    result.value.ongoingPersonaData?.fullName!.given!
+    result.value.ongoingPersonaData?.name!.given!
 
   displayResults(result)
 }

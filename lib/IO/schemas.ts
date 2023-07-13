@@ -34,8 +34,8 @@ export const PersonaDataNameVariant = union([
   literal(personaDataFullNameVariant.western),
 ])
 
-export type PersonaDataFullName = z.infer<typeof PersonaDataFullName>
-export const PersonaDataFullName = object({
+export type PersonaDataName = z.infer<typeof PersonaDataName>
+export const PersonaDataName = object({
   variant: PersonaDataNameVariant,
   familyName: string(),
   nickname: string(),
@@ -79,7 +79,7 @@ export type PersonaDataRequestResponseItem = z.infer<
   typeof PersonaDataRequestResponseItem
 >
 export const PersonaDataRequestResponseItem = object({
-  fullName: PersonaDataFullName.optional(),
+  name: PersonaDataName.optional(),
   emailAddresses: array(string()).optional(),
   phoneNumbers: array(string()).optional(),
 })
