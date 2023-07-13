@@ -40,7 +40,7 @@
     "build:types": "tsc --project tsconfig.types.json --emitDeclarationOnly",
     "preview": "vite preview",
     "prettier": "prettier --write lib",
-    "lint": "yarn eslint & yarn prettier & yarn tsc",
+    "lint": "npm run eslint & npm run prettier & npm run tsc",
     "prepare": "npx husky install",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
