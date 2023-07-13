@@ -7,7 +7,6 @@ const sdk = WalletSdk({
     'account_tdx_a_1qd5svul20u30qnq408zhj2tw5evqrunq48eg0jsjf9qsx5t8qu',
   logger: createLogger(1),
   networkId: 12,
-  version: 1,
 })
 
 const displayResults = (result: Result<any, any>) => {
@@ -26,8 +25,16 @@ document.getElementById('login-btn')!.onclick = async () => {
   clearResults()
   const result = await sdk.request({
     discriminator: 'authorizedRequest',
-    login: {},
+    auth: { discriminator: 'loginWithoutChallenge' },
+    ongoingPersonaData: {
+      isRequestingName: true,
+      numberOfRequestedEmailAddresses: { quantifier: 'atLeast', quantity: 1 },
+      numberOfRequestedPhoneNumbers: { quantifier: 'exactly', quantity: 1 },
+    },
   })
+  if (result.isErr()) return
+  result.value.discriminator === 'authorizedRequest' &&
+    result.value.ongoingPersonaData?.fullName!.given!
 
   displayResults(result)
 }
@@ -58,7 +65,7 @@ document.getElementById('persona-data-btn')!.onclick = async () => {
 
   const result = await sdk.request({
     discriminator: 'unauthorizedRequest',
-    oneTimePersonaData: { fields: ['givenName'] },
+    oneTimePersonaData: { isRequestingName: true },
   })
 
   displayResults(result)

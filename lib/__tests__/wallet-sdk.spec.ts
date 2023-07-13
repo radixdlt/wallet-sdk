@@ -4,7 +4,7 @@ import { subscribeSpyTo } from '@hirez_io/observer-spy'
 import { createLogger } from '../helpers/logger'
 import { ConnectorExtensionClient } from '../connector-extension/connector-extension-client'
 import { Subjects } from '../connector-extension/subjects'
-import { WalletInteractionSuccessResponse } from '../IO/v1/schemas'
+import { WalletInteractionSuccessResponse } from '../IO'
 
 const delay = (millis: number) =>
   new Promise<void>((resolve) => {
@@ -27,7 +27,6 @@ describe('sdk flow', () => {
     sdk = WalletSdk({
       dAppDefinitionAddress: 'radixDashboard',
       logger,
-      version: 2,
       networkId: 12,
       providers: { connectorExtensionClient },
     })

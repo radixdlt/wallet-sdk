@@ -24,25 +24,26 @@ export const AccountProof = object({
 export type Persona = z.infer<typeof Persona>
 export const Persona = object({ identityAddress: string(), label: string() })
 
-export const personaDataField = {
-  givenName: 'givenName',
-  familyName: 'familyName',
-  emailAddress: 'emailAddress',
-  phoneNumber: 'phoneNumber',
+export const personaDataFullNameVariant = {
+  western: 'western',
+  eastern: 'eastern',
 } as const
-export type PersonaDataField = z.infer<typeof PersonaDataField>
-export const PersonaDataField = union([
-  literal('givenName'),
-  literal('familyName'),
-  literal('emailAddress'),
-  literal('phoneNumber'),
+export type PersonaDataNameVariant = z.infer<typeof PersonaDataNameVariant>
+export const PersonaDataNameVariant = union([
+  literal(personaDataFullNameVariant.eastern),
+  literal(personaDataFullNameVariant.western),
 ])
 
-export type PersonaData = z.infer<typeof PersonaData>
-export const PersonaData = object({ field: PersonaDataField, value: string() })
+export type PersonaDataFullName = z.infer<typeof PersonaDataFullName>
+export const PersonaDataFullName = object({
+  variant: PersonaDataNameVariant,
+  familyName: string(),
+  nickname: string(),
+  givenNames: string(),
+})
 
-export type NumberOfAccounts = z.infer<typeof NumberOfAccounts>
-export const NumberOfAccounts = object({
+export type NumberOfValues = z.infer<typeof NumberOfValues>
+export const NumberOfValues = object({
   quantifier: union([literal('exactly'), literal('atLeast')]),
   quantity: number().gte(1),
 })
@@ -50,7 +51,7 @@ export const NumberOfAccounts = object({
 export type AccountsRequestItem = z.infer<typeof AccountsRequestItem>
 export const AccountsRequestItem = object({
   challenge: string().optional(),
-  numberOfAccounts: NumberOfAccounts,
+  numberOfAccounts: NumberOfValues,
 })
 
 export type AccountsRequestResponseItem = z.infer<
@@ -69,14 +70,18 @@ export const AccountsRequestResponseItem = object({
 
 export type PersonaDataRequestItem = z.infer<typeof PersonaDataRequestItem>
 export const PersonaDataRequestItem = object({
-  fields: array(PersonaDataField),
+  isRequestingName: boolean().optional(),
+  numberOfRequestedEmailAddresses: NumberOfValues.optional(),
+  numberOfRequestedPhoneNumbers: NumberOfValues.optional(),
 })
 
 export type PersonaDataRequestResponseItem = z.infer<
   typeof PersonaDataRequestResponseItem
 >
 export const PersonaDataRequestResponseItem = object({
-  fields: array(PersonaData),
+  fullName: PersonaDataFullName.optional(),
+  emailAddresses: array(string()).optional(),
+  phoneNumbers: array(string()).optional(),
 })
 
 export type ResetRequestItem = z.infer<typeof ResetRequestItem>
@@ -200,7 +205,7 @@ export const WalletInteractionItems = union([
 
 export type Metadata = z.infer<typeof Metadata>
 export const Metadata = object({
-  version: literal(1),
+  version: literal(2),
   networkId: number(),
   dAppDefinitionAddress: string(),
 })
@@ -265,8 +270,8 @@ export const WalletAuthorizedRequestResponseItems = object({
   discriminator: literal('authorizedRequest'),
   auth: AuthRequestResponseItem,
   oneTimeAccounts: AccountsRequestResponseItem.optional(),
-  oneTimePersonaData: PersonaDataRequestResponseItem.optional(),
   ongoingAccounts: AccountsRequestResponseItem.optional(),
+  oneTimePersonaData: PersonaDataRequestResponseItem.optional(),
   ongoingPersonaData: PersonaDataRequestResponseItem.optional(),
 })
 
