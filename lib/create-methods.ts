@@ -6,10 +6,10 @@ import {
   WalletRequestItems,
   WalletRequestResponseItems,
   WalletTransactionResponseItems,
-} from './IO/v2/schemas'
-import { createWalletInteractionFactory } from './IO/v2/create-wallet-interaction-factory'
+} from './IO'
 import { ConnectorExtensionClient } from './connector-extension/connector-extension-client'
 import { validateWalletResponse } from './helpers/validate-wallet-response'
+import { walletInteractionFactory } from './IO/wallet-interaction-factory'
 
 export type CreateMethodsInput = Metadata & Partial<{ logger: AppLogger }>
 export type CreateMethods = ReturnType<typeof createMethods>
@@ -18,7 +18,7 @@ export const createMethods = (
   connectorExtensionClient: ConnectorExtensionClient
 ) => {
   const logger = input.logger
-  const createWalletInteraction = createWalletInteractionFactory(logger)
+  const createWalletInteraction = walletInteractionFactory(logger)
 
   const request = (
     items: WalletRequestItems,

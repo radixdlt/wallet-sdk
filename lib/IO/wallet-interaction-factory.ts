@@ -1,10 +1,10 @@
 import { ResultAsync } from 'neverthrow'
+import { AppLogger } from '../helpers/logger'
+import { SdkError, createSdkError, errorType } from '../wallet-sdk'
+import { parseAsync } from '../helpers/parse-async'
 import { Metadata, WalletInteraction, WalletInteractionItems } from './schemas'
-import { AppLogger } from '../../helpers/logger'
-import { SdkError, createSdkError, errorType } from '../../wallet-sdk'
-import { parseAsync } from '../../helpers/parse-async'
 
-export const createWalletInteractionFactory =
+export const walletInteractionFactory =
   (logger?: AppLogger) =>
   (
     metadata: Metadata,
