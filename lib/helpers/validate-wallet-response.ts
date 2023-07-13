@@ -2,7 +2,7 @@ import { ResultAsync, err, ok } from 'neverthrow'
 import {
   WalletInteractionResponse,
   WalletInteractionSuccessResponse,
-} from '../IO/v1/schemas'
+} from '../IO'
 import { ZodError } from 'zod'
 import { SdkError, createSdkError } from './error'
 

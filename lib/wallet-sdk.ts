@@ -1,27 +1,27 @@
 import { createMethods } from './create-methods'
 import { AppLogger } from './helpers/logger'
-import { Metadata as MetadataV2 } from './IO/v2/schemas'
+import { Metadata } from './IO'
 import { ConnectorExtensionClient } from './connector-extension/connector-extension-client'
 
-export type WalletSdkInput = MetadataV2 &
+export type WalletSdkInput = Omit<Metadata, 'version'> &
   Partial<{
     logger: AppLogger
-    providers: Partial<{ connectorExtensionClient: ConnectorExtensionClient }>
+    providers: Partial<{
+      connectorExtensionClient: ConnectorExtensionClient
+    }>
   }>
 export type WalletSdk = ReturnType<typeof WalletSdk>
 
 export const WalletSdk = (input: WalletSdkInput) => {
-  MetadataV2.parse({
-    version: input.version,
+  const metadata = {
+    version: 2,
     dAppDefinitionAddress: input.dAppDefinitionAddress,
     networkId: input.networkId,
-  })
+  }
 
-  input.logger?.debug(`🔵 walletSdkInstantiated`, {
-    version: input.version,
-    networkId: input.networkId,
-    dAppDefinitionAddress: input.dAppDefinitionAddress,
-  })
+  Metadata.parse(metadata)
+
+  input.logger?.debug(`🔵 walletSdkInstantiated`, metadata)
 
   const logger = input.logger
   const messageClient =
@@ -29,7 +29,15 @@ export const WalletSdk = (input: WalletSdkInput) => {
     ConnectorExtensionClient({ logger })
 
   return {
-    ...createMethods(input, messageClient),
+    ...createMethods(
+      {
+        version: 2,
+        logger: input.logger,
+        dAppDefinitionAddress: input.dAppDefinitionAddress,
+        networkId: input.networkId,
+      },
+      messageClient
+    ),
     destroy: () => {
       logger?.debug(`🔵🧹 walletSdkInstantiatedDestroyed`)
       messageClient.destroy()
@@ -37,8 +45,6 @@ export const WalletSdk = (input: WalletSdkInput) => {
   }
 }
 
-export { ManifestBuilder } from './manifest-builder'
-export * as ManifestValue from './manifest-value'
-export * from './IO/v1/schemas'
+export * from './IO'
 export * from './helpers/error'
 export * from './helpers/logger'
