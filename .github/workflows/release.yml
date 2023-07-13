@@ -20,9 +20,9 @@ jobs:
         with:
           node-version: 'lts/*'
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: npm ci
       - name: Prepare
-        run: yarn build
+        run: npm run build
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
