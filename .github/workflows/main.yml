@@ -106,7 +106,7 @@ jobs:
 
   snyk_monitor:
     runs-on: ubuntu-latest
-    #if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
     needs:
       - test_and_lint
     permissions:
