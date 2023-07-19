@@ -8,6 +8,11 @@ module.exports = {
       prerelease: 'alpha',
     },
     {
+      name: 'fix-sbom',
+      channel: 'alpha',
+      prerelease: 'alpha',
+    },
+    {
       name: 'api-v2',
       channel: 'pre-alpha',
       prerelease: 'pre-alpha',

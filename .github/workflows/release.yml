@@ -28,7 +28,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPMJS_TOKEN }}
-        run: echo "RELEASE_VERSION=$(npx semantic-release --dryRun | grep -oP 'Published release \K.*? ')" >> $GITHUB_ENV
+        run: |
+          echo "RELEASE_VERSION=$(npx semantic-release --dryRun | grep -oP 'Published release \K.*? ')" >> $GITHUB_ENV
+          echo "RELEASE_VERSION $RELEASE_VERSION"
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
