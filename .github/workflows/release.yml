@@ -24,18 +24,13 @@ jobs:
         run: npm ci
       - name: Prepare
         run: npm run build
-      - name: Set release version
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPMJS_TOKEN }}
-        run: |
-          echo "RELEASE_VERSION=$(npx semantic-release --dryRun | grep -oP 'Published release \K.*? ')" >> $GITHUB_ENV
-          echo "RELEASE_VERSION $RELEASE_VERSION"
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPMJS_TOKEN }}
-        run: npx semantic-release
+        run: |
+          npx semantic-release | tee out
+          echo "RELEASE_VERSION=$(grep 'Created tag ' out | awk -F 'Created tag ' '{print $2}')" >> $GITHUB_ENV
 
       # Snyk SBOM
       - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
