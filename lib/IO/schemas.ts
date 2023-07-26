@@ -1,434 +1,359 @@
-import z, { boolean, literal, number, object, string, union } from 'zod'
+import { ResultAsync } from 'neverthrow'
+import { array, boolean, literal, number, object, string, union, z } from 'zod'
 
-export const RequestTypeSchema = {
-  oneTimeAccounts: literal('oneTimeAccounts'),
-  ongoingAccounts: literal('ongoingAccounts'),
-  oneTimePersonaData: literal('oneTimePersonaData'),
-  ongoingPersonaData: literal('ongoingPersonaData'),
-  auth: literal('auth'),
-  send: literal('send'),
-} as const
-
-export const ErrorTypeSchema = union([
-  literal('rejectedByUser'),
-  literal('wrongNetwork'),
-  literal('failedToPrepareTransaction'),
-  literal('failedToCompileTransaction'),
-  literal('failedToSignTransaction'),
-  literal('failedToSubmitTransaction'),
-  literal('failedToPollSubmittedTransaction'),
-  literal('failedToFindAccountWithEnoughFundsToLockFee'),
-  literal('submittedTransactionWasDuplicate'),
-  literal('submittedTransactionHasFailedTransactionStatus'),
-  literal('submittedTransactionHasRejectedTransactionStatus'),
-  literal('wrongAccountType'),
-  literal('unknownWebsite'),
-  literal('radixJsonNotFound'),
-  literal('unknownDappDefinitionAddress'),
-  literal('invalidPersona'),
-])
-
-export const personaDataField = {
-  givenName: 'givenName',
-  familyName: 'familyName',
-  emailAddress: 'emailAddress',
-  phoneNumber: 'phoneNumber',
-} as const
-
-export const PersonaDataFieldSchema = union([
-  literal(personaDataField.emailAddress),
-  literal(personaDataField.familyName),
-  literal(personaDataField.givenName),
-  literal(personaDataField.phoneNumber),
-])
-
-export type PersonaDataField = z.infer<typeof PersonaDataFieldSchema>
-
-const AccountSchema = object({
+export type Account = z.infer<typeof Account>
+export const Account = object({
   address: string(),
   label: string(),
   appearanceId: number(),
 })
 
-export type Account = z.infer<typeof AccountSchema>
-
-const AccountWithProofOfOwnershipSchema = object({
-  account: AccountSchema,
-  challenge: string(),
-  signature: string(),
-})
-
-export type AccountWithProofOfOwnership = z.infer<
-  typeof AccountWithProofOfOwnershipSchema
->
-
-const PersonaSchema = object({
-  identityAddress: string(),
-  label: string(),
-})
-
-export type Persona = z.infer<typeof PersonaSchema>
-
-const PersonaDataSchema = object({
-  field: PersonaDataFieldSchema,
-  value: string(),
-})
-
-export type PersonaData = z.infer<typeof PersonaDataSchema>
-
-const NumberOfAccountsQuantifierSchema = union([
-  literal('exactly'),
-  literal('atLeast'),
-])
-
-export type NumberOfAccountsQuantifier = z.infer<
-  typeof NumberOfAccountsQuantifierSchema
->
-
-const NumberOfAccountsSchema = object({
-  quantifier: union([literal('exactly'), literal('atLeast')]),
-  quantity: number(),
-})
-
-export type NumberOfAccounts = z.infer<typeof NumberOfAccountsSchema>
-
-const MetadataSchema = object({
-  networkId: number(),
-  dAppDefinitionAddress: string(),
-})
-
-export type Metadata = z.infer<typeof MetadataSchema>
-
-const OneTimeAccountsRequestItemSchema = object({
-  requiresProofOfOwnership: boolean(),
-  numberOfAccounts: NumberOfAccountsSchema,
-})
-
-export type OneTimeAccountsRequestItem = z.infer<
-  typeof OneTimeAccountsRequestItemSchema
->
-
-const OneTimeAccountsWithProofOfOwnershipRequestResponseItemSchema = object({
-  accounts: AccountWithProofOfOwnershipSchema.array(),
-})
-
-export type OneTimeAccountsWithProofOfOwnershipRequestResponseItem = z.infer<
-  typeof OneTimeAccountsWithProofOfOwnershipRequestResponseItemSchema
->
-
-const OneTimeAccountsWithoutProofOfOwnershipRequestResponseItemSchema = object({
-  accounts: AccountSchema.array(),
-})
-
-export type OneTimeAccountsWithoutProofOfOwnershipRequestResponseItem = z.infer<
-  typeof OneTimeAccountsWithoutProofOfOwnershipRequestResponseItemSchema
->
-
-export const OneTimeAccountsRequestResponseItemSchema = union([
-  OneTimeAccountsWithProofOfOwnershipRequestResponseItemSchema,
-  OneTimeAccountsWithoutProofOfOwnershipRequestResponseItemSchema,
-])
-
-export type OneTimeAccountsRequestResponseItem = z.infer<
-  typeof OneTimeAccountsRequestResponseItemSchema
->
-
-const OngoingAccountsRequestItemSchema = object({
-  requiresProofOfOwnership: boolean(),
-  numberOfAccounts: NumberOfAccountsSchema,
-})
-
-export type OngoingAccountsRequestItem = z.infer<
-  typeof OngoingAccountsRequestItemSchema
->
-
-const OngoingAccountsWithProofOfOwnershipRequestResponseItemSchema = object({
-  accounts: AccountWithProofOfOwnershipSchema.array(),
-})
-
-export type OngoingAccountsWithProofOfOwnershipRequestResponseItem = z.infer<
-  typeof OngoingAccountsWithProofOfOwnershipRequestResponseItemSchema
->
-
-const OngoingAccountsWithoutProofOfOwnershipRequestResponseItemSchema = object({
-  accounts: AccountSchema.array(),
-})
-
-export type OngoingAccountsWithoutProofOfOwnershipRequestResponseItem = z.infer<
-  typeof OngoingAccountsWithoutProofOfOwnershipRequestResponseItemSchema
->
-
-const OngoingAccountsRequestResponseItemSchema = union([
-  OngoingAccountsWithProofOfOwnershipRequestResponseItemSchema,
-  OngoingAccountsWithoutProofOfOwnershipRequestResponseItemSchema,
-])
-
-export type OngoingAccountsRequestResponseItem = z.infer<
-  typeof OngoingAccountsRequestResponseItemSchema
->
-
-const OneTimePersonaDataRequestItemSchema = object({
-  fields: string().array(),
-})
-
-export type OneTimePersonaDataRequestItem = z.infer<
-  typeof OneTimePersonaDataRequestItemSchema
->
-
-const OneTimePersonaDataRequestResponseItemSchema = object({
-  fields: PersonaDataSchema.array(),
-})
-
-export type OneTimePersonaDataRequestResponseItem = z.infer<
-  typeof OneTimePersonaDataRequestResponseItemSchema
->
-
-const OngoingPersonaDataRequestItemSchema = object({
-  fields: PersonaDataFieldSchema.array(),
-})
-
-export type OngoingPersonaDataRequestItem = z.infer<
-  typeof OngoingPersonaDataRequestItemSchema
->
-
-const OngoingPersonaDataRequestResponseItemSchema = object({
-  fields: PersonaDataSchema.array(),
-})
-
-export type OngoingPersonaDataRequestResponseItem = z.infer<
-  typeof OngoingPersonaDataRequestResponseItemSchema
->
-
-const AuthUsePersonaRequestItemSchema = object({
-  discriminator: literal('usePersona'),
-  identityAddress: string(),
-})
-
-export type AuthUsePersonaRequestItem = z.infer<
-  typeof AuthUsePersonaRequestItemSchema
->
-
-const AuthUsePersonaRequestResponseItemSchema = object({
-  discriminator: literal('usePersona'),
-  persona: PersonaSchema,
-})
-
-export type AuthUsePersonaRequestResponseItem = z.infer<
-  typeof AuthUsePersonaRequestResponseItemSchema
->
-
-const AuthLoginRequestItemSchema = object({
-  discriminator: literal('login'),
-  challenge: string().optional(),
-})
-
-export type AuthLoginRequestItem = z.infer<typeof AuthLoginRequestItemSchema>
-
-const AuthLoginWithoutChallengeRequestResponseItemSchema = object({
-  discriminator: literal('loginWithoutChallenge'),
-  persona: PersonaSchema,
-})
-
-export type AuthLoginWithoutChallengeRequestResponseItem = z.infer<
-  typeof AuthLoginWithoutChallengeRequestResponseItemSchema
->
-
-const AuthLoginWithChallengeRequestResponseItemSchema = object({
-  discriminator: literal('loginWithChallenge'),
-  persona: PersonaSchema,
-  challenge: string(),
+export type Proof = z.infer<typeof Proof>
+export const Proof = object({
   publicKey: string(),
   signature: string(),
+  curve: union([literal('curve25519'), literal('secp256k1')]),
 })
 
-export type AuthLoginWithChallengeRequestResponseItem = z.infer<
-  typeof AuthLoginWithChallengeRequestResponseItemSchema
->
+export type AccountProof = z.infer<typeof AccountProof>
+export const AccountProof = object({
+  accountAddress: string(),
+  proof: Proof,
+})
 
-export const AuthLoginRequestResponseItemSchema = union([
-  AuthLoginWithoutChallengeRequestResponseItemSchema,
-  AuthLoginWithChallengeRequestResponseItemSchema,
+export type Persona = z.infer<typeof Persona>
+export const Persona = object({ identityAddress: string(), label: string() })
+
+export const personaDataFullNameVariant = {
+  western: 'western',
+  eastern: 'eastern',
+} as const
+export type PersonaDataNameVariant = z.infer<typeof PersonaDataNameVariant>
+export const PersonaDataNameVariant = union([
+  literal(personaDataFullNameVariant.eastern),
+  literal(personaDataFullNameVariant.western),
 ])
 
-export type AuthLoginRequestResponseItem = z.infer<
-  typeof AuthLoginRequestResponseItemSchema
+export type PersonaDataName = z.infer<typeof PersonaDataName>
+export const PersonaDataName = object({
+  variant: PersonaDataNameVariant,
+  familyName: string(),
+  nickname: string(),
+  givenNames: string(),
+})
+
+export type NumberOfValues = z.infer<typeof NumberOfValues>
+export const NumberOfValues = object({
+  quantifier: union([literal('exactly'), literal('atLeast')]),
+  quantity: number().gte(1),
+})
+
+export type AccountsRequestItem = z.infer<typeof AccountsRequestItem>
+export const AccountsRequestItem = object({
+  challenge: string().optional(),
+  numberOfAccounts: NumberOfValues,
+})
+
+export type AccountsRequestResponseItem = z.infer<
+  typeof AccountsRequestResponseItem
 >
+export const AccountsRequestResponseItem = object({
+  accounts: array(Account),
+  challenge: string().optional(),
+  proofs: array(AccountProof).optional(),
+}).refine((data) => {
+  if (data.challenge || data?.proofs) {
+    return data.challenge && data?.proofs?.length
+  }
+  return true
+}, 'missing challenge or proofs')
 
-export const AuthRequestItemSchema = union([
-  AuthUsePersonaRequestItemSchema,
-  AuthLoginRequestItemSchema,
-])
+export type PersonaDataRequestItem = z.infer<typeof PersonaDataRequestItem>
+export const PersonaDataRequestItem = object({
+  isRequestingName: boolean().optional(),
+  numberOfRequestedEmailAddresses: NumberOfValues.optional(),
+  numberOfRequestedPhoneNumbers: NumberOfValues.optional(),
+})
 
-export type AuthRequestItem = z.infer<typeof AuthRequestItemSchema>
-
-const AuthRequestResponseItemSchema = union([
-  AuthUsePersonaRequestResponseItemSchema,
-  AuthLoginRequestResponseItemSchema,
-])
-
-export type AuthRequestResponseItem = z.infer<
-  typeof AuthRequestResponseItemSchema
+export type PersonaDataRequestResponseItem = z.infer<
+  typeof PersonaDataRequestResponseItem
 >
+export const PersonaDataRequestResponseItem = object({
+  name: PersonaDataName.optional(),
+  emailAddresses: array(string()).optional(),
+  phoneNumbers: array(string()).optional(),
+})
 
-export type ResetRequestItem = z.infer<typeof ResetRequestSchema>
-
-const ResetRequestSchema = object({
+export type ResetRequestItem = z.infer<typeof ResetRequestItem>
+export const ResetRequestItem = object({
   accounts: boolean(),
   personaData: boolean(),
 })
 
-const SendTransactionRequestItemSchema = object({
+export type LoginRequestResponseItem = z.infer<typeof LoginRequestResponseItem>
+export const LoginRequestResponseItem = object({
+  persona: Persona,
+  challenge: string().optional(),
+  proof: Proof.optional(),
+}).refine((data) => {
+  if (data.challenge || data.proof) {
+    return data.challenge && data.proof
+  }
+  return true
+}, 'missing challenge or proof')
+
+export type WalletUnauthorizedRequestItems = z.infer<
+  typeof WalletUnauthorizedRequestItems
+>
+export const WalletUnauthorizedRequestItems = object({
+  discriminator: literal('unauthorizedRequest'),
+  oneTimeAccounts: AccountsRequestItem.optional(),
+  oneTimePersonaData: PersonaDataRequestItem.optional(),
+})
+
+export type AuthUsePersonaRequestItem = z.infer<
+  typeof AuthUsePersonaRequestItem
+>
+export const AuthUsePersonaRequestItem = object({
+  discriminator: literal('usePersona'),
+  identityAddress: string(),
+})
+
+export type AuthLoginWithoutChallengeRequestItem = z.infer<
+  typeof AuthLoginWithoutChallengeRequestItem
+>
+export const AuthLoginWithoutChallengeRequestItem = object({
+  discriminator: literal('loginWithoutChallenge'),
+})
+
+export type AuthLoginWithChallengeRequestItem = z.infer<
+  typeof AuthLoginWithChallengeRequestItem
+>
+export const AuthLoginWithChallengeRequestItem = object({
+  discriminator: literal('loginWithChallenge'),
+  challenge: string(),
+})
+
+export const AuthLoginRequestItem = union([
+  AuthLoginWithoutChallengeRequestItem,
+  AuthLoginWithChallengeRequestItem,
+])
+export const AuthRequestItem = union([
+  AuthUsePersonaRequestItem,
+  AuthLoginRequestItem,
+])
+
+export type WalletAuthorizedRequestItems = z.infer<
+  typeof WalletAuthorizedRequestItems
+>
+export const WalletAuthorizedRequestItems = object({
+  discriminator: literal('authorizedRequest'),
+  auth: AuthRequestItem,
+  reset: ResetRequestItem.optional(),
+  oneTimeAccounts: AccountsRequestItem.optional(),
+  ongoingAccounts: AccountsRequestItem.optional(),
+  oneTimePersonaData: PersonaDataRequestItem.optional(),
+  ongoingPersonaData: PersonaDataRequestItem.optional(),
+})
+
+export type WalletRequestItems = z.infer<typeof WalletRequestItems>
+export const WalletRequestItems = union([
+  WalletUnauthorizedRequestItems,
+  WalletAuthorizedRequestItems,
+])
+
+export type SendTransactionItem = z.infer<typeof SendTransactionItem>
+export const SendTransactionItem = object({
   transactionManifest: string(),
   version: number(),
-  blobs: string().array().optional(),
+  blobs: array(string()).optional(),
   message: string().optional(),
 })
 
-export type SendTransactionItem = z.infer<
-  typeof SendTransactionRequestItemSchema
->
-
-const SendTransactionResponseItemSchema = object({
-  transactionIntentHash: string(),
+export type WalletTransactionItems = z.infer<typeof WalletTransactionItems>
+export const WalletTransactionItems = object({
+  discriminator: literal('transaction'),
+  send: SendTransactionItem,
 })
 
 export type SendTransactionResponseItem = z.infer<
-  typeof SendTransactionResponseItemSchema
+  typeof SendTransactionResponseItem
 >
-
-const WalletUnauthorizedRequestItemsSchema = object({
-  discriminator: literal('unauthorizedRequest'),
-  oneTimeAccounts: OneTimeAccountsRequestItemSchema.optional(),
-  oneTimePersonaData: OneTimePersonaDataRequestItemSchema.optional(),
-})
-
-export type WalletUnauthorizedRequestItems = z.infer<
-  typeof WalletUnauthorizedRequestItemsSchema
->
-
-const WalletAuthorizedRequestItemsSchema = object({
-  discriminator: literal('authorizedRequest'),
-  auth: AuthRequestItemSchema,
-  oneTimeAccounts: OneTimeAccountsRequestItemSchema.optional(),
-  ongoingAccounts: OngoingAccountsRequestItemSchema.optional(),
-  oneTimePersonaData: OneTimePersonaDataRequestItemSchema.optional(),
-  ongoingPersonaData: OngoingPersonaDataRequestItemSchema.optional(),
-  reset: ResetRequestSchema.optional(),
-})
-
-export type WalletAuthorizedRequestItems = z.infer<
-  typeof WalletAuthorizedRequestItemsSchema
->
-
-export const WalletRequestItemsSchema = union([
-  WalletUnauthorizedRequestItemsSchema,
-  WalletAuthorizedRequestItemsSchema,
-])
-
-export type WalletRequestItems = z.infer<typeof WalletRequestItemsSchema>
-
-const WalletTransactionItemsSchema = object({
-  discriminator: literal('transaction'),
-  send: SendTransactionRequestItemSchema,
-})
-
-export type WalletTransactionItems = z.infer<
-  typeof WalletTransactionItemsSchema
->
-
-const WalletInteractionItemsSchema = union([
-  WalletRequestItemsSchema,
-  WalletTransactionItemsSchema,
-])
-
-export type WalletInteractionItems = z.infer<
-  typeof WalletInteractionItemsSchema
->
-
-export const WalletInteractionSchema = object({
-  interactionId: string(),
-  items: WalletInteractionItemsSchema,
-  metadata: MetadataSchema,
-})
-
-export type WalletInteraction = z.infer<typeof WalletInteractionSchema>
-
-export const WalletUnauthorizedRequestResponseItemsSchema = object({
-  discriminator: literal('unauthorizedRequest'),
-  oneTimeAccounts: OneTimeAccountsRequestResponseItemSchema.optional(),
-  oneTimePersonaData: OneTimePersonaDataRequestResponseItemSchema.optional(),
-})
-
-export type WalletUnauthorizedRequestResponseItems = z.infer<
-  typeof WalletUnauthorizedRequestResponseItemsSchema
->
-
-export const WalletAuthorizedRequestResponseItemsSchema = object({
-  discriminator: literal('authorizedRequest'),
-  auth: AuthRequestResponseItemSchema,
-  oneTimeAccounts: OneTimeAccountsRequestResponseItemSchema.optional(),
-  ongoingAccounts: OngoingAccountsRequestResponseItemSchema.optional(),
-  oneTimePersonaData: OneTimePersonaDataRequestResponseItemSchema.optional(),
-  ongoingPersonaData: OngoingPersonaDataRequestResponseItemSchema.optional(),
-})
-
-export type WalletAuthorizedRequestResponseItems = z.infer<
-  typeof WalletAuthorizedRequestResponseItemsSchema
->
-
-export const WalletRequestResponseItemsSchema = union([
-  WalletUnauthorizedRequestResponseItemsSchema,
-  WalletAuthorizedRequestResponseItemsSchema,
-])
-
-export type WalletRequestResponseItems = z.infer<
-  typeof WalletRequestResponseItemsSchema
->
-
-export const WalletTransactionResponseItemsSchema = object({
-  discriminator: literal('transaction'),
-  send: SendTransactionResponseItemSchema,
+export const SendTransactionResponseItem = object({
+  transactionIntentHash: string(),
 })
 
 export type WalletTransactionResponseItems = z.infer<
-  typeof WalletTransactionResponseItemsSchema
+  typeof WalletTransactionResponseItems
 >
+const WalletTransactionResponseItems = object({
+  discriminator: literal('transaction'),
+  send: SendTransactionResponseItem,
+})
 
-export const WalletInteractionResponseItemsSchema = union([
-  WalletRequestResponseItemsSchema,
-  WalletTransactionResponseItemsSchema,
+export type CancelRequest = z.infer<typeof CancelRequest>
+export const CancelRequest = object({
+  discriminator: literal('cancelRequest'),
+})
+
+export type WalletInteractionItems = z.infer<typeof WalletInteractionItems>
+export const WalletInteractionItems = union([
+  WalletRequestItems,
+  WalletTransactionItems,
+  CancelRequest,
+])
+
+export type Metadata = z.infer<typeof Metadata>
+export const Metadata = object({
+  version: literal(2),
+  networkId: number(),
+  dAppDefinitionAddress: string(),
+})
+
+export type WalletInteraction = z.infer<typeof WalletInteraction>
+export const WalletInteraction = object({
+  interactionId: string(),
+  metadata: Metadata,
+  items: WalletInteractionItems,
+})
+
+export type WalletUnauthorizedRequestResponseItems = z.infer<
+  typeof WalletUnauthorizedRequestResponseItems
+>
+const WalletUnauthorizedRequestResponseItems = object({
+  discriminator: literal('unauthorizedRequest'),
+  oneTimeAccounts: AccountsRequestResponseItem.optional(),
+  oneTimePersonaData: PersonaDataRequestResponseItem.optional(),
+})
+
+export type AuthLoginWithoutChallengeRequestResponseItem = z.infer<
+  typeof AuthLoginWithoutChallengeRequestResponseItem
+>
+export const AuthLoginWithoutChallengeRequestResponseItem = object({
+  discriminator: literal('loginWithoutChallenge'),
+  persona: Persona,
+})
+
+export type AuthLoginWithChallengeRequestResponseItem = z.infer<
+  typeof AuthLoginWithChallengeRequestResponseItem
+>
+export const AuthLoginWithChallengeRequestResponseItem = object({
+  discriminator: literal('loginWithChallenge'),
+  persona: Persona,
+  challenge: string(),
+  proof: Proof,
+})
+
+export const AuthLoginRequestResponseItem = union([
+  AuthLoginWithoutChallengeRequestResponseItem,
+  AuthLoginWithChallengeRequestResponseItem,
+])
+
+export type AuthUsePersonaRequestResponseItem = z.infer<
+  typeof AuthUsePersonaRequestResponseItem
+>
+const AuthUsePersonaRequestResponseItem = object({
+  discriminator: literal('usePersona'),
+  persona: Persona,
+})
+
+export type AuthRequestResponseItem = z.infer<typeof AuthRequestResponseItem>
+export const AuthRequestResponseItem = union([
+  AuthUsePersonaRequestResponseItem,
+  AuthLoginRequestResponseItem,
+])
+
+export type WalletAuthorizedRequestResponseItems = z.infer<
+  typeof WalletAuthorizedRequestResponseItems
+>
+export const WalletAuthorizedRequestResponseItems = object({
+  discriminator: literal('authorizedRequest'),
+  auth: AuthRequestResponseItem,
+  oneTimeAccounts: AccountsRequestResponseItem.optional(),
+  ongoingAccounts: AccountsRequestResponseItem.optional(),
+  oneTimePersonaData: PersonaDataRequestResponseItem.optional(),
+  ongoingPersonaData: PersonaDataRequestResponseItem.optional(),
+})
+
+export type WalletRequestResponseItems = z.infer<
+  typeof WalletRequestResponseItems
+>
+export const WalletRequestResponseItems = union([
+  WalletUnauthorizedRequestResponseItems,
+  WalletAuthorizedRequestResponseItems,
 ])
 
 export type WalletInteractionResponseItems = z.infer<
-  typeof WalletInteractionResponseItemsSchema
+  typeof WalletInteractionResponseItems
 >
-
-export const WalletInteractionSuccessResponseSchema = object({
-  discriminator: literal('success'),
-  interactionId: string(),
-  items: WalletInteractionResponseItemsSchema,
-})
+const WalletInteractionResponseItems = union([
+  WalletRequestResponseItems,
+  WalletTransactionResponseItems,
+])
 
 export type WalletInteractionSuccessResponse = z.infer<
-  typeof WalletInteractionSuccessResponseSchema
+  typeof WalletInteractionSuccessResponse
 >
-
-export const WalletInteractionFailureResponseSchema = object({
-  discriminator: literal('failure'),
+export const WalletInteractionSuccessResponse = object({
+  discriminator: literal('success'),
   interactionId: string(),
-  error: ErrorTypeSchema,
-  message: string().optional(),
+  items: WalletInteractionResponseItems,
 })
 
 export type WalletInteractionFailureResponse = z.infer<
-  typeof WalletInteractionFailureResponseSchema
+  typeof WalletInteractionFailureResponse
 >
-
-export const WalletInteractionResponseSchema = union([
-  WalletInteractionSuccessResponseSchema,
-  WalletInteractionFailureResponseSchema,
-])
+export const WalletInteractionFailureResponse = object({
+  discriminator: literal('failure'),
+  interactionId: string(),
+  error: string(),
+  message: string().optional(),
+})
 
 export type WalletInteractionResponse = z.infer<
-  typeof WalletInteractionResponseSchema
+  typeof WalletInteractionResponse
 >
+export const WalletInteractionResponse = union([
+  WalletInteractionSuccessResponse,
+  WalletInteractionFailureResponse,
+])
+
+export const messageLifeCycleEventType = {
+  receivedByExtension: 'receivedByExtension',
+  receivedByWallet: 'receivedByWallet',
+  requestCancelSuccess: 'requestCancelSuccess',
+  requestCancelFail: 'requestCancelFail',
+} as const
+
+export type MessageLifeCycleEvent = z.infer<typeof MessageLifeCycleEvent>
+export const MessageLifeCycleEvent = object({
+  eventType: union([
+    literal(messageLifeCycleEventType.receivedByExtension),
+    literal(messageLifeCycleEventType.receivedByWallet),
+    literal(messageLifeCycleEventType.requestCancelSuccess),
+    literal(messageLifeCycleEventType.requestCancelFail),
+  ]),
+  interactionId: string(),
+})
+
+export type IncomingMessage = z.infer<typeof IncomingMessage>
+const IncomingMessage = union([
+  MessageLifeCycleEvent,
+  WalletInteractionResponse,
+])
+
+export const eventType = {
+  outgoingMessage: 'radix#chromeExtension#send',
+  incomingMessage: 'radix#chromeExtension#receive',
+} as const
+
+export type CallbackFns = {
+  eventCallback: (messageEvent: MessageLifeCycleEvent['eventType']) => void
+  requestControl: (api: {
+    cancelRequest: () => ResultAsync<
+      'requestCancelSuccess',
+      'requestCancelFail'
+    >
+    getRequest: () => WalletInteraction
+  }) => void
+}

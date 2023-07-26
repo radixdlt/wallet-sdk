@@ -6,29 +6,26 @@ This is a TypeScript developer SDK that facilitates communication with the Radix
 
 The current version only supports desktop browser webapps with requests made via the Radix Wallet Connector browser extension. It is intended to later add support for mobile browser webapps using deep linking with the same essential interface.
 
-You may wish to consider using this with the [√ Connect Button](https://github.com/radixdlt/connect-button), which works with this SDK to provide additional features for your application and users.
+You may wish to consider using this with [dApp toolkit](https://github.com/radixdlt/radix-dapp-toolkit), which works with this SDK to provide additional features for your application and users.
 
 - [Installation](#installation)
-- [Usage](#usage)
   - [Getting started](#getting-started)
-  - [Get Wallet Data](#get-wallet-data)
-    - [Wallet support](#wallet-support)
-    - [About oneTime VS ongoing requests](#about-onetime-vs-ongoing-requests)
-    - [Get list of Accounts](#get-list-of-accounts)
-      - [oneTimeAccountsWithoutProofOfOwnership](#onetimeaccountswithoutproofofownership)
-      - [oneTimeAccountsWithProofOfOwnership](#onetimeaccountswithproofofownership)
-      - [ongoingAccountsWithoutProofOfOwnership](#ongoingaccountswithoutproofofownership)
-      - [ongoingAccountsWithProofOfOwnership](#ongoingaccountswithproofofownership)
-    - [Get list of Persona data](#get-list-of-persona-data)
-      - [oneTimePersonaData](#onetimepersonadata)
-      - [ongoingPersonaData](#ongoingpersonadata)
-    - [Reset](#reset)
-    - [Login](#login)
-      - [login](#login-1)
-      - [usePersona](#usepersona)
-  - [Send transaction](#send-transaction)
-    - [Build transaction manifest](#build-transaction-manifest)
-    - [sendTransaction](#sendtransaction)
+- [⬇️ Getting Wallet Data](#️-getting-wallet-data)
+  - [💶 Accounts](#-accounts)
+    - [Request](#request)
+    - [Response](#response)
+  - [ℹ️ Persona Data](#ℹ️-persona-data)
+    - [Request](#request-1)
+    - [Response](#response-1)
+  - [🗑️ Reset](#️-reset)
+    - [Request](#request-2)
+    - [Response](#response-2)
+  - [🛂 Auth](#-auth)
+    - [Request](#request-3)
+    - [Response](#response-3)
+- [💸 Send transaction](#-send-transaction)
+  - [Build transaction manifest](#build-transaction-manifest)
+  - [sendTransaction](#sendtransaction)
   - [Errors](#errors)
 
 # Installation
@@ -45,114 +42,88 @@ npm install @radixdlt/wallet-sdk
 yarn add @radixdlt/wallet-sdk
 ```
 
-# Usage
-
 ## Getting started
 
 ```typescript
 import { WalletSdk } from '@radixdlt/wallet-sdk'
 
 const walletSdk = WalletSdk({
-  dAppDefinitionAddress: 'instabridge',
-  networkId: 0x01,
+  networkId: 12,
+  dAppDefinitionAddress:
+    'account_tdx_c_1p8j5r3umpgdwpedqssn0mwnwj9tv7ae7wfzjd9srwh5q9stufq',
 })
 ```
 
 ```typescript
-type WalletSdkInput = {
+type Metadata = {
+  networkId: number
   dAppDefinitionAddress: string
-  networkId?: number
-  logLevel?: LogLevelDesc
 }
 ```
 
+| Network  | ID  |
+| :------- | :-: |
+| Mainnet  |  1  |
+| RCNet-V1 | 12  |
+
+- **requires** networkId - Specifies which network to use
 - **requires** dAppDefinitionAddress - Specifies the dApp that is interacting with the wallet. Used in dApp verification process on the wallet side.
-- **optional** networkId - Specifies which network to use, defaults to mainnet (0x01)
-- **optional** logLevel - Specifies level of log output. Used internally for debugging.
 
-## Get Wallet Data
+# ⬇️ Getting Wallet Data
 
-### Wallet support
-
-| Requests                                                                          | Current Radix Wallet support |
-| :-------------------------------------------------------------------------------- | :--------------------------: |
-| [oneTimeAccountsWithoutProofOfOwnership](#onetimeaccountswithoutproofofownership) |              ✅              |
-| [oneTimeAccountsWithProofOfOwnership](#onetimeaccountswithproofofownership)       |              ❌              |
-| [ongoingAccountsWithoutProofOfOwnership](#ongoingaccountswithoutproofofownership) |              ✅              |
-| [ongoingAccountsWithProofOfOwnership](#ongoingaccountswithproofofownership)       |              ❌              |
-| [oneTimePersonaData](#onetimepersonadata)                                         |              ✅              |
-| [ongoingPersonaData](#ongoingpersonadata)                                         |              ✅              |
-| [loginWithChallenge](#loginwithchallenge)                                         |              ❌              |
-| [loginWithoutChallenge](#loginwithoutchallenge)                                   |              ✅              |
-| [usePersona](#usepersona)                                                         |              ✅              |
-| [reset](#reset)                                                                   |              ✅              |
-
-### About oneTime VS ongoing requests
+**About oneTime VS ongoing requests**
 
 There are two types of data requests: `oneTime` and `ongoing`.
 
-OneTime data requests will always result in the Radix Wallet asking for the user's permission to share the data with the dApp.
+**OneTime** data requests will **always** result in the Radix Wallet asking for the user's permission to share the data with the dApp.
 
-Ongoing data requests will only result in the Radix Wallet asking for the user's permission the first time. If accepted, the Radix Wallet will automatically respond to future data requests of this type with the current data. The user's permissions for ongoing data sharing with a given dApp can be managed or revoked by the user at any time in the Radix Wallet.
+```typescript
+type WalletUnauthorizedRequestItems = {
+  discriminator: 'unauthorizedRequest'
+  oneTimeAccounts?: AccountsRequestItem
+  oneTimePersonaData?: PersonaDataRequestItem
+}
+```
+
+**Ongoing** data requests will only result in the Radix Wallet asking for the user's permission the first time. If accepted, the Radix Wallet will automatically respond to future data requests of this type with the current data. The user's permissions for ongoing data sharing with a given dApp can be managed or revoked by the user at any time in the Radix Wallet.
+
+```typescript
+type WalletAuthorizedRequestItems = {
+  discriminator: 'authorizedRequest'
+  auth: AuthRequestItem
+  reset?: ResetRequestItem
+  oneTimeAccounts?: AccountsRequestItem
+  oneTimePersonaData?: PersonaDataRequestItem
+  ongoingAccounts?: AccountsRequestItem
+  ongoingPersonaData?: PersonaDataRequestItem
+}
+```
 
 The user's ongoing data sharing permissions are associated with a given Persona (similar to a login) in the Radix Wallet. This means that in order to request `ongoing` data, a `identityAddress` must be included.
 
-Typically the dApp should begin with a `login` request which will return the `identityAddress` for the user's chosen Persona, which can be used for further requests (perhaps while the user has a valid session):
+Typically the dApp should begin with a `login` request which will return the `identityAddress` for the user's chosen Persona, which can be used for further requests (perhaps while the user has a valid session)
+
+## 💶 Accounts
+
+This request type is for getting one or more Radix accounts managed by the user's Radix Wallet app. You may specify the number of accounts desired, and if you require proof of ownership of the account.
+
+### Request
 
 ```typescript
-const result = await walletSdk.request(
-  requestBuilder(
-    requestItem.login.withoutChallenge(),
-    requestItem.ongoingAccounts.withoutProofOfOwnership()
-  )
-)
-
-if (result.isErr()) {
-  // code to handle the exception
+type NumberOfValues = {
+  quantifier: 'exactly' | 'atLeast'
+  quantity: number
 }
-
-// {
-//   persona: {
-//     label: string
-//     identityAddress: string
-//   },
-//   ongoingAccounts: Account[]
-// }
-const value = result.value
-
-// store the identityAddress for future ongoing data requests
-const identityAddress = value.login.persona.identityAddress
 ```
-
-Notice that `requestItem.usePersona(identityAddress)` needs to contain the stored `identityAddress`.
 
 ```typescript
-const result = await walletSdk.request(
-  requestBuilder(
-    requestItem.usePersona(identityAddress),
-    requestItem.ongoingAccounts.withoutProofOfOwnership()
-  )
-)
-
-if (result.isErr()) {
-  // code to handle the exception
+type AccountsRequestItem = {
+  challenge?: Challenge
+  numberOfAccounts: NumberOfValues
 }
-
-// {
-//   persona: {
-//     label: string
-//     identityAddress: string
-//   },
-//   ongoingAccounts: Account[]
-// }
-const value = result.value
 ```
 
-### Get list of Accounts
-
-This request type is for one or more Radix account addresses managed by the user's Radix Wallet app. You may specify the number of accounts desired, and if you require proof of ownership of the account.
-
-**Types**
+### Response
 
 ```typescript
 type Account = {
@@ -163,170 +134,271 @@ type Account = {
 ```
 
 ```typescript
-type AccountWithProofOfOwnership = {
-  account: {
-    address: string
-    label: string
-    appearanceId: number
-  }
-  challenge: string
+type AccountProof = {
+  accountAddress: string
+  proof: Proof
+}
+```
+
+```typescript
+type Proof = {
+  publicKey: string
   signature: string
+  curve: 'curve25519' | 'secp256k1'
 }
 ```
 
-#### oneTimeAccountsWithoutProofOfOwnership
+```typescript
+type AccountsRequestResponseItem = {
+  accounts: Account[]
+  challenge?: Challenge
+  proofs?: AccountProof[]
+}
+```
 
-Get a list of accounts
+<details>
+
+<summary>ongoingAccounts example</summary>
 
 ```typescript
-const result = await walletSdk.request(
-  requestBuilder(requestItem.oneTimeAccounts.withoutProofOfOwnership(3))
-)
+const result = await sdk.request({
+  discriminator: 'authorizedRequest',
+  auth: { discriminator: 'loginWithoutChallenge' },
+  ongoingAccounts: {
+    numberOfAccounts: { quantifier: 'atLeast', quantity: 1 },
+  },
+})
 
 if (result.isErr()) {
   // code to handle the exception
 }
 
 // {
-//   oneTimeAccounts: Account[];
+//   discriminator: "authorizedRequest",
+//   auth: {
+//     discriminator: loginWithoutChallenge,
+//     persona: Persona
+//   },
+//   ongoingAccounts: {
+//     accounts: Account[]
+//   }
 // }
 const value = result.value
 ```
 
-#### oneTimeAccountsWithProofOfOwnership
+</details>
 
-Get a list of accounts with verifiable cryptographic proof of ownership.
+<details>
+
+<summary>oneTimeAccounts example</summary>
 
 ```typescript
-const result = await walletSdk.request(
-  requestBuilder(requestItem.oneTimeAccounts.withProofOfOwnership(3))
-)
+const result = await walletSdk.request({
+  discriminator: 'unauthorizedRequest',
+  oneTimeAccounts: { numberOfAccounts: { quantifier: 'atLeast', quantity: 1 } },
+})
 
 if (result.isErr()) {
   // code to handle the exception
 }
 
 // {
-//   oneTimeAccounts: AccountWithProofOfOwnership[];
+//   discriminator: "unauthorizedRequest",
+//   oneTimeAccounts: {
+//     accounts: Account[]
+//   }
 // }
 const value = result.value
 ```
 
-#### ongoingAccountsWithoutProofOfOwnership
+</details>
+
+<details>
+
+<summary>with proof of ownership example</summary>
 
 ```typescript
-const result = await walletSdk.request(
-  requestBuilder(
-    requestItem.usePersona(identityAddress),
-    requestItem.ongoingAccounts.withoutProofOfOwnership(3)
-  )
-)
+// hex encoded 32 random bytes
+const challenge = [...crypto.getRandomValues(new Uint8Array(32))]
+  .map((item) => item.toString(16).padStart(2, '0'))
+  .join('')
+
+const result = await sdk.request({
+  discriminator: 'authorizedRequest',
+  auth: { discriminator: 'loginWithoutChallenge' },
+  ongoingAccounts: {
+    challenge,
+    numberOfAccounts: { quantifier: 'atLeast', quantity: 1 },
+  },
+  oneTimeAccounts: {
+    challenge,
+    numberOfAccounts: { quantifier: 'atLeast', quantity: 1 },
+  },
+})
 
 if (result.isErr()) {
   // code to handle the exception
 }
 
 // {
-//   ongoingAccounts: Account[];
+//   discriminator: "authorizedRequest",
+//   auth: {
+//     discriminator: loginWithoutChallenge,
+//     persona: Persona
+//   },
+//   ongoingAccounts: {
+//     accounts: Account[],
+//     challenge,
+//     proofs: AccountProof[]
+//   },
+//   oneTimeAccounts: {
+//     accounts: Account[],
+//     challenge,
+//     proofs: AccountProof[]
+//   }
 // }
 const value = result.value
 ```
 
-#### ongoingAccountsWithProofOfOwnership
+</details>
 
-```typescript
-const result = await walletSdk.request(
-  requestBuilder(
-    requestItem.usePersona(identityAddress),
-    requestItem.ongoingAccounts.withProofOfOwnership(3)
-  )
-)
-
-if (result.isErr()) {
-  // code to handle the exception
-}
-
-// {
-//   ongoingAccounts: AccountWithProofOfOwnership[];
-// }
-const value = result.value
-```
-
-### Get list of Persona data
+## ℹ️ Persona Data
 
 This request type is for a list of personal data fields associated with the user's selected Persona.
 
-| Available persona data fields |
-| :---------------------------- |
-| `"givenName"`                 |
-| `"familyName"`                |
-| `"emailAddress"`              |
-| `"phoneNumber"`               |
-
-**Types**
+### Request
 
 ```typescript
-type PersonaDataField = {
-  value: string
-  field: string
+type PersonaDataRequestItem = {
+  isRequestingName?: boolean()
+  numberOfRequestedEmailAddresses?: NumberOfValues
+  numberOfRequestedPhoneNumbers?: NumberOfValues
 }
 ```
 
-#### oneTimePersonaData
+### Response
 
 ```typescript
-const result = await walletSdk.request(
-  requestBuilder(requestItem.oneTimePersonaData(['givenName', 'emailAddress']))
-)
+type PersonaDataRequestResponseItem = {
+  name?: {
+    variant: 'eastern' | 'western'
+    family: string
+    given: string
+  }
+  emailAddresses?: NumberOfValues
+  phoneNumbers?: NumberOfValues
+}
+```
+
+<details>
+
+<summary>ongoingPersonaData example</summary>
+
+```typescript
+const result = await sdk.request({
+  discriminator: 'authorizedRequest',
+  auth: { discriminator: 'loginWithoutChallenge' },
+  ongoingPersonaData: {
+    isRequestingName: true,
+    numberOfRequestedEmailAddresses: { quantifier: 'atLeast', quantity: 1 },
+    numberOfRequestedPhoneNumbers: { quantifier: 'exactly', quantity: 1 },
+  },
+})
 
 if (result.isErr()) {
   // code to handle the exception
 }
 
 // {
-//   oneTimePersonaData: PersonaDataField[];
-// }
-const value = result.value
-```
-
-#### ongoingPersonaData
-
-```typescript
-const result = await walletSdk.request(
-  requestBuilder(
-    requestItem.usePersona(identityAddress),
-    requestItem.ongoingPersonaData(['givenName', 'emailAddress'])
-  )
-)
-
-if (result.isErr()) {
-  // code to handle the exception
-}
-
-// {
-//   persona: {
-//     identityAddress: string
-//     label: string
+//   discriminator: "authorizedRequest",
+//   auth: {
+//     discriminator: loginWithoutChallenge,
+//     persona: Persona
+//   },
+//   ongoingPersonaData: {
+//     name: {
+//       variant: 'western',
+//       given: 'John',
+//       family: 'Conner'
+//     },
+//     emailAddresses: ['jc@resistance.ai'],
+//     phoneNumbers: ['123123123']
 //   }
-//   ongoingPersonaData: PersonaDataField[];
 // }
+
 const value = result.value
 ```
 
-### Reset
+</details>
+
+<details>
+
+<summary>oneTimePersonaData example</summary>
+
+```typescript
+const result = await sdk.request({
+  discriminator: 'unauthorizedRequest',
+  oneTimePersonaData: {
+    isRequestingName: true,
+  },
+})
+
+if (result.isErr()) {
+  // code to handle the exception
+}
+
+// {
+//   discriminator: "unauthorizedRequest",
+//   oneTimePersonaData: {
+//     name: {
+//       variant: 'eastern',
+//       given: 'Jet',
+//       family: 'Li'
+//     }
+//   }
+// }
+
+const value = result.value
+```
+
+</details>
+
+## 🗑️ Reset
 
 You can send a reset request to ask the user to provide new values for ongoing accounts and/or persona data.
 
+### Request
+
 ```typescript
-const result = await walletSdk.request(
-  requestBuilder(
-    requestItem.usePersona(identityAddress),
-    requestItem.reset({ account: true, personaData: true })
-  )
-)
+type ResetRequestItem = {
+  accounts: boolean
+  personaData: boolean
+}
 ```
 
-### Login
+### Response
+
+A Reset request has no response.
+
+<details>
+
+<summary>reset example</summary>
+
+```typescript
+const result = await sdk.request({
+  discriminator: 'authorizedRequest',
+  auth: { discriminator: 'loginWithoutChallenge' },
+  reset: { accounts: true, personaData: true },
+})
+
+if (result.isErr()) {
+  // code to handle the exception
+}
+```
+
+</details>
+
+## 🛂 Auth
 
 Sometimes your dApp may want a more personalized, consistent user experience and the Radix Wallet is able to login users with a Persona.
 
@@ -336,65 +408,200 @@ If your dApp does have a server backend and you are keeping track of users to pe
 
 Once your dApp has a given `identityAddress`, it may be used for future requests for data that the user has given "ongoing" permission to share.
 
-#### login
+```typescript
+type Persona = {
+  identityAddress: string
+  label: string
+}
+```
+
+**Login**
 
 This request type results in the Radix Wallet asking the user to select a Persona to login to this dApp (or suggest one already used in the past there), and providing cryptographic proof of control.
 
+```typescript
+// Hex encoded 32 random bytes
+type Challenge = string
+```
+
 This proof comes in the form of a signed "challenge" against an on-ledger Identity component. For each Persona a user creates in the Radix Wallet, the wallet automatically creates an associated on-ledger Identity (which contains none of the personal data held in the wallet). This Identity includes a public key in its metadata, and the signature on the challenge uses the corresponding private key. ROLA (Radix Off-Ledger Authentication) may be used in your dApp backend to check if the login challenge is correct against on-ledger state.
+
+```typescript
+type Proof = {
+  publicKey: string
+  signature: string
+  curve: 'curve25519' | 'secp256k1'
+}
+```
 
 The on-ledger address of this Identity will be the `identityAddress` used to identify that user – in future queries, or perhaps in your dApp's own user database.
 
 If you are building a pure frontend dApp where the login is for pure user convenience, you may safely ignore the challenge and simply keep track of the `identityAddress` in the user's session for use in data requests that require it.
 
-```typescript
-const result = await walletSdk.request(
-  requestBuilder(
-    requestItem.loginWithChallenge('e23e7a3e-c349-4ca7-8ce1-1d067b396cb2')
-  )
-)
-
-if (result.isErr()) {
-  // code to handle the exception
-}
-
-// {
-//   persona: {
-//     label: string
-//     identityAddress: string
-//     publicKey: string
-//   }
-//   signedChallenge: {
-//     challenge: string
-//     signature: string
-//     publicKey: string
-//   }
-// }
-const value = result.value
-```
-
-#### usePersona
+**usePersona**
 
 If you have already identified the user via a login (perhaps for a given active session), you may specify a `identityAddress` directly without requesting a login from the wallet.
 
+<details>
+
+<summary>login example</summary>
+
 ```typescript
-const result = await walletSdk.request(
-  requestBuilder(requestItem.usePersona(identityAddress))
-)
+const result = await sdk.request({
+  discriminator: 'authorizedRequest',
+  auth: { discriminator: 'loginWithoutChallenge' },
+})
 
 if (result.isErr()) {
   // code to handle the exception
 }
 
 // {
-//   persona: {
-//     identityAddress: string
-//     label: string
-//   }
+//   discriminator: "authorizedRequest",
+//   auth: {
+//     discriminator: 'loginWithoutChallenge',
+//     persona: Persona
+//   },
 // }
 const value = result.value
 ```
 
-## Send transaction
+</details>
+<details>
+
+<summary>login with challenge example</summary>
+
+```typescript
+// hex encoded 32 random bytes
+const challenge = [...crypto.getRandomValues(new Uint8Array(32))]
+  .map((item) => item.toString(16).padStart(2, '0'))
+  .join('')
+
+const result = await sdk.request({
+  discriminator: 'authorizedRequest',
+  auth: {
+    discriminator: 'loginWithChallenge',
+    challenge,
+  },
+})
+
+if (result.isErr()) {
+  // code to handle the exception
+}
+
+// {
+//   discriminator: "authorizedRequest",
+//   auth: {
+//     discriminator: 'loginWithChallenge',
+//     persona: Persona,
+//     challenge: Challenge,
+//     proof: Proof
+//   },
+// }
+const value = result.value
+```
+
+</details>
+<details>
+
+<summary>usePersona example</summary>
+
+```typescript
+const result = await sdk.request({
+  discriminator: 'authorizedRequest',
+  auth: {
+    discriminator: 'usePersona',
+    identityAddress:
+      'identity_tdx_c_1p35qpky5sczp5t4qkhzecz3nm8tcvy4mz4997mqtuzlsvfvrwm',
+  },
+})
+
+if (result.isErr()) {
+  // code to handle the exception
+}
+
+// {
+//   discriminator: "authorizedRequest",
+//   auth: {
+//     discriminator: usePersona,
+//     persona: Persona
+//   },
+// }
+const value = result.value
+```
+
+</details>
+
+### Request
+
+```typescript
+type AuthRequestItem = AuthUsePersonaRequestItem | AuthLoginRequestItem
+```
+
+```typescript
+type AuthUsePersonaRequestItem = {
+  discriminator: 'usePersona'
+  identityAddress: string
+}
+```
+
+```typescript
+type AuthLoginRequestItem =
+  | AuthLoginWithoutChallengeRequestItem
+  | AuthLoginWithChallengeRequestItem
+```
+
+```typescript
+type AuthLoginWithoutChallengeRequestItem = {
+  discriminator: 'loginWithoutChallenge'
+}
+```
+
+```typescript
+type AuthLoginWithChallengeRequestItem = {
+  discriminator: 'loginWithChallenge'
+  challenge: Challenge
+}
+```
+
+### Response
+
+```typescript
+type AuthRequestResponseItem =
+  | AuthUsePersonaRequestResponseItem
+  | AuthLoginRequestResponseItem
+```
+
+```typescript
+type AuthUsePersonaRequestResponseItem = {
+  discriminator: 'usePersona'
+  persona: Persona
+}
+```
+
+```typescript
+type AuthLoginRequestResponseItem =
+  | AuthLoginWithoutChallengeResponseRequestItem
+  | AuthLoginWithChallengeRequestResponseItem
+```
+
+```typescript
+type AuthLoginWithoutChallengeRequestResponseItem = {
+  discriminator: 'loginWithoutChallenge'
+  persona: Persona
+}
+```
+
+```typescript
+type AuthLoginWithChallengeRequestResponseItem = {
+  discriminator: 'loginWithChallenge'
+  persona: Persona
+  challenge: Challenge
+  proof: Proof
+}
+```
+
+# 💸 Send transaction
 
 Your dApp can send transactions to the user's Radix Wallet for them to review, sign, and submit them to the Radix Network.
 
@@ -404,9 +611,9 @@ It is important to note that what your dApp sends to the Radix Wallet is actuall
 
 **NOTE:** Information will be provided soon on a ["comforming" transaction manifest stub format](https://docs-babylon.radixdlt.com/main/standards/comforming-transactions.html) that ensures clear presentation and handling in the Radix Wallet.
 
-### Build transaction manifest
+## Build transaction manifest
 
-This constructs the lines of a transaction manifest stub.
+This constructs the lines of a transaction manifest stub. An alternative manifest builder with additional features can be found in [TypeScript Radix Engine Toolkit](https://github.com/radixdlt/typescript-radix-engine-toolkit#building-manifests)
 
 ```typescript
 import {
@@ -446,9 +653,7 @@ const manifest = new ManifestBuilder()
   .toString()
 ```
 
-More examples can be found [here](./lib/__tests__/manifest-builder.spec.ts).
-
-### sendTransaction
+## sendTransaction
 
 This sends the transaction manifest stub to a user's Radix Wallet, where it will be completed, presented to the user for review, signed as required, and submitted to the Radix network to be processed.
 
@@ -466,21 +671,24 @@ type SendTransactionInput = {
 - **optional** blobs - used for deploying packages
 - **optional** message - message to be included in the transaction
 
+<details>
+
+<summary>sendTransaction example</summary>
+
 ```typescript
-const result = await walletSdk.sendTransaction({
-  transactionManifest: manifest,
+const result = await sdk.sendTransaction({
   version: 1,
+  transactionManifest: '...',
 })
 
 if (result.isErr()) {
   // code to handle the exception
 }
 
-// {
-//   transactionIntentHash: string
-// }
-const value = result.value
+const transactionIntentHash = result.value.transactionIntentHash
 ```
+
+</details>
 
 ## Errors
 
