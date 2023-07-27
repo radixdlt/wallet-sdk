@@ -613,45 +613,7 @@ It is important to note that what your dApp sends to the Radix Wallet is actuall
 
 ## Build transaction manifest
 
-This constructs the lines of a transaction manifest stub. An alternative manifest builder with additional features can be found in [TypeScript Radix Engine Toolkit](https://github.com/radixdlt/typescript-radix-engine-toolkit#building-manifests)
-
-```typescript
-import {
-  ManifestBuilder,
-  Decimal,
-  Address,
-  Bucket,
-  Expression,
-} from '@radixdlt/wallet-sdk'
-
-const manifest = new ManifestBuilder()
-  .callMethod(
-    'component_tdx_a_1qguw8y8g437nnkusxukllha7l7c0cy658g34jyucm7tqkjanvl',
-    'withdraw_by_amount',
-    [
-      Decimal('1'),
-      Address(
-        'resource_tdx_a_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqegh4k9'
-      ),
-    ]
-  )
-  .takeFromWorktop(
-    'resource_tdx_a_1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzqegh4k9',
-    'xrd_bucket'
-  )
-  .callMethod(
-    'component_tdx_a_1qfdcf5nvl9qkfv743p7dzj7zse5ex50p3cqnelg6puuqd4m540',
-    'buy_gumball',
-    [Bucket('xrd_bucket')]
-  )
-  .callMethod(
-    'component_tdx_a_1qguw8y8g437nnkusxukllha7l7c0cy658g34jyucm7tqkjanvl',
-    'deposit_batch',
-    [Expression('ENTIRE_WORKTOP')]
-  )
-  .build()
-  .toString()
-```
+We recommend using template strings for constructing simpler transaction manifests. If your dApp is sending complex manifests a manifest builder can be found in [TypeScript Radix Engine Toolkit](https://github.com/radixdlt/typescript-radix-engine-toolkit#building-manifests)
 
 ## sendTransaction
 
