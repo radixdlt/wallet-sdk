@@ -51,5 +51,6 @@ export const createMethods = (
   return {
     request,
     sendTransaction,
+    extensionStatus$: connectorExtensionClient.extensionStatus$,
   }
 }
