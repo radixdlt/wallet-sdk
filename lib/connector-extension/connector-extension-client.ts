@@ -3,6 +3,7 @@ import { AppLogger } from '../helpers/logger'
 import {
   CallbackFns,
   IncomingMessage,
+  MessageLifeCycleExtensionStatusEvent,
   WalletInteraction,
   WalletInteractionSuccessResponse,
   eventType,
@@ -18,7 +19,9 @@ import {
   map,
   merge,
   of,
+  race,
   share,
+  switchMap,
   takeUntil,
   tap,
   timer,
@@ -191,11 +194,44 @@ export const ConnectorExtensionClient = (
     )
   }
 
+  const extensionStatusEvent$ = subjects.messageLifeCycleEventSubject.pipe(
+    filter(
+      (event): event is MessageLifeCycleExtensionStatusEvent =>
+        event.eventType === 'extensionStatus'
+    )
+  )
+
   return {
     send: sendWalletInteraction,
     destroy: () => {
       subscription.unsubscribe()
       removeEventListener(eventType.incomingMessage, handleIncomingMessage)
     },
+    extensionStatus$: of(true).pipe(
+      tap(() => {
+        subjects.outgoingMessageSubject.next({
+          interactionId: crypto.randomUUID(),
+          discriminator: 'extensionStatus',
+        })
+      }),
+      switchMap(() =>
+        race(
+          extensionStatusEvent$,
+          merge(
+            extensionStatusEvent$,
+            timer(config.extensionDetectionTime).pipe(
+              map(
+                () =>
+                  ({
+                    eventType: 'extensionStatus',
+                    isWalletLinked: false,
+                    isExtensionAvailable: false,
+                  } as MessageLifeCycleExtensionStatusEvent)
+              )
+            )
+          )
+        )
+      )
+    ),
   }
 }
