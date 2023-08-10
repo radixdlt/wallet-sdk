@@ -207,6 +207,13 @@ export const ConnectorExtensionClient = (
       subscription.unsubscribe()
       removeEventListener(eventType.incomingMessage, handleIncomingMessage)
     },
+    openPopup: () => {
+      window.dispatchEvent(
+        new CustomEvent(eventType.outgoingMessage, {
+          detail: { discriminator: 'openPopup' },
+        })
+      )
+    },
     extensionStatus$: of(true).pipe(
       tap(() => {
         subjects.outgoingMessageSubject.next({

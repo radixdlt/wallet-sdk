@@ -9,6 +9,10 @@ const sdk = WalletSdk({
   networkId: 12,
 })
 
+document.getElementById('open-popup-btn')!.onclick = async () => {
+  sdk.openPopup()
+}
+
 const displayResults = (result: Result<any, any>) => {
   document.getElementById('results')!.innerHTML = `<pre>${JSON.stringify(
     result.isErr() ? result.error : result.value,

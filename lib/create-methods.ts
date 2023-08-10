@@ -52,5 +52,6 @@ export const createMethods = (
     request,
     sendTransaction,
     extensionStatus$: connectorExtensionClient.extensionStatus$,
+    openPopup: connectorExtensionClient.openPopup,
   }
 }
