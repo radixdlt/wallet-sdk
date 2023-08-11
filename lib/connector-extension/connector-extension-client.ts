@@ -107,7 +107,6 @@ export const ConnectorExtensionClient = (
       map((message) => {
         const error = createSdkError('canceledByUser', message.interactionId)
         logger?.debug(`🔵⬆️❌ walletRequestCanceled`, error)
-        cancelRequestSubject.next(err(error))
         return message
       })
     )
@@ -117,6 +116,12 @@ export const ConnectorExtensionClient = (
         interactionId: walletInteraction.interactionId,
         items: { discriminator: 'cancelRequest' },
         metadata: walletInteraction.metadata,
+      })
+
+      setTimeout(() => {
+        cancelRequestSubject.next(
+          err(createSdkError('canceledByUser', walletInteraction.interactionId))
+        )
       })
 
       return ResultAsync.fromSafePromise(

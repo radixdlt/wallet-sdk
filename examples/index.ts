@@ -4,9 +4,9 @@ import { createLogger } from '../lib/helpers/logger'
 
 const sdk = WalletSdk({
   dAppDefinitionAddress:
-    'account_tdx_a_1qd5svul20u30qnq408zhj2tw5evqrunq48eg0jsjf9qsx5t8qu',
+    'account_tdx_d_12y9wptk69gxnfqrm4gepcu4apuscc8z4v5pvurfr3tcmtjl29a2wjn',
   logger: createLogger(1),
-  networkId: 12,
+  networkId: 13,
 })
 
 document.getElementById('open-popup-btn')!.onclick = async () => {
