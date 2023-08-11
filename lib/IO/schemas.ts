@@ -45,7 +45,7 @@ export const PersonaDataName = object({
 export type NumberOfValues = z.infer<typeof NumberOfValues>
 export const NumberOfValues = object({
   quantifier: union([literal('exactly'), literal('atLeast')]),
-  quantity: number().gte(1),
+  quantity: number().gte(0),
 })
 
 export type AccountsRequestItem = z.infer<typeof AccountsRequestItem>
@@ -318,16 +318,35 @@ export const WalletInteractionResponse = union([
   WalletInteractionFailureResponse,
 ])
 
+export const ExtensionInteraction = object({
+  interactionId: string(),
+  discriminator: literal('extensionStatus'),
+})
+
+export type ExtensionInteraction = z.infer<typeof ExtensionInteraction>
+
 export const messageLifeCycleEventType = {
+  extensionStatus: 'extensionStatus',
   receivedByExtension: 'receivedByExtension',
   receivedByWallet: 'receivedByWallet',
   requestCancelSuccess: 'requestCancelSuccess',
   requestCancelFail: 'requestCancelFail',
 } as const
 
-export type MessageLifeCycleEvent = z.infer<typeof MessageLifeCycleEvent>
+export const MessageLifeCycleExtensionStatusEvent = object({
+  eventType: literal(messageLifeCycleEventType.extensionStatus),
+  interactionId: string(),
+  isWalletLinked: boolean(),
+  isExtensionAvailable: boolean(),
+})
+
+export type MessageLifeCycleExtensionStatusEvent = z.infer<
+  typeof MessageLifeCycleExtensionStatusEvent
+>
+
 export const MessageLifeCycleEvent = object({
   eventType: union([
+    literal(messageLifeCycleEventType.extensionStatus),
     literal(messageLifeCycleEventType.receivedByExtension),
     literal(messageLifeCycleEventType.receivedByWallet),
     literal(messageLifeCycleEventType.requestCancelSuccess),
@@ -335,6 +354,8 @@ export const MessageLifeCycleEvent = object({
   ]),
   interactionId: string(),
 })
+
+export type MessageLifeCycleEvent = z.infer<typeof MessageLifeCycleEvent>
 
 export type IncomingMessage = z.infer<typeof IncomingMessage>
 const IncomingMessage = union([

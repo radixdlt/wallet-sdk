@@ -3,6 +3,7 @@ import { AppLogger } from '../helpers/logger'
 import {
   CallbackFns,
   IncomingMessage,
+  MessageLifeCycleExtensionStatusEvent,
   WalletInteraction,
   WalletInteractionSuccessResponse,
   eventType,
@@ -18,7 +19,9 @@ import {
   map,
   merge,
   of,
+  race,
   share,
+  switchMap,
   takeUntil,
   tap,
   timer,
@@ -104,7 +107,6 @@ export const ConnectorExtensionClient = (
       map((message) => {
         const error = createSdkError('canceledByUser', message.interactionId)
         logger?.debug(`🔵⬆️❌ walletRequestCanceled`, error)
-        cancelRequestSubject.next(err(error))
         return message
       })
     )
@@ -114,6 +116,12 @@ export const ConnectorExtensionClient = (
         interactionId: walletInteraction.interactionId,
         items: { discriminator: 'cancelRequest' },
         metadata: walletInteraction.metadata,
+      })
+
+      setTimeout(() => {
+        cancelRequestSubject.next(
+          err(createSdkError('canceledByUser', walletInteraction.interactionId))
+        )
       })
 
       return ResultAsync.fromSafePromise(
@@ -191,11 +199,51 @@ export const ConnectorExtensionClient = (
     )
   }
 
+  const extensionStatusEvent$ = subjects.messageLifeCycleEventSubject.pipe(
+    filter(
+      (event): event is MessageLifeCycleExtensionStatusEvent =>
+        event.eventType === 'extensionStatus'
+    )
+  )
+
   return {
     send: sendWalletInteraction,
     destroy: () => {
       subscription.unsubscribe()
       removeEventListener(eventType.incomingMessage, handleIncomingMessage)
     },
+    openPopup: () => {
+      window.dispatchEvent(
+        new CustomEvent(eventType.outgoingMessage, {
+          detail: { discriminator: 'openPopup' },
+        })
+      )
+    },
+    extensionStatus$: of(true).pipe(
+      tap(() => {
+        subjects.outgoingMessageSubject.next({
+          interactionId: crypto.randomUUID(),
+          discriminator: 'extensionStatus',
+        })
+      }),
+      switchMap(() =>
+        race(
+          extensionStatusEvent$,
+          merge(
+            extensionStatusEvent$,
+            timer(config.extensionDetectionTime).pipe(
+              map(
+                () =>
+                  ({
+                    eventType: 'extensionStatus',
+                    isWalletLinked: false,
+                    isExtensionAvailable: false,
+                  } as MessageLifeCycleExtensionStatusEvent)
+              )
+            )
+          )
+        )
+      )
+    ),
   }
 }
