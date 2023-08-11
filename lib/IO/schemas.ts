@@ -45,7 +45,7 @@ export const PersonaDataName = object({
 export type NumberOfValues = z.infer<typeof NumberOfValues>
 export const NumberOfValues = object({
   quantifier: union([literal('exactly'), literal('atLeast')]),
-  quantity: number().gte(1),
+  quantity: number().gte(0),
 })
 
 export type AccountsRequestItem = z.infer<typeof AccountsRequestItem>
