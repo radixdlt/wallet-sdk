@@ -25,12 +25,17 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/wallet-sdk.umd.js",
-  "module": "./dist/wallet-sdk.mjs",
+  "main": "./dist/wallet-sdk.mjs",
   "exports": {
     ".": {
-      "import": "./dist/wallet-sdk.mjs",
-      "require": "./dist/wallet-sdk.umd.js"
+      "import": {
+        "types": "./dist/wallet-sdk.d.ts",
+        "default": "./dist/wallet-sdk.mjs"
+      },
+      "require": {
+        "types": "./dist/wallet-sdk.d.ts",
+        "default": "./dist/wallet-sdk.umd.js"
+      }
     }
   },
   "types": "./dist/wallet-sdk.d.ts",
