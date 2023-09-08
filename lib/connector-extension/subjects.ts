@@ -5,7 +5,7 @@ import {
   MessageLifeCycleExtensionStatusEvent,
   WalletInteraction,
   WalletInteractionResponse,
-} from '../IO/schemas'
+} from '@radixdlt/radix-connect-schemas'
 
 export type Subjects = ReturnType<typeof Subjects>
 

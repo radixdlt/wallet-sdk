@@ -4,7 +4,7 @@ import { subscribeSpyTo } from '@hirez_io/observer-spy'
 import { createLogger } from '../helpers/logger'
 import { ConnectorExtensionClient } from '../connector-extension/connector-extension-client'
 import { Subjects } from '../connector-extension/subjects'
-import { WalletInteractionSuccessResponse } from '../IO'
+import { WalletInteractionSuccessResponse } from '@radixdlt/radix-connect-schemas'
 
 const delay = (millis: number) =>
   new Promise<void>((resolve) => {
@@ -193,6 +193,7 @@ describe('sdk flow', () => {
         },
       })
 
+      // @ts-ignore
       expect(outgoingMessageSpy.getFirstValue().metadata).toEqual({
         dAppDefinitionAddress: 'radixDashboard',
         networkId: 12,
@@ -281,6 +282,7 @@ describe('sdk flow', () => {
         'account_tdx_b_1qlu8fdyj77jpmu2mqe4rgh3738jcva4nfd2y2vp675zqgdg72y'
       )
 
+      // @ts-ignore
       expect(outgoingMessageSpy.getFirstValue().metadata).toEqual({
         dAppDefinitionAddress: 'radixDashboard',
         networkId: 12,
@@ -361,6 +363,7 @@ describe('sdk flow', () => {
       setTimeout(() => {
         const outgoingMessage = outgoingMessageSpy.getFirstValue()
 
+        // @ts-ignore
         expect(outgoingMessage.metadata.networkId).toBe(12)
 
         subjects.incomingMessageSubject.next({
