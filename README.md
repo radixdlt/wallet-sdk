@@ -27,6 +27,7 @@ You may wish to consider using this with [dApp toolkit](https://github.com/radix
   - [Build transaction manifest](#build-transaction-manifest)
   - [sendTransaction](#sendtransaction)
   - [Errors](#errors)
+- [License](#license)
 
 # Installation
 
@@ -670,3 +671,7 @@ const transactionIntentHash = result.value.transactionIntentHash
 | submittedTransactionWasDuplicate                 | App submitted a transaction and got informed by Gateway it was duplicated                                                                                          | "TXID: <TXID_STRING>"                                                                                                                       |
 | submittedTransactionHasFailedTransactionStatus   | App submitted a transaction to Gateway and polled transaction status telling app it was a failed transaction                                                       | "TXID: <TXID_STRING>"                                                                                                                       |
 | submittedTransactionHasRejectedTransactionStatus | App submitted a transaction to Gateway and polled transaction status telling app it was a rejected transaction                                                     | "TXID: <TXID_STRING>"                                                                                                                       |
+
+# License
+
+The Wallet SDK code is released under [Apache 2.0 license](LICENSE). Binaries are licensed under the [Radix Software EULA](http://www.radixdlt.com/terms/genericEULA)
