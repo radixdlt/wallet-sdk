@@ -18,11 +18,12 @@
     "Dawid Sowa <dawid.sowa@rdx.works>"
   ],
   "bugs": "https://github.com/radixdlt/wallet-sdk/issues",
-  "license": "Apache-2.0",
+  "license": "SEE LICENSE IN RADIX-SOFTWARE-EULA",
   "engines": {
     "node": ">=14.0.0"
   },
   "files": [
+    "RADIX-SOFTWARE-EULA",
     "dist"
   ],
   "main": "./dist/wallet-sdk.mjs",
