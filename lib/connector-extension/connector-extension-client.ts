@@ -213,32 +213,33 @@ export const ConnectorExtensionClient = (
       removeEventListener(eventType.incomingMessage, handleIncomingMessage)
     },
     openPopup: () => {
-      window.dispatchEvent(
-        new CustomEvent(eventType.outgoingMessage, {
-          detail: { discriminator: 'openPopup' },
-        })
-      )
+      subjects.outgoingMessageSubject.next({
+        interactionId: crypto.randomUUID(),
+        discriminator: 'openPopup',
+      })
     },
     extensionStatus$: of(true).pipe(
-      tap(() => {
+      map(() => {
+        const interactionId = crypto.randomUUID()
         subjects.outgoingMessageSubject.next({
-          interactionId: crypto.randomUUID(),
+          interactionId,
           discriminator: 'extensionStatus',
         })
+        return interactionId
       }),
-      switchMap(() =>
+      switchMap((interactionId) =>
         race(
           extensionStatusEvent$,
           merge(
             extensionStatusEvent$,
             timer(config.extensionDetectionTime).pipe(
               map(
-                () =>
-                  ({
-                    eventType: 'extensionStatus',
-                    isWalletLinked: false,
-                    isExtensionAvailable: false,
-                  } as MessageLifeCycleExtensionStatusEvent)
+                (): MessageLifeCycleExtensionStatusEvent => ({
+                  interactionId,
+                  eventType: 'extensionStatus',
+                  isWalletLinked: false,
+                  isExtensionAvailable: false,
+                })
               )
             )
           )
