@@ -7,7 +7,7 @@ import {
   WalletInteraction,
   WalletInteractionSuccessResponse,
   eventType,
-} from '../IO/schemas'
+} from '@radixdlt/radix-connect-schemas'
 import { Err, Result, ResultAsync, err, ok } from 'neverthrow'
 import { SdkError, createSdkError } from '../wallet-sdk'
 import {

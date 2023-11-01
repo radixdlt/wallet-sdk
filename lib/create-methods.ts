@@ -6,7 +6,7 @@ import {
   WalletRequestItems,
   WalletRequestResponseItems,
   WalletTransactionResponseItems,
-} from './IO'
+} from '@radixdlt/radix-connect-schemas'
 import { ConnectorExtensionClient } from './connector-extension/connector-extension-client'
 import { validateWalletResponse } from './helpers/validate-wallet-response'
 import { walletInteractionFactory } from './IO/wallet-interaction-factory'

@@ -1,7 +1,7 @@
 import { createMethods } from './create-methods'
 import { AppLogger } from './helpers/logger'
-import { Metadata } from './IO'
 import { ConnectorExtensionClient } from './connector-extension/connector-extension-client'
+import { Metadata } from '@radixdlt/radix-connect-schemas'
 
 export type WalletSdkInput = Omit<Metadata, 'version'> &
   Partial<{
@@ -48,3 +48,4 @@ export const WalletSdk = (input: WalletSdkInput) => {
 export * from './IO'
 export * from './helpers/error'
 export * from './helpers/logger'
+export * from '@radixdlt/radix-connect-schemas'

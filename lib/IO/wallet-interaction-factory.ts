@@ -2,7 +2,11 @@ import { ResultAsync } from 'neverthrow'
 import { AppLogger } from '../helpers/logger'
 import { SdkError, createSdkError, errorType } from '../wallet-sdk'
 import { parseAsync } from '../helpers/parse-async'
-import { Metadata, WalletInteraction, WalletInteractionItems } from './schemas'
+import {
+  Metadata,
+  WalletInteraction,
+  WalletInteractionItems,
+} from '@radixdlt/radix-connect-schemas'
 
 export const walletInteractionFactory =
   (logger?: AppLogger) =>
