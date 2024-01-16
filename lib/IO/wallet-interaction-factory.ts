@@ -13,12 +13,16 @@ export const walletInteractionFactory =
   (
     metadata: Metadata,
     items: WalletInteractionItems,
-    interactionId = crypto.randomUUID()
+    interactionId = crypto.randomUUID(),
+    arbitraryData: any = {}
+    // arbitraryData: WalletInteractionArbitraryData = {}
+    // eslint-disable-next-line max-params
   ): ResultAsync<WalletInteraction, SdkError> => {
     const walletInteraction = {
       items,
       interactionId,
       metadata,
+      arbitraryData,
     }
     return parseAsync(WalletInteraction, walletInteraction).mapErr((issues) => {
       logger?.error(`🔵⬆️❌ invalidWalletInteraction`, issues)

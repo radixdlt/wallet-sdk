@@ -22,9 +22,11 @@ export const createMethods = (
 
   const request = (
     items: WalletRequestItems,
-    callbackFns: Partial<CallbackFns> = {}
+    callbackFns: Partial<CallbackFns> = {},
+    arbitraryData: any = {}
+    // TODO: arbitraryData: WalletInteractionArbitraryData = {}
   ) =>
-    createWalletInteraction(input, items)
+    createWalletInteraction(input, items, undefined, arbitraryData)
       .andThen((walletInteraction) =>
         connectorExtensionClient.send(walletInteraction, callbackFns)
       )
@@ -33,12 +35,19 @@ export const createMethods = (
 
   const sendTransaction = (
     items: SendTransactionItem,
-    callbackFns: Partial<CallbackFns> = {}
+    callbackFns: Partial<CallbackFns> = {},
+    arbitraryData: any = {}
+    // TODO: arbitraryData: WalletInteractionArbitraryData = {}
   ) =>
-    createWalletInteraction(input, {
-      discriminator: 'transaction',
-      send: items,
-    })
+    createWalletInteraction(
+      input,
+      {
+        discriminator: 'transaction',
+        send: items,
+      },
+      undefined,
+      arbitraryData
+    )
       .andThen((walletInteraction) =>
         connectorExtensionClient.send(walletInteraction, callbackFns)
       )
