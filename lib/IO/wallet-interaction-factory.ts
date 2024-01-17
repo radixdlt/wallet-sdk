@@ -5,6 +5,7 @@ import { parseAsync } from '../helpers/parse-async'
 import {
   Metadata,
   WalletInteraction,
+  WalletInteractionArbitraryData,
   WalletInteractionItems,
 } from '@radixdlt/radix-connect-schemas'
 
@@ -13,13 +14,17 @@ export const walletInteractionFactory =
   (
     metadata: Metadata,
     items: WalletInteractionItems,
-    interactionId = crypto.randomUUID()
+    interactionId = crypto.randomUUID(),
+    arbitraryData: WalletInteractionArbitraryData = {}
+    // eslint-disable-next-line max-params
   ): ResultAsync<WalletInteraction, SdkError> => {
     const walletInteraction = {
       items,
+      discriminator: 'walletInteraction',
       interactionId,
       metadata,
-    }
+      arbitraryData,
+    } satisfies WalletInteraction
     return parseAsync(WalletInteraction, walletInteraction).mapErr((issues) => {
       logger?.error(`🔵⬆️❌ invalidWalletInteraction`, issues)
       return createSdkError(

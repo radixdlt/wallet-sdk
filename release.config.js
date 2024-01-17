@@ -1,3 +1,4 @@
+/* eslint-disable no-template-curly-in-string */
 module.exports = {
   branches: [
     'main',
@@ -11,6 +12,11 @@ module.exports = {
       name: 'api-v2',
       channel: 'pre-alpha',
       prerelease: 'pre-alpha',
+    },
+    {
+      name: 'release/([a-z0-9-.]+)',
+      channel: '${name.replace(/^release\\//g, "")}',
+      prerelease: '${name.replace(/^release\\//g, "")}',
     },
   ],
   plugins: [

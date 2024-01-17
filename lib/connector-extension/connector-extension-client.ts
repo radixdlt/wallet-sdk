@@ -114,6 +114,7 @@ export const ConnectorExtensionClient = (
     const sendCancelRequest = () => {
       subjects.outgoingMessageSubject.next({
         interactionId: walletInteraction.interactionId,
+        discriminator: 'walletInteraction',
         items: { discriminator: 'cancelRequest' },
         metadata: walletInteraction.metadata,
       })
