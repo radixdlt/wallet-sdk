@@ -219,6 +219,13 @@ export const ConnectorExtensionClient = (
         discriminator: 'openPopup',
       })
     },
+    removeSessionId: (sessionId: string) => {
+      subjects.outgoingMessageSubject.next({
+        interactionId: crypto.randomUUID(),
+        discriminator: 'removeSessionId',
+        sessionId,
+      })
+    },
     extensionStatus$: of(true).pipe(
       map(() => {
         const interactionId = crypto.randomUUID()
