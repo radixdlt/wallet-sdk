@@ -114,6 +114,7 @@ export const ConnectorExtensionClient = (
     const sendCancelRequest = () => {
       subjects.outgoingMessageSubject.next({
         interactionId: walletInteraction.interactionId,
+        discriminator: 'walletInteraction',
         items: { discriminator: 'cancelRequest' },
         metadata: walletInteraction.metadata,
       })
@@ -216,6 +217,13 @@ export const ConnectorExtensionClient = (
       subjects.outgoingMessageSubject.next({
         interactionId: crypto.randomUUID(),
         discriminator: 'openPopup',
+      })
+    },
+    removeSessionId: (sessionId: string) => {
+      subjects.outgoingMessageSubject.next({
+        interactionId: crypto.randomUUID(),
+        discriminator: 'removeSessionId',
+        sessionId,
       })
     },
     extensionStatus$: of(true).pipe(

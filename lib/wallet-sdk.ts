@@ -38,6 +38,7 @@ export const WalletSdk = (input: WalletSdkInput) => {
       },
       messageClient
     ),
+    removeSessionId: messageClient.removeSessionId,
     destroy: () => {
       logger?.debug(`🔵🧹 walletSdkInstantiatedDestroyed`)
       messageClient.destroy()
