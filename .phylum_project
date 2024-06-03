@@ -1,0 +1,7 @@
+id: 69591930-06f5-47f2-8a83-52b3c6d05a8e
+name: wallet-sdk
+created_at: 2024-06-03T08:05:29.399875+02:00
+group_name: Wallet
+depfiles:
+- path: ./package-lock.json
+  type: npm
