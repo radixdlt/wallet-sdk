@@ -1,3 +1,9 @@
+## This repository is archived
+
+Please check [Radix dApp Toolkit](https://github.com/radixdlt/radix-dapp-toolkit) repository for most up to date code
+
+---
+
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 This is a TypeScript developer SDK that facilitates communication with the Radix Wallet for two purposes: **requesting various forms of data from the wallet** and **sending transactions to the wallet**.
